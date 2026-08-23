@@ -35,6 +35,8 @@ lines-between-types = 1
 "tests/**/*.py" = [
 
     "S101",    # asserts allowed in tests
+    "S105",    # hardcoded password: test fixture token/secret strings only
+    "S106",    # hardcoded password passed to function: test fixture tokens only
     "ARG",     # unused function args (pytest fixtures)
     "FBT",     # booleans as positional arguments (@pytest.mark.parametrize)
     "PLR2004", # magic value used in comparison
