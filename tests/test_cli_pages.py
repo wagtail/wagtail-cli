@@ -171,6 +171,7 @@ def test_pages_delete_without_yes_exit_2_non_tty(monkeypatch):
     assert "--yes" in result.stderr or "--yes" in result.output
 
 
+@respx.mock
 def test_pages_update_without_yes_exit_2_non_tty_no_http(monkeypatch):
     _env(monkeypatch)
     monkeypatch.setattr("wgtl_api_cli.cli.pages._is_tty", lambda: False)
