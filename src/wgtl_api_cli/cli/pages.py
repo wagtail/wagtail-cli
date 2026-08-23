@@ -113,6 +113,8 @@ def find_page(
     site: str | None = typer.Option(None, "--site", help="Find within a site."),
 ) -> None:
     """Locate a page by ID or URL path, returning its API location."""
+    if id is None and path is None:
+        raise UsageError("Provide one of --id or --path to find a page.")
     client = get_client(ctx)
     result = pages_resources.find_page(client, id=id, html_path=path, site=site)
     emit(ctx, result)
@@ -122,7 +124,7 @@ def find_page(
 @appify
 def get_page(
     ctx: typer.Context,
-    page_id: str = typer.Argument(help="Page ID."),
+    page_id: int = typer.Argument(help="Page ID."),
     version: str | None = typer.Option(
         None, "--version", help="'draft' (default) or 'live'."
     ),
@@ -132,7 +134,7 @@ def get_page(
     client = get_client(ctx)
     rich_text_format = "html" if html else None
     result = pages_resources.get_page(
-        client, int(page_id), version=version, rich_text_format=rich_text_format
+        client, page_id, version=version, rich_text_format=rich_text_format
     )
     emit(ctx, result)
 
@@ -169,7 +171,7 @@ def create_page(
 @appify
 def update_page(
     ctx: typer.Context,
-    page_id: str = typer.Argument(help="Page ID."),
+    page_id: int = typer.Argument(help="Page ID."),
     title: str | None = typer.Option(None, "--title", help="New page title."),
     slug: str | None = typer.Option(None, "--slug", help="New URL slug."),
     field: list[str] | None = typer.Option(  # noqa: B008
@@ -188,9 +190,9 @@ def update_page(
         fields=parsing.parse_fields(field or []),
         for_create=False,
     )
-    result = pages_resources.update_page(client, int(page_id), payload)
+    result = pages_resources.update_page(client, page_id, payload)
     if publish:
-        result = pages_resources.publish_page(client, int(page_id))
+        result = pages_resources.publish_page(client, page_id)
     emit(ctx, result)
 
 
@@ -198,14 +200,14 @@ def update_page(
 @appify
 def delete_page(
     ctx: typer.Context,
-    page_id: str = typer.Argument(help="Page ID."),
+    page_id: int = typer.Argument(help="Page ID."),
     yes: bool = typer.Option(False, "--yes", help="Skip confirmation."),
 ) -> None:
     """Delete a page (confirmation required unless --yes)."""
     if not _require_yes(ctx, yes, f"delete page {page_id}"):
         return
     client = get_client(ctx)
-    result = pages_resources.delete_page(client, int(page_id))
+    result = pages_resources.delete_page(client, page_id)
     emit(ctx, result)
 
 
@@ -213,29 +215,29 @@ def delete_page(
 @appify
 def publish(
     ctx: typer.Context,
-    page_id: str = typer.Argument(help="Page ID."),
+    page_id: int = typer.Argument(help="Page ID."),
 ) -> None:
     """Publish a page's latest revision."""
     client = get_client(ctx)
-    emit(ctx, pages_resources.publish_page(client, int(page_id)))
+    emit(ctx, pages_resources.publish_page(client, page_id))
 
 
 @pages_app.command("unpublish")
 @appify
 def unpublish(
     ctx: typer.Context,
-    page_id: str = typer.Argument(help="Page ID."),
+    page_id: int = typer.Argument(help="Page ID."),
 ) -> None:
     """Unpublish a page, moving it back to draft."""
     client = get_client(ctx)
-    emit(ctx, pages_resources.unpublish_page(client, int(page_id)))
+    emit(ctx, pages_resources.unpublish_page(client, page_id))
 
 
 @pages_app.command("copy")
 @appify
 def copy(
     ctx: typer.Context,
-    page_id: str = typer.Argument(help="Page ID to copy."),
+    page_id: int = typer.Argument(help="Page ID to copy."),
     destination: str = typer.Option(
         ..., "--destination", help="Destination parent REF."
     ),
@@ -257,7 +259,7 @@ def copy(
     destination_id = _resolve_ref(ctx, destination)
     result = pages_resources.copy_page(
         client,
-        int(page_id),
+        page_id,
         destination_id=destination_id,
         slug=slug,
         title=title,
@@ -271,7 +273,7 @@ def copy(
 @appify
 def move(
     ctx: typer.Context,
-    page_id: str = typer.Argument(help="Page ID to move."),
+    page_id: int = typer.Argument(help="Page ID to move."),
     destination: str = typer.Option(
         ..., "--destination", help="Destination parent REF."
     ),
@@ -281,7 +283,7 @@ def move(
     destination_id = _resolve_ref(ctx, destination)
     emit(
         ctx,
-        pages_resources.move_page(client, int(page_id), destination_id=destination_id),
+        pages_resources.move_page(client, page_id, destination_id=destination_id),
     )
 
 
@@ -289,14 +291,14 @@ def move(
 @appify
 def revert(
     ctx: typer.Context,
-    page_id: str = typer.Argument(help="Page ID."),
-    revision: str = typer.Option(..., "--revision", help="Revision ID."),
+    page_id: int = typer.Argument(help="Page ID."),
+    revision: int = typer.Option(..., "--revision", help="Revision ID."),
 ) -> None:
     """Revert a page to a previous revision."""
     client = get_client(ctx)
     emit(
         ctx,
-        pages_resources.revert_page(client, int(page_id), revision_id=int(revision)),
+        pages_resources.revert_page(client, page_id, revision_id=revision),
     )
 
 
@@ -304,7 +306,7 @@ def revert(
 @appify
 def create_alias(
     ctx: typer.Context,
-    page_id: str = typer.Argument(help="Page ID to alias."),
+    page_id: int = typer.Argument(help="Page ID to alias."),
     destination: str = typer.Option(
         ..., "--destination", help="Destination parent REF."
     ),
@@ -314,9 +316,7 @@ def create_alias(
     destination_id = _resolve_ref(ctx, destination)
     emit(
         ctx,
-        pages_resources.create_alias(
-            client, int(page_id), destination_id=destination_id
-        ),
+        pages_resources.create_alias(client, page_id, destination_id=destination_id),
     )
 
 
@@ -324,23 +324,23 @@ def create_alias(
 @appify
 def convert_alias(
     ctx: typer.Context,
-    page_id: str = typer.Argument(help="Alias page ID."),
+    page_id: int = typer.Argument(help="Alias page ID."),
 ) -> None:
     """Convert an alias into an ordinary page."""
     client = get_client(ctx)
-    emit(ctx, pages_resources.convert_alias(client, int(page_id)))
+    emit(ctx, pages_resources.convert_alias(client, page_id))
 
 
 @pages_app.command("copy-for-translation")
 @appify
 def copy_for_translation(
     ctx: typer.Context,
-    page_id: str = typer.Argument(help="Page ID."),
+    page_id: int = typer.Argument(help="Page ID."),
     locale: str = typer.Option(..., "--locale", help="Target locale code."),
 ) -> None:
     """Copy a page for translation into a locale."""
     client = get_client(ctx)
-    emit(ctx, pages_resources.copy_for_translation(client, int(page_id), locale=locale))
+    emit(ctx, pages_resources.copy_for_translation(client, page_id, locale=locale))
 
 
 revisions_app = typer.Typer(
@@ -352,7 +352,7 @@ revisions_app = typer.Typer(
 @appify
 def revisions_list(
     ctx: typer.Context,
-    page_id: str = typer.Argument(help="Page ID."),
+    page_id: int = typer.Argument(help="Page ID."),
     limit: int | None = typer.Option(None, "--limit", help="Max items."),
     offset: int | None = typer.Option(None, "--offset", help="Pagination offset."),
 ) -> None:
@@ -360,9 +360,7 @@ def revisions_list(
     client = get_client(ctx)
     emit(
         ctx,
-        pages_resources.list_revisions(
-            client, int(page_id), limit=limit, offset=offset
-        ),
+        pages_resources.list_revisions(client, page_id, limit=limit, offset=offset),
     )
 
 
@@ -370,12 +368,12 @@ def revisions_list(
 @appify
 def revisions_get(
     ctx: typer.Context,
-    page_id: str = typer.Argument(help="Page ID."),
-    revision_id: str = typer.Argument(help="Revision ID."),
+    page_id: int = typer.Argument(help="Page ID."),
+    revision_id: int = typer.Argument(help="Revision ID."),
 ) -> None:
     """Fetch a single revision of a page."""
     client = get_client(ctx)
-    emit(ctx, pages_resources.get_revision(client, int(page_id), int(revision_id)))
+    emit(ctx, pages_resources.get_revision(client, page_id, revision_id))
 
 
 pages_app.add_typer(revisions_app, name="revisions")

@@ -171,6 +171,30 @@ def test_pages_delete_without_yes_exit_2_non_tty(monkeypatch):
     assert "--yes" in result.stderr or "--yes" in result.output
 
 
+def test_pages_update_without_yes_exit_2_non_tty_no_http(monkeypatch):
+    _env(monkeypatch)
+    monkeypatch.setattr("wgtl_api_cli.cli.pages._is_tty", lambda: False)
+    result = runner.invoke(app, ["pages", "update", "5", "--title", "New"])
+    assert result.exit_code == 2
+    assert "--yes" in result.stderr or "--yes" in result.output
+    assert len(respx.calls) == 0
+
+
+@respx.mock
+def test_pages_non_numeric_id_clean_exit_2():
+    result = runner.invoke(app, ["pages", "get", "abc"])
+    assert result.exit_code == 2
+    assert "Traceback" not in result.output
+    assert "Traceback" not in result.stderr
+
+
+@respx.mock
+def test_pages_find_requires_id_or_path():
+    result = runner.invoke(app, ["pages", "find"])
+    assert result.exit_code == 2
+    assert "--id" in result.output or "--id" in result.stderr
+
+
 @respx.mock
 def test_pages_publish_unpublish(monkeypatch):
     _env(monkeypatch)
