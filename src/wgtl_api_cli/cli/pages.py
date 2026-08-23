@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import sys
-
 from typing import Any
 
 import typer
@@ -10,6 +8,8 @@ from wgtl_api_cli import parsing
 from wgtl_api_cli.errors import UsageError
 from wgtl_api_cli.resources import pages as pages_resources
 
+from ._shared import is_tty as _is_tty  # noqa: F401
+from ._shared import require_yes as _require_yes
 from .main import app, appify, emit, get_client
 
 
@@ -18,11 +18,6 @@ pages_app = typer.Typer(
     help="Read, create, and manage pages (including actions and revisions).",
     no_args_is_help=True,
 )
-
-
-def _is_tty() -> bool:
-    """Whether stdin is interactive (used before prompting for confirmation)."""
-    return sys.stdin.isatty()
 
 
 def _resolve_ref(ctx: typer.Context, raw: str) -> Any:
@@ -36,21 +31,6 @@ def _resolve_ref(ctx: typer.Context, raw: str) -> Any:
     if ctx.obj.dry_run:
         return raw
     return parsing.resolve_page_ref(get_client(ctx), raw)
-
-
-def _require_yes(ctx: typer.Context, yes: bool, what: str) -> bool:
-    """Return True if the operation should proceed.
-
-    With --yes always proceed; on a TTY prompt for confirmation; on a
-    non-TTY refuse with a usage error (scripts must pass --yes).
-    """
-    if yes:
-        return True
-    if not _is_tty():
-        raise UsageError(
-            f"Refusing to {what} on a non-interactive terminal; pass --yes."
-        )
-    return typer.confirm(f"{what.capitalize()}? Are you sure?")
 
 
 @pages_app.command("list")

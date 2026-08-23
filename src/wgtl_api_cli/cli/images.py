@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import sys
-
 from pathlib import Path
 
 import typer
@@ -10,6 +8,8 @@ from wgtl_api_cli import parsing
 from wgtl_api_cli.errors import UsageError
 from wgtl_api_cli.resources import images as images_resources
 
+from ._shared import is_tty as _is_tty  # noqa: F401
+from ._shared import require_yes as _require_yes
 from .main import app, appify, emit, get_client
 
 
@@ -18,20 +18,6 @@ images_app = typer.Typer(
     help="List, view, upload, and manage images.",
     no_args_is_help=True,
 )
-
-
-def _is_tty() -> bool:
-    return sys.stdin.isatty()
-
-
-def _require_yes(ctx: typer.Context, yes: bool, what: str) -> bool:
-    if yes:
-        return True
-    if not _is_tty():
-        raise UsageError(
-            f"Refusing to {what} on a non-interactive terminal; pass --yes."
-        )
-    return typer.confirm(f"{what.capitalize()}? Are you sure?")
 
 
 @images_app.command("list")

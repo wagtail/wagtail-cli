@@ -1,13 +1,11 @@
 from __future__ import annotations
 
-import sys
-
 import typer
 
 from wgtl_api_cli import parsing
-from wgtl_api_cli.errors import UsageError
 from wgtl_api_cli.resources import snippets as snippets_resources
 
+from ._shared import require_yes as _require_yes
 from .main import app, appify, emit, get_client
 
 
@@ -17,26 +15,6 @@ snippets_app = typer.Typer(
     "revisions).",
     no_args_is_help=True,
 )
-
-
-def _is_tty() -> bool:
-    """Whether stdin is interactive (used before prompting for confirmation)."""
-    return sys.stdin.isatty()
-
-
-def _require_yes(ctx: typer.Context, yes: bool, what: str) -> bool:
-    """Return True if the operation should proceed.
-
-    With --yes always proceed; on a TTY prompt for confirmation; on a
-    non-TTY refuse with a usage error (scripts must pass --yes).
-    """
-    if yes:
-        return True
-    if not _is_tty():
-        raise UsageError(
-            f"Refusing to {what} on a non-interactive terminal; pass --yes."
-        )
-    return typer.confirm(f"{what.capitalize()}? Are you sure?")
 
 
 @snippets_app.command("list")

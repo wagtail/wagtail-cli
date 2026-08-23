@@ -54,3 +54,4 @@ generate-client:
 test-integration:
     WGTL_TEST_BASE_URL=$${WGTL_TEST_BASE_URL:-http://127.0.0.1:9001/api/v3} uv run pytest -m integration
 
+

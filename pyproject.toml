@@ -55,7 +55,6 @@ build-backend = "uv_build"
 [tool.uv.build-backend]
 module-name = "wgtl_api_cli"
 source-exclude = [
-    "testmanage.py",
     ".*",
     "*.js",
     "*.json",

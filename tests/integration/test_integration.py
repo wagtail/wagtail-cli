@@ -133,7 +133,6 @@ def test_image_upload_lifecycle(tmp_path: Path) -> None:
 def test_page_lifecycle() -> None:
     """create → get → update → publish → revisions → unpublish → delete."""
     page_id = None
-    image_id = None
     title = _unique("wgtl-int-page")
     try:
         # create as a draft
@@ -181,8 +180,6 @@ def test_page_lifecycle() -> None:
     finally:
         if page_id is not None:
             _invoke(["pages", "delete", str(page_id), "--yes"])
-        if image_id is not None:
-            _invoke(["images", "delete", str(image_id), "--yes"])
 
 
 def test_dry_run_makes_no_changes() -> None:
