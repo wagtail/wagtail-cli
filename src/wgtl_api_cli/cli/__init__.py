@@ -13,4 +13,5 @@ from . import (  # noqa: F401
     redirects,
     schema,
     sites,
+    snippets,
 )
