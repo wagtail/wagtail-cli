@@ -1,4 +1,10 @@
-import tomllib
+import sys
+
+
+if sys.version_info >= (3, 11):
+    import tomllib
+else:
+    import tomli as tomllib
 
 from wgtl_api_cli.config import Config, load_config, save_user_config
 
