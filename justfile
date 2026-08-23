@@ -42,3 +42,6 @@ coverage:
 generate-client:
     uv run clientele start-api -f 'src/wgtl_api_cli/client/openapi.json' -o "$(pwd)/src/wgtl_api_cli/client/" --regen
     rm -f src/wgtl_api_cli/client/pyproject.toml
+    # clientele overwrites __init__.py with empty content on regen; re-apply
+    # the GENERATED marker so it stays durable. Recipe owns this marker.
+    printf '%s\n' '# GENERATED — see justfile generate-client' > src/wgtl_api_cli/client/__init__.py
