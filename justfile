@@ -33,3 +33,12 @@ test:
 coverage:
     uv run pytest --cov src/wgtl_api_cli
     uv run coverage report -m
+
+# Regenerate the clientele client from the committed OpenAPI snapshot.
+# NOTE: must pass the output dir as an ABSOLUTE path so clientele generates
+# relative imports (src.wgtl_api_cli.client would break a wheel install).
+# The generated client at src/wgtl_api_cli/client/ is committed and never
+# hand-edited; review the resulting diff before committing.
+generate-client:
+    uv run clientele start-api -f 'src/wgtl_api_cli/client/openapi.json' -o "$(pwd)/src/wgtl_api_cli/client/" --regen
+    rm -f src/wgtl_api_cli/client/pyproject.toml
