@@ -42,6 +42,14 @@ def test_whoami_unconfigured_exit_2(monkeypatch):
     assert "wgtl init" in result.output
 
 
+def test_conflicting_output_flags_exit_2_no_traceback():
+    result = runner.invoke(app, ["--json", "--human", "whoami"])
+    assert result.exit_code == 2
+    assert "Cannot combine --json and --human" in result.stderr
+    assert "Traceback" not in result.output
+    assert "Traceback" not in result.stderr
+
+
 @respx.mock
 def test_init_writes_dotfile(monkeypatch, tmp_path):
     monkeypatch.setattr(

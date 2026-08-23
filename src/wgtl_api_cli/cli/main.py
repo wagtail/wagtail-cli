@@ -68,10 +68,12 @@ def main(
     ctx: typer.Context = typer.Context,
 ) -> None:
     """CLI client for the Wagtail v3 API."""
-    # collect a callback is called for the root invocation
     fmt: str | None = None
     if json and human:
-        raise UsageError("Cannot combine --json and --human")
+        # The root callback is not appify-wrapped, so emit a clean usage error
+        # rather than raising (which would surface as an uncaught traceback).
+        typer.echo("Error (2): Cannot combine --json and --human", err=True)
+        raise typer.Exit(code=2)
     if json:
         fmt = "json"
     elif human:
