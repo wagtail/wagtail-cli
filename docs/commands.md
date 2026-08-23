@@ -25,7 +25,7 @@ error if both are given).
 
 - **JSON when piped**, human-readable when on a terminal.
 - `--json` / `--human` override auto-detection. Human lists render as a table
-  (id/title/type/slug by default); details render as key/value lines.
+  (id/title/name/label columns by default); details render as key/value lines.
 - `--dry-run` prints `METHOD url`, `Params`, and the JSON body that would be
   sent, and makes no network call.
 - `schema show` always outputs JSON (the schema is the machine-readable contract).
@@ -104,7 +104,8 @@ read from a `.md` file are sent with `format: db_markdown`.
 Upload and manage images.
 
 ```
-wgtl images list [--search Q] [--order F] [--limit N] [--offset N]
+wgtl images list [--search Q] [--search-operator and|or] [--order F]
+                [--limit N] [--offset N]
 wgtl images get <ID>
 wgtl images create <FILE> --title T [--field K:V]...     # multipart upload
 wgtl images update <ID> [--title T] [--field K:V]... [--yes]
@@ -116,7 +117,8 @@ wgtl images delete <ID> [--yes]
 Upload and manage documents.
 
 ```
-wgtl documents list [--search Q] [--order F] [--limit N] [--offset N]
+wgtl documents list [--search Q] [--search-operator and|or] [--order F]
+                   [--limit N] [--offset N]
 wgtl documents get <ID>
 wgtl documents create <FILE> --title T [--field K:V]...  # multipart upload
 wgtl documents update <ID> [--title T] [--field K:V]... [--yes]
@@ -129,7 +131,9 @@ Manage API-enabled snippets. The snippet type is always required (each snippet
 model lives in its own table).
 
 ```
-wgtl snippets list <TYPE> [--search Q] [--order F] [--limit N] [--offset N]
+wgtl snippets list <TYPE> [--locale CODE] [--translation-of N]
+                [--search Q] [--search-operator and|or] [--order F]
+                [--limit N] [--offset N]
 wgtl snippets get <TYPE> <PK>
 wgtl snippets create <TYPE> [--field K:V]...
 wgtl snippets update <TYPE> <PK> [--field K:V]... [--yes]
@@ -138,7 +142,7 @@ wgtl snippets publish <TYPE> <PK>
 wgtl snippets unpublish <TYPE> <PK>
 wgtl snippets revert <TYPE> <PK> --revision N
 wgtl snippets copy-for-translation <TYPE> <PK> --locale CODE
-wgtl snippets revisions list <TYPE> <PK>
+wgtl snippets revisions list <TYPE> <PK> [--limit N] [--offset N]
 wgtl snippets revisions get <TYPE> <PK> <REVISION_ID>
 ```
 
