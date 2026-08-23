@@ -80,8 +80,11 @@ def find_page(client, *, html_path=None, id=None, site=None) -> dict:
     )
 
 
-def get_page(client, page_id, *, version=None) -> dict:
-    return client.get(f"/pages/{page_id}/", params={"version": version})
+def get_page(client, page_id, *, version=None, rich_text_format=None) -> dict:
+    return client.get(
+        f"/pages/{page_id}/",
+        params={"version": version, "rich_text_format": rich_text_format},
+    )
 
 
 def create_page(client, payload) -> dict:
