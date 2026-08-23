@@ -1,0 +1,18 @@
+name: Template checks
+
+on: [push, pull_request]
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+      - run: uvx cookiecutter . --no-input
+      - run: tree wagtail-cool-project
+      # Ensure package can be installed
+      - run: uv sync --dev

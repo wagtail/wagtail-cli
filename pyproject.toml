@@ -1,0 +1,73 @@
+[project]
+name = "wgtl-api-cli"
+version = "0.1.0"
+description = "Experimental CLI API client for Wagtail"
+readme = "README.md"
+license = "BSD-3-Clause"
+classifiers = [
+    # Update this based on your project's status.
+    # See: https://pypi.org/classifiers/
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Framework :: Django",
+    "Framework :: Django :: 5.2",
+    "Framework :: Django :: 6.0",
+    "Framework :: Wagtail",
+    "Framework :: Wagtail :: 7",
+]
+# See: https://devguide.python.org/versions/#supported-versions
+requires-python = ">=3.10"
+dependencies = [
+    # https://www.djangoproject.com/download/#supported-versions
+    "django>=5.2",
+    # https://github.com/wagtail/wagtail/wiki/Release-schedule
+    # https://docs.wagtail.org/en/latest/releases/upgrading.html#compatible-django-python-versions
+    "wagtail>=7.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/org-name-or-username/wgtl-api-cli"
+Repository = "https://github.com/org-name-or-username/wgtl-api-cli"
+Changelog = "https://github.com/org-name-or-username/wgtl-api-cli/blob/main/CHANGELOG.md"
+Documentation = "https://github.com/org-name-or-username/wgtl-api-cli/tree/main/docs"
+Issues = "https://github.com/org-name-or-username/wgtl-api-cli/issues"
+# Add funding link if needed.
+# Funding = "https://github.com/org-name-or-username/wgtl-api-cli"
+
+[dependency-groups]
+dev = [
+    "dj-database-url>=3.1.2",
+    "pytest>=8.1.1",
+    "pytest-cov>=7.1.0",
+    "pytest-django>=4.12.0",
+    "ruff>=0.15.9",
+]
+
+[build-system]
+requires = ["uv_build>=0.11.19,<0.12"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "wgtl_api_cli"
+source-exclude = [
+    "wgtl_api_cli/static_src",
+    "wgtl_api_cli/test",
+    "wgtl_api_cli/static/wgtl_api_cli/js/.gitignore",
+    "testmanage.py",
+    ".*",
+    "*.js",
+    "*.json",
+    "*.ini",
+    "*.yml",
+]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "wgtl_api_cli.test.settings"
