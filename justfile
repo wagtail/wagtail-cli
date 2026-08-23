@@ -45,3 +45,12 @@ generate-client:
     # clientele overwrites __init__.py with empty content on regen; re-apply
     # the GENERATED marker so it stays durable. Recipe owns this marker.
     printf '%s\n' '# GENERATED — see justfile generate-client' > src/wgtl_api_cli/client/__init__.py
+
+
+# Run the integration test suite against a live Wagtail v3 API.
+# Requires WGTL_TEST_BASE_URL and WGTL_TEST_TOKEN (or the default below).
+# NOTE: bakerydemo's HTTPS dev cert at 9001.wagtail.test is NOT trusted by the
+# CLI's httpx client; use the plain-HTTP loopback URL for local runs.
+test-integration:
+    WGTL_TEST_BASE_URL=$${WGTL_TEST_BASE_URL:-http://127.0.0.1:9001/api/v3} uv run pytest -m integration
+
