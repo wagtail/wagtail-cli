@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `wgtl`, a CLI client for the Wagtail v3 API, with full coverage of the
+  shipped OpenAPI operations: pages (CRUD, find, publish/unpublish, copy, move,
+  revert, aliases, copy-for-translation, revisions), images, documents,
+  snippets (incl. actions and revisions), sites, locales, redirects, schema, and
+  whoami.
+- CLI contract: a config cascade (flags → env → project dotfile → user
+  dotfile), JSON-when-piped output with `--json`/`--human` overrides,
+  `--dry-run` on mutating commands, RFC 7807 error forwarding, and stable
+  exit codes.
+- Content ergonomics: repeatable `--field KEY:VALUE` with JSON auto-parse and
+  `@file`/`@-`/stdin readers, plus `.md` → `db_markdown` rich-text envelopes.
+- Client generated from the OpenAPI schema (`just generate-client`), an
+  openapi snapshot, and a coverage-gap test guarding endpoint coverage.
+- Unit tests for the CLI and resources layers (CliRunner + respx) and an
+  opt-in integration suite for a live site.
+
 ## [0.1.0] - YYYY-MM-DD
 
 ### Added
