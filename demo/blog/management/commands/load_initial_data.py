@@ -9,8 +9,6 @@ from datetime import date
 from pathlib import Path
 from typing import Any
 
-import wagtail
-
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
 from django.core.files.base import ContentFile
@@ -22,6 +20,8 @@ from wagtail.images.models import Image
 from wagtail.models import Collection, Site
 from wagtail.rich_text import RichText
 from wagtail.users.models import UserProfile
+
+import wagtail
 
 from blog.models import BlogIndexPage, BlogPage, Person
 

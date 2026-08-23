@@ -26,13 +26,13 @@ BASE_DIR = PROJECT_DIR.parent
 # Application definition
 
 INSTALLED_APPS = [
-    "wgtl_api_cli",
     "blog",
     "home",
     "search",
     "wagtail.contrib.forms",
     "wagtail.contrib.routable_page",
     "wagtail.contrib.redirects",
+    "wagtail.api.v3",
     "wagtail.embeds",
     "wagtail.sites",
     "wagtail.users",
