@@ -185,6 +185,23 @@ wgtl redirects delete <ID> [--yes]
 
 ---
 
+## Confirmations
+
+Commands that mutate-or-destroy an existing object (`update`, `delete`) gate on
+`--yes` on a TTY (they prompt for confirmation otherwise; piped/scripted
+invocations never prompt, so pass `--yes` there).
+
+Commands that perform an action (`publish`, `unpublish`, `revert`,
+`copy-for-translation`) execute immediately without a confirmation prompt —
+preview them with `--dry-run` instead.
+
+```
+wgtl --dry-run pages publish 42
+wgtl pages delete 42 --yes
+```
+
+---
+
 ## `--field` value parsing
 
 `--field KEY:VALUE` is repeatable. Value handling:

@@ -59,4 +59,5 @@ def save_user_config(config: Config, path: Path | None = None) -> Path:
     path = path or _user_dotfile()
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(f'url = "{config.base_url}"\ntoken = "{config.token or ""}"\n')
+    os.chmod(path, 0o600)
     return path

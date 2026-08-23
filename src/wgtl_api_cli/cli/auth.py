@@ -53,6 +53,14 @@ def init(
     if isinstance(data, dict) and isinstance(data.get("user"), dict):
         username = data.get("user", {}).get("username")
 
+    if cc.dry_run:
+        redacted = (token[:4] + "…") if token else ""
+        typer.echo(
+            f"dry-run: would write token for url={url} (token={redacted}) "
+            "to ~/.wgtl.toml. No file was written; no connection was made."
+        )
+        return
+
     save_user_config(Config(base_url=url, token=token))
     who = f" as {username}" if username else ""
     typer.echo(f"Connected. Config written to ~/.wgtl.toml{who}.")

@@ -60,3 +60,11 @@ def test_save_user_config_round_trip(tmp_path):
     out = save_user_config(Config(base_url="https://x", token="t"), path=path)
     data = tomllib.loads(out.read_text())
     assert data == {"url": "https://x", "token": "t"}
+
+
+def test_save_user_config_restricts_permissions(tmp_path):
+    path = tmp_path / "sub" / ".wgtl.toml"
+    save_user_config(Config(base_url="https://x", token="t"), path=path)
+    import stat
+
+    assert stat.S_IMODE(path.stat().st_mode) == 0o600

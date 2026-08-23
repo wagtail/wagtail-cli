@@ -34,9 +34,6 @@ def _scalar(v: Any) -> str:
     return "null" if v is None else str(v)
 
 
-_FLATTEN_PREFS = ("id", "title", "name", "label")
-
-
 def _table(items: list[Any]) -> str:
     rows = [i if isinstance(i, dict) else {"value": i} for i in items]
     # flatten one level of nested meta

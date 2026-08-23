@@ -60,3 +60,19 @@ def test_init_writes_dotfile(monkeypatch, tmp_path):
     assert result.exit_code == 0
     data = (tmp_path / ".wgtl.toml").read_text()
     assert 'url = "https://x.test/api/v3"' in data and 'token = "tok123"' in data
+
+
+@respx.mock
+def test_init_dry_run_writes_nothing(monkeypatch, tmp_path):
+    monkeypatch.setattr(
+        "wgtl_api_cli.config._user_dotfile", lambda: tmp_path / ".wgtl.toml"
+    )
+    # No route is registered: if any request is made, respx raises and the
+    # test fails. Dry-run must skip both network and filesystem writes.
+    result = runner.invoke(
+        app, ["--dry-run", "--url", BASE, "--token", "tok123", "init"]
+    )
+    assert result.exit_code == 0
+    assert not (tmp_path / ".wgtl.toml").exists()
+    assert "dry-run: would write" in result.output
+    assert "tok123" not in result.output  # token redacted
