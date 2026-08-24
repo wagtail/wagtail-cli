@@ -109,7 +109,7 @@ def get_client(ctx: typer.Context) -> WgtlClient:
     cfg = load_config(cli_url=cc.url, cli_token=cc.token)
     if not cfg.is_configured:
         raise UsageError(
-            "Not configured. Run `wt init` or set WAGTAIL_CLI_BASE_URL / "
+            "Not configured. Run `wt api init` or set WAGTAIL_CLI_BASE_URL / "
             "WAGTAIL_CLI_TOKEN."
         )
     return WgtlClient(

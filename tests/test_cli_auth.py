@@ -39,7 +39,7 @@ def test_whoami_unconfigured_exit_2(monkeypatch):
     monkeypatch.delenv("WAGTAIL_CLI_TOKEN", raising=False)
     result = runner.invoke(app, ["--url", BASE, "api", "whoami"])  # url but no token
     assert result.exit_code == 2
-    assert "wt init" in result.output
+    assert "wt api init" in result.output
 
 
 def test_conflicting_output_flags_exit_2_no_traceback():
