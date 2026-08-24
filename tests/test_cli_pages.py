@@ -23,6 +23,7 @@ def test_pages_list_passes_filters(monkeypatch):
     result = runner.invoke(
         app,
         [
+            "api",
             "pages",
             "list",
             "--type",
@@ -47,7 +48,7 @@ def test_pages_list_passes_filters(monkeypatch):
 def test_pages_list_multiple_types_repeated_param(monkeypatch):
     _env(monkeypatch)
     respx.get(f"{BASE}/pages/").respond(200, json={"count": 0, "items": []})
-    runner.invoke(app, ["pages", "list", "--type", "a.A", "--type", "b.B"])
+    runner.invoke(app, ["api", "pages", "list", "--type", "a.A", "--type", "b.B"])
     url = str(respx.calls[0].request.url)
     assert "type=a.A" in url and "type=b.B" in url
 
@@ -56,7 +57,9 @@ def test_pages_list_multiple_types_repeated_param(monkeypatch):
 def test_pages_get_with_version_and_html(monkeypatch):
     _env(monkeypatch)
     respx.get(f"{BASE}/pages/7/").respond(200, json={"id": 7, "title": "X"})
-    result = runner.invoke(app, ["pages", "get", "7", "--version", "live", "--html"])
+    result = runner.invoke(
+        app, ["api", "pages", "get", "7", "--version", "live", "--html"]
+    )
     assert result.exit_code == 0
     url = str(respx.calls[0].request.url)
     assert "version=live" in url
@@ -69,7 +72,7 @@ def test_pages_find_returns_location(monkeypatch):
     respx.get(f"{BASE}/pages/find/", params={"html_path": "/blog/"}).respond(
         302, headers={"location": "/api/v3/pages/61/?pid=1"}
     )
-    result = runner.invoke(app, ["pages", "find", "--path", "/blog/"])
+    result = runner.invoke(app, ["api", "pages", "find", "--path", "/blog/"])
     assert result.exit_code == 0
     assert "location" in result.output
 
@@ -81,6 +84,7 @@ def test_pages_create_with_field_and_publish(monkeypatch):
     result = runner.invoke(
         app,
         [
+            "api",
             "pages",
             "create",
             "blog.BlogPage",
@@ -112,7 +116,17 @@ def test_pages_create_resolves_path_parent(monkeypatch):
     )
     respx.post(f"{BASE}/pages/").respond(200, json={"id": 100})
     result = runner.invoke(
-        app, ["pages", "create", "blog.BlogPage", "--parent", "/blog/", "--title", "X"]
+        app,
+        [
+            "api",
+            "pages",
+            "create",
+            "blog.BlogPage",
+            "--parent",
+            "/blog/",
+            "--title",
+            "X",
+        ],
     )
     assert result.exit_code == 0
     payload = json.loads(respx.calls[1].request.content)
@@ -126,6 +140,7 @@ def test_pages_create_dry_run_no_http(monkeypatch):
         app,
         [
             "--dry-run",
+            "api",
             "pages",
             "create",
             "blog.BlogPage",
@@ -146,7 +161,17 @@ def test_pages_update_sends_patch(monkeypatch):
     respx.patch(f"{BASE}/pages/7/").respond(200, json={"id": 7, "title": "New"})
     result = runner.invoke(
         app,
-        ["pages", "update", "7", "--title", "New", "--field", "subtitle:S", "--yes"],
+        [
+            "api",
+            "pages",
+            "update",
+            "7",
+            "--title",
+            "New",
+            "--field",
+            "subtitle:S",
+            "--yes",
+        ],
     )
     assert result.exit_code == 0
     payload = json.loads(respx.calls[0].request.content)
@@ -157,7 +182,7 @@ def test_pages_update_sends_patch(monkeypatch):
 def test_pages_delete_with_yes(monkeypatch):
     _env(monkeypatch)
     respx.delete(f"{BASE}/pages/5/").respond(204)
-    result = runner.invoke(app, ["pages", "delete", "5", "--yes"])
+    result = runner.invoke(app, ["api", "pages", "delete", "5", "--yes"])
     assert result.exit_code == 0
     assert respx.calls[0].request.method == "DELETE"
     assert str(respx.calls[0].request.url).endswith("/pages/5/")
@@ -166,7 +191,7 @@ def test_pages_delete_with_yes(monkeypatch):
 def test_pages_delete_without_yes_exit_2_non_tty(monkeypatch):
     _env(monkeypatch)
     monkeypatch.setattr("wagtail_cli.cli.pages._is_tty", lambda: False)
-    result = runner.invoke(app, ["pages", "delete", "5"])
+    result = runner.invoke(app, ["api", "pages", "delete", "5"])
     assert result.exit_code == 2
     assert "--yes" in result.stderr or "--yes" in result.output
 
@@ -175,7 +200,7 @@ def test_pages_delete_without_yes_exit_2_non_tty(monkeypatch):
 def test_pages_update_without_yes_exit_2_non_tty_no_http(monkeypatch):
     _env(monkeypatch)
     monkeypatch.setattr("wagtail_cli.cli.pages._is_tty", lambda: False)
-    result = runner.invoke(app, ["pages", "update", "5", "--title", "New"])
+    result = runner.invoke(app, ["api", "pages", "update", "5", "--title", "New"])
     assert result.exit_code == 2
     assert "--yes" in result.stderr or "--yes" in result.output
     assert len(respx.calls) == 0
@@ -183,7 +208,7 @@ def test_pages_update_without_yes_exit_2_non_tty_no_http(monkeypatch):
 
 @respx.mock
 def test_pages_non_numeric_id_clean_exit_2():
-    result = runner.invoke(app, ["pages", "get", "abc"])
+    result = runner.invoke(app, ["api", "pages", "get", "abc"])
     assert result.exit_code == 2
     assert "Traceback" not in result.output
     assert "Traceback" not in result.stderr
@@ -191,7 +216,7 @@ def test_pages_non_numeric_id_clean_exit_2():
 
 @respx.mock
 def test_pages_find_requires_id_or_path():
-    result = runner.invoke(app, ["pages", "find"])
+    result = runner.invoke(app, ["api", "pages", "find"])
     assert result.exit_code == 2
     assert "--id" in result.output or "--id" in result.stderr
 
@@ -202,13 +227,13 @@ def test_pages_publish_unpublish(monkeypatch):
     pub = respx.post(f"{BASE}/pages/7/actions/publish/").respond(
         200, json={"id": 7, "status": "live"}
     )
-    res1 = runner.invoke(app, ["pages", "publish", "7"])
+    res1 = runner.invoke(app, ["api", "pages", "publish", "7"])
     assert res1.exit_code == 0
     assert "live" in res1.output
     respx.post(f"{BASE}/pages/7/actions/unpublish/").respond(
         200, json={"id": 7, "status": "draft"}
     )
-    res2 = runner.invoke(app, ["pages", "unpublish", "7"])
+    res2 = runner.invoke(app, ["api", "pages", "unpublish", "7"])
     assert res2.exit_code == 0
     assert pub.called
 
@@ -223,6 +248,7 @@ def test_pages_copy(monkeypatch):
     result = runner.invoke(
         app,
         [
+            "api",
             "pages",
             "copy",
             "7",
@@ -244,7 +270,7 @@ def test_pages_copy(monkeypatch):
 def test_pages_move(monkeypatch):
     _env(monkeypatch)
     respx.post(f"{BASE}/pages/7/actions/move/").respond(200, json={"id": 7})
-    result = runner.invoke(app, ["pages", "move", "7", "--destination", "10"])
+    result = runner.invoke(app, ["api", "pages", "move", "7", "--destination", "10"])
     assert result.exit_code == 0
     body = json.loads(respx.calls[0].request.content)
     assert body == {"destination_id": 10}
@@ -254,7 +280,7 @@ def test_pages_move(monkeypatch):
 def test_pages_revert(monkeypatch):
     _env(monkeypatch)
     respx.post(f"{BASE}/pages/7/actions/revert/").respond(200, json={"id": 7})
-    result = runner.invoke(app, ["pages", "revert", "7", "--revision", "42"])
+    result = runner.invoke(app, ["api", "pages", "revert", "7", "--revision", "42"])
     assert result.exit_code == 0
     body = json.loads(respx.calls[0].request.content)
     assert body == {"revision_id": 42}
@@ -264,7 +290,9 @@ def test_pages_revert(monkeypatch):
 def test_pages_create_alias(monkeypatch):
     _env(monkeypatch)
     respx.post(f"{BASE}/pages/7/actions/create_alias/").respond(200, json={"id": 50})
-    result = runner.invoke(app, ["pages", "create-alias", "7", "--destination", "10"])
+    result = runner.invoke(
+        app, ["api", "pages", "create-alias", "7", "--destination", "10"]
+    )
     assert result.exit_code == 0
     body = json.loads(respx.calls[0].request.content)
     assert body == {"destination_id": 10}
@@ -274,7 +302,7 @@ def test_pages_create_alias(monkeypatch):
 def test_pages_convert_alias(monkeypatch):
     _env(monkeypatch)
     respx.post(f"{BASE}/pages/7/actions/convert_alias/").respond(200, json={"id": 7})
-    result = runner.invoke(app, ["pages", "convert-alias", "7"])
+    result = runner.invoke(app, ["api", "pages", "convert-alias", "7"])
     assert result.exit_code == 0
 
 
@@ -285,7 +313,7 @@ def test_pages_copy_for_translation(monkeypatch):
         200, json={"id": 90}
     )
     result = runner.invoke(
-        app, ["pages", "copy-for-translation", "7", "--locale", "fr"]
+        app, ["api", "pages", "copy-for-translation", "7", "--locale", "fr"]
     )
     assert result.exit_code == 0
     body = json.loads(respx.calls[0].request.content)
@@ -298,7 +326,7 @@ def test_pages_revisions_list(monkeypatch):
     respx.get(f"{BASE}/pages/7/revisions/").respond(
         200, json={"count": 1, "items": [{"id": 42}]}
     )
-    result = runner.invoke(app, ["pages", "revisions", "list", "7"])
+    result = runner.invoke(app, ["api", "pages", "revisions", "list", "7"])
     assert result.exit_code == 0
     assert str(respx.calls[0].request.url).endswith("/pages/7/revisions/")
 
@@ -307,7 +335,7 @@ def test_pages_revisions_list(monkeypatch):
 def test_pages_revisions_get(monkeypatch):
     _env(monkeypatch)
     respx.get(f"{BASE}/pages/7/revisions/42/").respond(200, json={"id": 42, "page": 7})
-    result = runner.invoke(app, ["pages", "revisions", "get", "7", "42"])
+    result = runner.invoke(app, ["api", "pages", "revisions", "get", "7", "42"])
     assert result.exit_code == 0
 
 
@@ -323,7 +351,8 @@ def test_pages_422_exit_7_with_problem_on_stderr(monkeypatch):
     }
     respx.post(f"{BASE}/pages/").respond(422, json=problem)
     result = runner.invoke(
-        app, ["pages", "create", "blog.BlogPage", "--parent", "3", "--title", "Bad"]
+        app,
+        ["api", "pages", "create", "blog.BlogPage", "--parent", "3", "--title", "Bad"],
     )
     assert result.exit_code == 7
     assert "422" in result.stderr

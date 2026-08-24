@@ -5,10 +5,10 @@ import typer
 from wagtail_cli.config import Config, save_user_config
 from wagtail_cli.resources._client import WgtlClient
 
-from .main import app, appify, emit, get_client
+from .main import api_app, appify, emit, get_client
 
 
-@app.command(name="whoami")
+@api_app.command(name="whoami")
 @appify
 def whoami(ctx: typer.Context) -> None:
     """Show the authenticated user for the current session."""
@@ -16,7 +16,7 @@ def whoami(ctx: typer.Context) -> None:
     emit(ctx, client.get("/whoami/"))
 
 
-@app.command(name="init")
+@api_app.command(name="init")
 @appify
 def init(
     ctx: typer.Context,

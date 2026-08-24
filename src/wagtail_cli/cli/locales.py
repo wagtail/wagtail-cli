@@ -6,7 +6,7 @@ from wagtail_cli import parsing
 from wagtail_cli.resources import locales as locales_resources
 
 from ._shared import require_yes as _require_yes
-from .main import app, appify, emit, get_client
+from .main import api_app, appify, emit, get_client
 
 
 locales_app = typer.Typer(
@@ -92,4 +92,4 @@ def delete_locale(
     emit(ctx, locales_resources.delete_locale(client, locale_id))
 
 
-app.add_typer(locales_app, name="locales")
+api_app.add_typer(locales_app, name="locales")

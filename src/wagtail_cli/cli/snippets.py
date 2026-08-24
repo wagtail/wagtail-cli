@@ -6,7 +6,7 @@ from wagtail_cli import parsing
 from wagtail_cli.resources import snippets as snippets_resources
 
 from ._shared import require_yes as _require_yes
-from .main import app, appify, emit, get_client
+from .main import api_app, appify, emit, get_client
 
 
 snippets_app = typer.Typer(
@@ -213,4 +213,4 @@ def revisions_get(
 
 
 snippets_app.add_typer(revisions_app, name="revisions")
-app.add_typer(snippets_app, name="snippets")
+api_app.add_typer(snippets_app, name="snippets")

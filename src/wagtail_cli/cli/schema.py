@@ -7,7 +7,7 @@ import typer
 from wagtail_cli import output
 from wagtail_cli.resources import schema as schema_resources
 
-from .main import app, appify, emit, get_client
+from .main import api_app, appify, emit, get_client
 
 
 schema_app = typer.Typer(
@@ -39,4 +39,4 @@ def show_type(
     typer.echo(output.render(data, "json"))
 
 
-app.add_typer(schema_app, name="schema")
+api_app.add_typer(schema_app, name="schema")

@@ -21,6 +21,14 @@ app = typer.Typer(
     no_args_is_help=True,
 )
 
+api_app = typer.Typer(
+    name="api",
+    help="Interact with a Wagtail v3 API.",
+    no_args_is_help=True,
+)
+
+app.add_typer(api_app, name="api")
+
 
 def _version_callback(value: bool) -> None:
     if value:

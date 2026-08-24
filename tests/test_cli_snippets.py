@@ -21,7 +21,7 @@ def _env(monkeypatch):
 def test_snippets_list(monkeypatch):
     _env(monkeypatch)
     respx.get(f"{BASE}/snippets/{TYPE}/").respond(200, json={"count": 1, "items": []})
-    result = runner.invoke(app, ["snippets", "list", TYPE])
+    result = runner.invoke(app, ["api", "snippets", "list", TYPE])
     assert result.exit_code == 0
 
 
@@ -29,7 +29,7 @@ def test_snippets_list(monkeypatch):
 def test_snippets_get(monkeypatch):
     _env(monkeypatch)
     respx.get(f"{BASE}/snippets/{TYPE}/22/").respond(200, json={"id": 22})
-    result = runner.invoke(app, ["snippets", "get", TYPE, "22"])
+    result = runner.invoke(app, ["api", "snippets", "get", TYPE, "22"])
     assert result.exit_code == 0
     assert '"id":22' in result.output
 
@@ -38,7 +38,9 @@ def test_snippets_get(monkeypatch):
 def test_snippets_create_via_field(monkeypatch):
     _env(monkeypatch)
     respx.post(f"{BASE}/snippets/{TYPE}/").respond(201, json={"id": 30})
-    result = runner.invoke(app, ["snippets", "create", TYPE, "--field", "text:Hello"])
+    result = runner.invoke(
+        app, ["api", "snippets", "create", TYPE, "--field", "text:Hello"]
+    )
     assert result.exit_code == 0
     body = json.loads(respx.calls[0].request.content)
     assert body == {"text": "Hello"}
@@ -50,7 +52,7 @@ def test_snippets_update_patch(monkeypatch):
     respx.patch(f"{BASE}/snippets/{TYPE}/22/").respond(200, json={"id": 22})
     result = runner.invoke(
         app,
-        ["snippets", "update", TYPE, "22", "--field", "text:Updated", "--yes"],
+        ["api", "snippets", "update", TYPE, "22", "--field", "text:Updated", "--yes"],
     )
     assert result.exit_code == 0
     assert respx.calls[0].request.method == "PATCH"
@@ -63,7 +65,7 @@ def test_snippets_update_refuses_non_tty_without_yes(monkeypatch):
     _env(monkeypatch)
     # CliRunner stdin is not a TTY, so confirmation fails unless --yes.
     result = runner.invoke(
-        app, ["snippets", "update", TYPE, "22", "--field", "text:Updated"]
+        app, ["api", "snippets", "update", TYPE, "22", "--field", "text:Updated"]
     )
     assert result.exit_code == 2
     assert len(respx.calls) == 0
@@ -73,7 +75,7 @@ def test_snippets_update_refuses_non_tty_without_yes(monkeypatch):
 def test_snippets_delete_requires_yes(monkeypatch):
     _env(monkeypatch)
     respx.delete(f"{BASE}/snippets/{TYPE}/22/").respond(204)
-    result = runner.invoke(app, ["snippets", "delete", TYPE, "22", "--yes"])
+    result = runner.invoke(app, ["api", "snippets", "delete", TYPE, "22", "--yes"])
     assert result.exit_code == 0
     assert respx.calls[0].request.method == "DELETE"
 
@@ -81,7 +83,7 @@ def test_snippets_delete_requires_yes(monkeypatch):
 @respx.mock
 def test_snippets_delete_refuses_non_tty_without_yes(monkeypatch):
     _env(monkeypatch)
-    result = runner.invoke(app, ["snippets", "delete", TYPE, "22"])
+    result = runner.invoke(app, ["api", "snippets", "delete", TYPE, "22"])
     assert result.exit_code == 2
     assert len(respx.calls) == 0
 
@@ -92,7 +94,7 @@ def test_snippets_publish(monkeypatch):
     respx.post(f"{BASE}/snippets/{TYPE}/22/actions/publish/").respond(
         200, json={"id": 22}
     )
-    result = runner.invoke(app, ["snippets", "publish", TYPE, "22"])
+    result = runner.invoke(app, ["api", "snippets", "publish", TYPE, "22"])
     assert result.exit_code == 0
 
 
@@ -102,7 +104,7 @@ def test_snippets_unpublish(monkeypatch):
     respx.post(f"{BASE}/snippets/{TYPE}/22/actions/unpublish/").respond(
         200, json={"id": 22}
     )
-    result = runner.invoke(app, ["snippets", "unpublish", TYPE, "22"])
+    result = runner.invoke(app, ["api", "snippets", "unpublish", TYPE, "22"])
     assert result.exit_code == 0
 
 
@@ -112,7 +114,9 @@ def test_snippets_revert(monkeypatch):
     respx.post(f"{BASE}/snippets/{TYPE}/22/actions/revert/").respond(
         200, json={"id": 22}
     )
-    result = runner.invoke(app, ["snippets", "revert", TYPE, "22", "--revision", "7"])
+    result = runner.invoke(
+        app, ["api", "snippets", "revert", TYPE, "22", "--revision", "7"]
+    )
     assert result.exit_code == 0
     assert json.loads(respx.calls[0].request.content) == {"revision_id": 7}
 
@@ -124,7 +128,7 @@ def test_snippets_copy_for_translation(monkeypatch):
         200, json={"id": 22}
     )
     result = runner.invoke(
-        app, ["snippets", "copy-for-translation", TYPE, "22", "--locale", "fr"]
+        app, ["api", "snippets", "copy-for-translation", TYPE, "22", "--locale", "fr"]
     )
     assert result.exit_code == 0
     assert json.loads(respx.calls[0].request.content) == {"locale": "fr"}
@@ -134,7 +138,7 @@ def test_snippets_copy_for_translation(monkeypatch):
 def test_snippets_revisions_list(monkeypatch):
     _env(monkeypatch)
     respx.get(f"{BASE}/snippets/{TYPE}/22/revisions/").respond(200, json={"items": []})
-    result = runner.invoke(app, ["snippets", "revisions", "list", TYPE, "22"])
+    result = runner.invoke(app, ["api", "snippets", "revisions", "list", TYPE, "22"])
     assert result.exit_code == 0
 
 
@@ -142,7 +146,9 @@ def test_snippets_revisions_list(monkeypatch):
 def test_snippets_revisions_get(monkeypatch):
     _env(monkeypatch)
     respx.get(f"{BASE}/snippets/{TYPE}/22/revisions/5/").respond(200, json={"id": 5})
-    result = runner.invoke(app, ["snippets", "revisions", "get", TYPE, "22", "5"])
+    result = runner.invoke(
+        app, ["api", "snippets", "revisions", "get", TYPE, "22", "5"]
+    )
     assert result.exit_code == 0
     assert '"id":5' in result.output
 
@@ -152,7 +158,7 @@ def test_snippets_create_dry_run_no_http(monkeypatch):
     _env(monkeypatch)
     result = runner.invoke(
         app,
-        ["--dry-run", "snippets", "create", TYPE, "--field", "text:Hello"],
+        ["--dry-run", "api", "snippets", "create", TYPE, "--field", "text:Hello"],
     )
     assert result.exit_code == 0
     assert "POST" in result.output and "/snippets/" in result.output
@@ -170,6 +176,8 @@ def test_snippets_validation_error_exit_7(monkeypatch):
         "errors": [{"loc": ["text"]}],
     }
     respx.post(f"{BASE}/snippets/{TYPE}/").respond(422, json=problem)
-    result = runner.invoke(app, ["snippets", "create", TYPE, "--field", "text:Bad"])
+    result = runner.invoke(
+        app, ["api", "snippets", "create", TYPE, "--field", "text:Bad"]
+    )
     assert result.exit_code == 7
     assert "Validation failed" in result.output

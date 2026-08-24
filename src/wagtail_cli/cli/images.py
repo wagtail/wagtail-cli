@@ -10,7 +10,7 @@ from wagtail_cli.resources import images as images_resources
 
 from ._shared import is_tty as _is_tty  # noqa: F401
 from ._shared import require_yes as _require_yes
-from .main import app, appify, emit, get_client
+from .main import api_app, appify, emit, get_client
 
 
 images_app = typer.Typer(
@@ -121,4 +121,4 @@ def delete_image(
     emit(ctx, images_resources.delete_image(client, image_id))
 
 
-app.add_typer(images_app, name="images")
+api_app.add_typer(images_app, name="images")

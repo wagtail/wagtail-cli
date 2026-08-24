@@ -10,7 +10,7 @@ from wagtail_cli.resources import documents as documents_resources
 
 from ._shared import is_tty as _is_tty  # noqa: F401
 from ._shared import require_yes as _require_yes
-from .main import app, appify, emit, get_client
+from .main import api_app, appify, emit, get_client
 
 
 documents_app = typer.Typer(
@@ -121,4 +121,4 @@ def delete_document(
     emit(ctx, documents_resources.delete_document(client, document_id))
 
 
-app.add_typer(documents_app, name="documents")
+api_app.add_typer(documents_app, name="documents")

@@ -10,7 +10,7 @@ from wagtail_cli.resources import pages as pages_resources
 
 from ._shared import is_tty as _is_tty  # noqa: F401
 from ._shared import require_yes as _require_yes
-from .main import app, appify, emit, get_client
+from .main import api_app, appify, emit, get_client
 
 
 pages_app = typer.Typer(
@@ -357,4 +357,4 @@ def revisions_get(
 
 
 pages_app.add_typer(revisions_app, name="revisions")
-app.add_typer(pages_app, name="pages")
+api_app.add_typer(pages_app, name="pages")

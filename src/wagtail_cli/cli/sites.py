@@ -7,7 +7,7 @@ from wagtail_cli.resources import sites as sites_resources
 
 from ._shared import is_tty as _is_tty  # noqa: F401
 from ._shared import require_yes as _require_yes
-from .main import app, appify, emit, get_client
+from .main import api_app, appify, emit, get_client
 
 
 sites_app = typer.Typer(
@@ -88,4 +88,4 @@ def delete_site(
     emit(ctx, sites_resources.delete_site(client, site_id))
 
 
-app.add_typer(sites_app, name="sites")
+api_app.add_typer(sites_app, name="sites")

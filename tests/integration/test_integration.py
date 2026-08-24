@@ -58,7 +58,7 @@ def _invoke(args: list[str]) -> object:
     """Run the CLI with the integration env config and return the result."""
     return runner.invoke(
         app,
-        args,
+        ["api", *args],
         env={"WAGTAIL_CLI_BASE_URL": BASE_URL, "WAGTAIL_CLI_TOKEN": TOKEN},
     )
 

@@ -7,7 +7,7 @@ from wagtail_cli.errors import UsageError
 from wagtail_cli.resources import redirects as redirects_resources
 
 from ._shared import require_yes as _require_yes
-from .main import app, appify, emit, get_client
+from .main import api_app, appify, emit, get_client
 
 
 redirects_app = typer.Typer(
@@ -113,4 +113,4 @@ def delete_redirect(
     emit(ctx, redirects_resources.delete_redirect(client, redirect_id))
 
 
-app.add_typer(redirects_app, name="redirects")
+api_app.add_typer(redirects_app, name="redirects")

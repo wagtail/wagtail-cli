@@ -24,7 +24,7 @@ def _png(tmp_path):
 def test_images_list(monkeypatch):
     _env(monkeypatch)
     respx.get(f"{BASE}/images/").respond(200, json={"count": 0, "items": []})
-    result = runner.invoke(app, ["images", "list", "--limit", "5"])
+    result = runner.invoke(app, ["api", "images", "list", "--limit", "5"])
     assert result.exit_code == 0
     assert "limit=5" in str(respx.calls[0].request.url)
 
@@ -33,7 +33,7 @@ def test_images_list(monkeypatch):
 def test_images_get(monkeypatch):
     _env(monkeypatch)
     respx.get(f"{BASE}/images/7/").respond(200, json={"id": 7, "title": "X"})
-    result = runner.invoke(app, ["images", "get", "7"])
+    result = runner.invoke(app, ["api", "images", "get", "7"])
     assert result.exit_code == 0
     assert '"id":7' in result.output
 
@@ -45,7 +45,16 @@ def test_images_create_multipart(monkeypatch, tmp_path):
     respx.post(f"{BASE}/images/").respond(201, json={"id": 10})
     result = runner.invoke(
         app,
-        ["images", "create", str(f), "--title", "Sunset", "--field", "description:A"],
+        [
+            "api",
+            "images",
+            "create",
+            str(f),
+            "--title",
+            "Sunset",
+            "--field",
+            "description:A",
+        ],
     )
     assert result.exit_code == 0
     sent = respx.calls[0].request
@@ -58,7 +67,9 @@ def test_images_create_multipart(monkeypatch, tmp_path):
 def test_images_update_with_yes(monkeypatch):
     _env(monkeypatch)
     respx.patch(f"{BASE}/images/7/").respond(200, json={"id": 7})
-    result = runner.invoke(app, ["images", "update", "7", "--title", "New", "--yes"])
+    result = runner.invoke(
+        app, ["api", "images", "update", "7", "--title", "New", "--yes"]
+    )
     assert result.exit_code == 0
     assert respx.calls[0].request.method == "PATCH"
 
@@ -66,7 +77,7 @@ def test_images_update_with_yes(monkeypatch):
 def test_images_update_without_yes_non_tty(monkeypatch):
     _env(monkeypatch)
     monkeypatch.setattr("wagtail_cli.cli.images._is_tty", lambda: False)
-    result = runner.invoke(app, ["images", "update", "7", "--title", "New"])
+    result = runner.invoke(app, ["api", "images", "update", "7", "--title", "New"])
     assert result.exit_code == 2
     assert "--yes" in result.stderr or "--yes" in result.output
     assert len(respx.calls) == 0
@@ -76,7 +87,7 @@ def test_images_update_without_yes_non_tty(monkeypatch):
 def test_images_delete_with_yes(monkeypatch):
     _env(monkeypatch)
     respx.delete(f"{BASE}/images/7/").respond(204)
-    result = runner.invoke(app, ["images", "delete", "7", "--yes"])
+    result = runner.invoke(app, ["api", "images", "delete", "7", "--yes"])
     assert result.exit_code == 0
     assert respx.calls[0].request.method == "DELETE"
 
@@ -85,7 +96,7 @@ def test_images_delete_with_yes(monkeypatch):
 def test_images_create_missing_file(monkeypatch, tmp_path):
     _env(monkeypatch)
     result = runner.invoke(
-        app, ["images", "create", str(tmp_path / "nope.png"), "--title", "X"]
+        app, ["api", "images", "create", str(tmp_path / "nope.png"), "--title", "X"]
     )
     assert result.exit_code == 2
     assert "Cannot read file" in (result.stderr or result.output)
@@ -96,7 +107,7 @@ def test_images_create_dry_run_no_http(monkeypatch, tmp_path):
     _env(monkeypatch)
     f = _png(tmp_path)
     result = runner.invoke(
-        app, ["--dry-run", "images", "create", str(f), "--title", "X"]
+        app, ["--dry-run", "api", "images", "create", str(f), "--title", "X"]
     )
     assert result.exit_code == 0
     assert len(respx.calls) == 0
@@ -107,7 +118,7 @@ def test_images_create_dry_run_no_http(monkeypatch, tmp_path):
 def test_documents_list(monkeypatch):
     _env(monkeypatch)
     respx.get(f"{BASE}/documents/").respond(200, json={"count": 0, "items": []})
-    result = runner.invoke(app, ["documents", "list"])
+    result = runner.invoke(app, ["api", "documents", "list"])
     assert result.exit_code == 0
 
 
@@ -117,7 +128,9 @@ def test_documents_create_multipart(monkeypatch, tmp_path):
     f = tmp_path / "a.pdf"
     f.write_bytes(b"%PDF-1.4")
     respx.post(f"{BASE}/documents/").respond(201, json={"id": 12})
-    result = runner.invoke(app, ["documents", "create", str(f), "--title", "Brief"])
+    result = runner.invoke(
+        app, ["api", "documents", "create", str(f), "--title", "Brief"]
+    )
     assert result.exit_code == 0
     sent = respx.calls[0].request
     assert sent.headers["content-type"].startswith("multipart/form-data")
@@ -128,6 +141,6 @@ def test_documents_create_multipart(monkeypatch, tmp_path):
 def test_documents_delete_requires_yes(monkeypatch):
     _env(monkeypatch)
     monkeypatch.setattr("wagtail_cli.cli.documents._is_tty", lambda: False)
-    result = runner.invoke(app, ["documents", "delete", "3"])
+    result = runner.invoke(app, ["api", "documents", "delete", "3"])
     assert result.exit_code == 2
     assert "--yes" in result.stderr or "--yes" in result.output

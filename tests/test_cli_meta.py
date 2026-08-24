@@ -23,7 +23,7 @@ def _env(monkeypatch):
 def test_sites_list(monkeypatch):
     _env(monkeypatch)
     respx.get(f"{BASE}/sites/").respond(200, json={"count": 1, "items": []})
-    result = runner.invoke(app, ["sites", "list"])
+    result = runner.invoke(app, ["api", "sites", "list"])
     assert result.exit_code == 0
 
 
@@ -34,6 +34,7 @@ def test_sites_create_via_field(monkeypatch):
     result = runner.invoke(
         app,
         [
+            "api",
             "sites",
             "create",
             "--field",
@@ -54,6 +55,7 @@ def test_sites_update_put(monkeypatch):
     result = runner.invoke(
         app,
         [
+            "api",
             "sites",
             "update",
             "5",
@@ -72,7 +74,7 @@ def test_sites_update_put(monkeypatch):
 def test_sites_delete_requires_yes(monkeypatch):
     _env(monkeypatch)
     monkeypatch.setattr("wagtail_cli.cli.sites._is_tty", lambda: False)
-    result = runner.invoke(app, ["sites", "delete", "5"])
+    result = runner.invoke(app, ["api", "sites", "delete", "5"])
     assert result.exit_code == 2
     assert "--yes" in result.stderr or "--yes" in result.output
 
@@ -84,7 +86,7 @@ def test_sites_delete_requires_yes(monkeypatch):
 def test_locales_list(monkeypatch):
     _env(monkeypatch)
     respx.get(f"{BASE}/locales/").respond(200, json={"count": 0, "items": []})
-    result = runner.invoke(app, ["locales", "list"])
+    result = runner.invoke(app, ["api", "locales", "list"])
     assert result.exit_code == 0
 
 
@@ -92,7 +94,9 @@ def test_locales_list(monkeypatch):
 def test_locales_create_via_field(monkeypatch):
     _env(monkeypatch)
     respx.post(f"{BASE}/locales/").respond(201, json={"id": 4})
-    result = runner.invoke(app, ["locales", "create", "--field", "language_code:fr"])
+    result = runner.invoke(
+        app, ["api", "locales", "create", "--field", "language_code:fr"]
+    )
     assert result.exit_code == 0
     assert json.loads(respx.calls[0].request.content) == {"language_code": "fr"}
 
@@ -102,7 +106,7 @@ def test_locales_update_put(monkeypatch):
     _env(monkeypatch)
     respx.put(f"{BASE}/locales/4/").respond(200, json={"id": 4})
     result = runner.invoke(
-        app, ["locales", "update", "4", "--field", "language_code:de", "--yes"]
+        app, ["api", "locales", "update", "4", "--field", "language_code:de", "--yes"]
     )
     assert result.exit_code == 0
     assert respx.calls[0].request.method == "PUT"
@@ -112,7 +116,7 @@ def test_locales_update_put(monkeypatch):
 def test_locales_delete_yes(monkeypatch):
     _env(monkeypatch)
     respx.delete(f"{BASE}/locales/4/").respond(204)
-    result = runner.invoke(app, ["locales", "delete", "4", "--yes"])
+    result = runner.invoke(app, ["api", "locales", "delete", "4", "--yes"])
     assert result.exit_code == 0
 
 
@@ -123,7 +127,7 @@ def test_locales_delete_yes(monkeypatch):
 def test_redirects_list(monkeypatch):
     _env(monkeypatch)
     respx.get(f"{BASE}/redirects/").respond(200, json={"count": 0, "items": []})
-    result = runner.invoke(app, ["redirects", "list"])
+    result = runner.invoke(app, ["api", "redirects", "list"])
     assert result.exit_code == 0
 
 
@@ -133,13 +137,13 @@ def test_redirects_find_path(monkeypatch):
     respx.get(f"{BASE}/redirects/find/", params={"html_path": "/old/"}).respond(
         302, headers={"location": "/api/v3/redirects/9/?"}
     )
-    result = runner.invoke(app, ["redirects", "find", "--path", "/old/"])
+    result = runner.invoke(app, ["api", "redirects", "find", "--path", "/old/"])
     assert result.exit_code == 0
     assert "location" in result.output
 
 
 def test_redirects_find_requires_arg(monkeypatch):
-    result = runner.invoke(app, ["redirects", "find"])
+    result = runner.invoke(app, ["api", "redirects", "find"])
     assert result.exit_code == 2
     assert "--id" in result.output or "--id" in result.stderr
 
@@ -151,6 +155,7 @@ def test_redirects_create_via_field(monkeypatch):
     result = runner.invoke(
         app,
         [
+            "api",
             "redirects",
             "create",
             "--field",
@@ -172,7 +177,7 @@ def test_redirects_update_put(monkeypatch):
     respx.put(f"{BASE}/redirects/9/").respond(200, json={"id": 9})
     result = runner.invoke(
         app,
-        ["redirects", "update", "9", "--field", "redirect_link:/new2/", "--yes"],
+        ["api", "redirects", "update", "9", "--field", "redirect_link:/new2/", "--yes"],
     )
     assert result.exit_code == 0
     assert respx.calls[0].request.method == "PUT"
@@ -182,5 +187,5 @@ def test_redirects_update_put(monkeypatch):
 def test_redirects_delete_yes(monkeypatch):
     _env(monkeypatch)
     respx.delete(f"{BASE}/redirects/9/").respond(204)
-    result = runner.invoke(app, ["redirects", "delete", "9", "--yes"])
+    result = runner.invoke(app, ["api", "redirects", "delete", "9", "--yes"])
     assert result.exit_code == 0
