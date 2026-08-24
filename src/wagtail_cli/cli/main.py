@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import functools
 import json
+import shutil
+import subprocess
 
 from collections.abc import Callable
 from dataclasses import asdict, dataclass
@@ -156,3 +158,138 @@ def appify(fn: Callable[..., Any]) -> Callable[..., Any]:
 def cli() -> None:
     """Console entry point (Typer app)."""
     app()
+
+
+DEFAULT_PROJECT_TEMPLATE = (
+    "https://github.com/wagtail/wagtail-custom-base-page-template/archive/main.zip"
+)
+
+
+def build_startproject_args(
+    name: str,
+    directory: str | None,
+    template: str,
+    extensions: list[str],
+    names: list[str],
+    excludes: list[str],
+    verbosity: int,
+    settings: str | None,
+    pythonpath: str | None,
+    traceback: bool,
+    no_color: bool,
+    force_color: bool,
+    version: bool,
+) -> list[str]:
+    args = [
+        "django-admin",
+        "startproject",
+        f"--template={template}",
+        "--ext=" + ",".join(extensions),
+        "--name=" + ",".join(names),
+    ]
+    args += [f"--exclude={x}" for x in excludes]
+    args.append(name)
+    if directory:
+        args.append(directory)
+    if version:
+        args.append("--version")
+    if verbosity != 1:
+        args += [f"--verbosity={verbosity}"]
+    if settings:
+        args += [f"--settings={settings}"]
+    if pythonpath:
+        args += [f"--pythonpath={pythonpath}"]
+    if traceback:
+        args.append("--traceback")
+    if no_color:
+        args.append("--no-color")
+    if force_color:
+        args.append("--force-color")
+    return args
+
+
+@app.command()
+def start(
+    name: str = typer.Argument(..., help="Name of the application or project."),
+    directory: str | None = typer.Argument(
+        None, help="Optional destination directory, created if needed."
+    ),
+    template: str = typer.Option(
+        DEFAULT_PROJECT_TEMPLATE,
+        "--template",
+        help="The path or URL to load the template from.",
+    ),
+    extension: list[str] = typer.Option(  # noqa: B008
+        ["html", "rst"],
+        "--extension",
+        "-e",
+        help="File extension(s) to render (repeatable).",
+    ),
+    name_files: list[str] = typer.Option(  # noqa: B008
+        ["Dockerfile"], "--name", "-n", help="File name(s) to render (repeatable)."
+    ),
+    exclude: list[str] = typer.Option(  # noqa: B008
+        [], "--exclude", "-x", help="Directory name(s) to exclude (repeatable)."
+    ),
+    verbosity: int = typer.Option(
+        1, "-v", "--verbosity", min=0, max=3, help="Verbosity level 0-3."
+    ),
+    settings: str | None = typer.Option(
+        None, "--settings", help="Python path to settings module."
+    ),
+    pythonpath: str | None = typer.Option(
+        None, "--pythonpath", help="Directory to add to PYTHONPATH."
+    ),
+    traceback: bool = typer.Option(
+        False, "--traceback", help="Show full traceback on CommandError."
+    ),
+    no_color: bool = typer.Option(False, "--no-color", help="Don't colorize output."),
+    force_color: bool = typer.Option(
+        False, "--force-color", help="Force colorized output."
+    ),
+    version: bool = typer.Option(
+        False, "--version", help="Show Django startproject version and exit."
+    ),
+) -> None:
+    """Create a Django project directory structure (replicates `wagtail start`)."""
+    try:
+        __import__(name)
+    except ImportError:
+        pass
+    else:
+        typer.echo(
+            f"'{name}' conflicts with the name of an existing Python module "
+            "and cannot be used as a project name. Please try another name.",
+            err=True,
+        )
+        raise typer.Exit(code=1)
+
+    template_display = template
+    if template == DEFAULT_PROJECT_TEMPLATE:
+        template_display = "the default custom base page template"
+    typer.echo(f"Creating a Wagtail project called {name} using {template_display}")
+
+    if not shutil.which("django-admin"):
+        typer.echo(
+            "django-admin not found on PATH. Install Django to create a project "
+            "(e.g. `pip install Django`).",
+            err=True,
+        )
+        raise typer.Exit(code=1)
+
+    argv = build_startproject_args(
+        name,
+        directory,
+        template,
+        extension,
+        name_files,
+        exclude,
+        verbosity,
+        settings,
+        pythonpath,
+        traceback,
+        no_color,
+        force_color,
+        version,
+    )
+    raise SystemExit(subprocess.run(argv).returncode)  # noqa: S603  # argv is user-authored CLI args forwarded verbatim to django-admin
