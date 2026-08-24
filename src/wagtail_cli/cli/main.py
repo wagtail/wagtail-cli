@@ -2,14 +2,20 @@ from __future__ import annotations
 
 import functools
 import json
+import os
 import shutil
 import subprocess
+import sys
 
 from collections.abc import Callable
 from dataclasses import asdict, dataclass
+from pathlib import Path
 from typing import Any
 
 import typer
+
+from click import Context
+from typer.main import get_command
 
 from wagtail_cli import __version__, output
 from wagtail_cli.config import load_config
@@ -156,8 +162,77 @@ def appify(fn: Callable[..., Any]) -> Callable[..., Any]:
 
 
 def cli() -> None:
-    """Console entry point (Typer app)."""
-    app()
+    """Console entry point: route known groups/globals to Typer, delegate the rest."""
+    argv = sys.argv[1:]
+    if argv and argv[0] == "--version":
+        _print_enhanced_version()
+        return
+    if argv and argv[0] in ("--help", "-h"):
+        _print_enhanced_help()
+        return
+    first = argv[0] if argv else None
+    if not first or first in _KNOWN_GROUPS or first.startswith("-"):
+        app()
+        return
+    target = resolve_delegate(argv)
+    if target is None:
+        typer.echo(
+            "Cannot run a Django command here: no ./manage.py in the current "
+            "directory and DJANGO_SETTINGS_MODULE is not set.",
+            err=True,
+        )
+        raise SystemExit(1)
+    raise SystemExit(subprocess.call(target))  # noqa: S603  # argv is user-authored CLI args forwarded verbatim to the Django runner
+
+
+_KNOWN_GROUPS = {"api", "start"}
+
+
+def resolve_delegate(args: list[str]) -> list[str] | None:
+    """Resolve the command to run for a delegated invocation.
+
+    Returns the argv to run, or None when there is nothing to delegate to.
+    """
+    manage_py = Path.cwd() / "manage.py"
+    if manage_py.is_file():
+        return [sys.executable, str(manage_py), *args]
+    if os.environ.get("DJANGO_SETTINGS_MODULE"):
+        return ["django-admin", *args]
+    return None
+
+
+def _capture(cmd: list[str]) -> str | None:
+    try:
+        proc = subprocess.run(cmd, capture_output=True, text=True)  # noqa: S603  # explicit argv list, no shell
+    except OSError:
+        return None
+    if proc.returncode == 0:
+        return proc.stdout.strip()
+    return None
+
+
+def _print_enhanced_version() -> None:
+    typer.echo(f"wagtail-cli {__version__}")
+    wagtail_ver = _capture(["wagtail", "--version"])
+    if wagtail_ver:
+        typer.echo(f"Wagtail: {wagtail_ver}")
+    django_ver = _capture(["django-admin", "--version"])
+    if django_ver:
+        typer.echo(f"Django: {django_ver}")
+    raise SystemExit(0)
+
+
+def _print_enhanced_help() -> None:
+    cmd = get_command(app)
+    ctx = Context(cmd, info_name="wt")
+    typer.echo(cmd.get_help(ctx))
+    manage_py = Path.cwd() / "manage.py"
+    if manage_py.is_file():
+        out = _capture([sys.executable, str(manage_py), "--help"])
+        if out:
+            typer.echo("\n--- ./manage.py --help ---\n")
+            typer.echo(out)
+    raise SystemExit(0)
 
 
 DEFAULT_PROJECT_TEMPLATE = (
