@@ -41,7 +41,7 @@ export WAGTAIL_CLI_BASE_URL="http://127.0.0.1:9001/api/v3"
 export WAGTAIL_CLI_TOKEN="wagtail_xxxxxxxxxxxxxxxxxxxxxxxx"
 
 # or persist it once:
-wt init
+wt api init
 # prompts for URL + token and writes ~/.wagtail-cli.toml
 ```
 
@@ -50,16 +50,16 @@ See [Configuration](configuration.md) for the full precedence rules.
 ## 3. Verify authentication
 
 ```bash
-wt whoami
+wt api whoami
 # {"user": {"username": "demo", ...}, "profile": {...}, "groups": []}
 ```
 
 ## 4. Browse pages and the content model
 
 ```bash
-wt pages list --limit 5        # paginated, JSON when piped
-wt schema list                 # registered page types and snippets
-wt schema show blog.BlogPage   # the raw JSON read/create/patch schema
+wt api pages list --limit 5        # paginated, JSON when piped
+wt api schema list                 # registered page types and snippets
+wt api schema show blog.BlogPage   # the raw JSON read/create/patch schema
 ```
 
 `pages list` is a good sanity check: an error here usually means a bad URL,
@@ -80,7 +80,7 @@ EOF
 Create and publish a page whose `body` field is rich text:
 
 ```bash
-wt pages create blog.BlogPage \
+wt api pages create blog.BlogPage \
   --parent /blog/ \
   --title "A Philosophy of Bread" \
   --field body:@post.md \
@@ -103,8 +103,8 @@ What happens:
 ## 6. Verify it's live
 
 ```bash
-wt pages list --search "Philosophy of Bread"
-wt pages get <ID> --version live
+wt api pages list --search "Philosophy of Bread"
+wt api pages get <ID> --version live
 ```
 
 Open the page in a browser if you like:
@@ -116,7 +116,7 @@ Every mutating command supports `--dry-run`, which prints the request that
 *would* be sent without sending it:
 
 ```bash
-wt pages create blog.BlogPage --parent /blog/ \
+wt api pages create blog.BlogPage --parent /blog/ \
   --title "Dry" --field body:@post.md --dry-run
 # POST http://127.0.0.1:9001/api/v3/pages/
 # { ...payload... }

@@ -109,8 +109,8 @@ def get_client(ctx: typer.Context) -> WgtlClient:
     cfg = load_config(cli_url=cc.url, cli_token=cc.token)
     if not cfg.is_configured:
         raise UsageError(
-            "Not configured. Run `wt init` or set WAGTAIL_CLI_BASE_URL / \
-            WAGTAIL_CLI_TOKEN."
+            "Not configured. Run `wt init` or set WAGTAIL_CLI_BASE_URL / "
+            "WAGTAIL_CLI_TOKEN."
         )
     return WgtlClient(
         cfg.base_url,
@@ -174,6 +174,9 @@ def cli() -> None:
     if not first or first in _KNOWN_GROUPS or first.startswith("-"):
         app()
         return
+    # `cli()` is the console entry point and runs outside Typer's runner, so
+    # we exit here via SystemExit, not typer.Exit (which is only meaningful
+    # inside a Typer command context).
     target = resolve_delegate(argv)
     if target is None:
         typer.echo(

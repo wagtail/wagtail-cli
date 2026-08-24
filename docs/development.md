@@ -9,7 +9,7 @@ Three layers; dependencies point strictly downward:
 ```
 src/wagtail_cli/
 ├── cli/            # Typer layer: argument parsing, orchestration only
-│   ├── main.py     # root app, global options, CliContext, get_client(), emit(), appify()
+│   ├── main.py     # root app + api group, start, cli() dispatch + delegation
 │   ├── _shared.py  # shared is_tty / require_yes helpers
 │   ├── auth.py     # whoami, init
 │   ├── schema.py   # schema list|show

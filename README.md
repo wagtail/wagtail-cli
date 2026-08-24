@@ -21,22 +21,35 @@ uvx --from wagtail-cli wt       # one-shot, no install
 export WAGTAIL_CLI_BASE_URL="https://cms.example.com/api/v3/"
 export WAGTAIL_CLI_TOKEN="your-api-token"
 
-wt whoami        # verify authentication
-wt pages list    # browse pages
-wt schema list   # discover page types
+wt api whoami        # verify authentication
+wt api pages list    # browse pages
+wt api schema list   # discover page types
 ```
 
-Or run `wt init` once to save these to `~/.wagtail-cli.toml` interactively.
+Or run `wt api init` once to save these to `~/.wagtail-cli.toml` interactively.
 
 Create and publish a blog page from a Markdown file:
 
 ```bash
-wt pages create blog.BlogPage --parent /blog/ \
+wt api pages create blog.BlogPage --parent /blog/ \
   --title "Hello world" --field body:@post.md --publish
 ```
 
 Rich-text fields accept Markdown via a `.md` file reference: the value is sent
 to the API as `{"format": "db_markdown", "content": …}`.
+
+## Command surface
+
+- **`wt api …`** — all Wagtail v3 API operations (`pages`, `images`,
+  `documents`, `snippets`, `sites`, `locales`, `redirects`, `schema`), plus
+  `wt api init` and `wt api whoami`.
+- **`wt start …`** — scaffold a new Django/Wagtail project (mirrors
+  `wagtail start` / `django-admin startproject`; default custom base-page template).
+- **Delegation** — any other `wt <command>` is forwarded to `./manage.py` (if
+  present) or `django-admin` (when `DJANGO_SETTINGS_MODULE` is set), so `wt`
+  also fronts Django commands like `wt runserver`/`wt makemigrations`.
+- **`wt --version` / `wt --help`** — custom, enhanced with detected Wagtail/Django
+  versions and `./manage.py --help` when available.
 
 ## Documentation
 

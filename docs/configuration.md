@@ -1,7 +1,7 @@
 # Configuration
 
 The CLI needs a base URL and an API token. Provide them via flags, environment
-variables, dotfiles, or `wt init`.
+variables, dotfiles, or `wt api init`.
 
 ## Precedence
 
@@ -30,10 +30,10 @@ and `--token` flags override them for a single invocation.
 
 ## Dotfiles
 
-`wt init` writes the user dotfile interactively:
+`wt api init` writes the user dotfile interactively:
 
 ```bash
-wt init
+wt api init
 # API base URL: https://cms.example.com/api/v3/
 # API token: ****************************
 # Testing connection… ✓
