@@ -2,15 +2,15 @@ import json
 
 import respx
 
-from wgtl_api_cli.resources._client import WgtlClient
-from wgtl_api_cli.resources.locales import (
+from wagtail_cli.resources._client import WgtlClient
+from wagtail_cli.resources.locales import (
     create_locale,
     delete_locale,
     get_locale,
     list_locales,
     update_locale,
 )
-from wgtl_api_cli.resources.redirects import (
+from wagtail_cli.resources.redirects import (
     create_redirect,
     delete_redirect,
     find_redirect,
@@ -18,7 +18,7 @@ from wgtl_api_cli.resources.redirects import (
     list_redirects,
     update_redirect,
 )
-from wgtl_api_cli.resources.sites import (
+from wagtail_cli.resources.sites import (
     create_site,
     delete_site,
     get_site,

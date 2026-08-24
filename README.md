@@ -1,4 +1,4 @@
-# wgtl-api-cli
+# wagtail-cli
 
 A command-line client for the Wagtail v3 API. Install it, point it at a Wagtail
 site's API, and drive CMS operations (pages, images, documents, snippets, sites,
@@ -8,30 +8,30 @@ AI-orchestrated content management.
 ## Installation
 
 Pick the command for your preferred package installer. The console script is
-`wgtl` (the package name is `wgtl-api-cli`):
+`wt` (the package name is `wagtail-cli`):
 
 ```bash
-uv tool install wgtl-api-cli      # permanent install; then run `wgtl …`
-uvx --from wgtl-api-cli wgtl       # one-shot, no install
+uv tool install wagtail-cli      # permanent install; then run `wt …`
+uvx --from wagtail-cli wt       # one-shot, no install
 ```
 
 ## Quick start
 
 ```bash
-export WAGTAIL_BASE_URL="https://cms.example.com/api/v3/"
-export WAGTAIL_TOKEN="your-api-token"
+export WAGTAIL_CLI_BASE_URL="https://cms.example.com/api/v3/"
+export WAGTAIL_CLI_TOKEN="your-api-token"
 
-wgtl whoami        # verify authentication
-wgtl pages list    # browse pages
-wgtl schema list   # discover page types
+wt whoami        # verify authentication
+wt pages list    # browse pages
+wt schema list   # discover page types
 ```
 
-Or run `wgtl init` once to save these to `~/.wgtl.toml` interactively.
+Or run `wt init` once to save these to `~/.wagtail-cli.toml` interactively.
 
 Create and publish a blog page from a Markdown file:
 
 ```bash
-wgtl pages create blog.BlogPage --parent /blog/ \
+wt pages create blog.BlogPage --parent /blog/ \
   --title "Hello world" --field body:@post.md --publish
 ```
 

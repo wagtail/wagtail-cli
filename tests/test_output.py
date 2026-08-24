@@ -1,6 +1,6 @@
 import json
 
-from wgtl_api_cli.output import render
+from wagtail_cli.output import render
 
 
 def test_json_compact():
@@ -31,6 +31,6 @@ def test_auto_json_when_piped(monkeypatch, capsys):
 
 
 def test_none_fmt_piped_detection(monkeypatch):
-    monkeypatch.setattr("wgtl_api_cli.output._stdout_is_tty", lambda: True)
+    monkeypatch.setattr("wagtail_cli.output._stdout_is_tty", lambda: True)
     out = render({"items": [{"id": 1}]}, fmt=None)
     assert not out.startswith("{}")  # human mode chosen

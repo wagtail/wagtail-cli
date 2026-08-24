@@ -1,12 +1,12 @@
-"""Integration tests for the wgtl CLI against a live Wagtail v3 API.
+"""Integration tests for the wt CLI against a live Wagtail v3 API.
 
 These exercise the real CLI (via Typer's ``CliRunner``) end to end against a
-live server. They are skipped unless both ``WGTL_TEST_BASE_URL`` and
-``WGTL_TEST_TOKEN`` are set.
+live server. They are skipped unless both ``WAGTAIL_CLI_TEST_BASE_URL`` and
+``WAGTAIL_CLI_TEST_TOKEN`` are set.
 
 Example (local bakerydemo dev server):
-    WGTL_TEST_BASE_URL=http://127.0.0.1:9001/api/v3 \\
-    WGTL_TEST_TOKEN=wagtail_… uv run pytest -m integration -q
+    WAGTAIL_CLI_TEST_BASE_URL=http://127.0.0.1:9001/api/v3 \\
+    WAGTAIL_CLI_TEST_TOKEN=wagtail_… uv run pytest -m integration -q
 """
 
 from __future__ import annotations
@@ -21,17 +21,17 @@ import pytest
 
 from typer.testing import CliRunner
 
-from wgtl_api_cli.cli.main import app
+from wagtail_cli.cli.main import app
 
 
-BASE_URL = os.environ.get("WGTL_TEST_BASE_URL")
-TOKEN = os.environ.get("WGTL_TEST_TOKEN")
+BASE_URL = os.environ.get("WAGTAIL_CLI_TEST_BASE_URL")
+TOKEN = os.environ.get("WAGTAIL_CLI_TEST_TOKEN")
 
 pytestmark = pytest.mark.integration
 
 if not BASE_URL or not TOKEN:
     pytest.skip(
-        "WGTL_TEST_BASE_URL / WGTL_TEST_TOKEN not set; skipping integration tests",
+        "WAGTAIL_CLI_TEST_BASE_URL / WAGTAIL_CLI_TEST_TOKEN not set; skipping integration tests",
         allow_module_level=True,
     )
 
@@ -59,7 +59,7 @@ def _invoke(args: list[str]) -> object:
     return runner.invoke(
         app,
         args,
-        env={"WAGTAIL_BASE_URL": BASE_URL, "WAGTAIL_TOKEN": TOKEN},
+        env={"WAGTAIL_CLI_BASE_URL": BASE_URL, "WAGTAIL_CLI_TOKEN": TOKEN},
     )
 
 
@@ -100,7 +100,7 @@ def test_bad_token_exit_4() -> None:
 def test_image_upload_lifecycle(tmp_path: Path) -> None:
     """Upload an image, fetch it, then delete it (finally-guarded)."""
     image_id = None
-    title = _unique("wgtl-int-img")
+    title = _unique("wt-int-img")
     path = tmp_path / "pic.png"
     path.write_bytes(_PNG)
     try:
@@ -133,7 +133,7 @@ def test_image_upload_lifecycle(tmp_path: Path) -> None:
 def test_page_lifecycle() -> None:
     """create → get → update → publish → revisions → unpublish → delete."""
     page_id = None
-    title = _unique("wgtl-int-page")
+    title = _unique("wt-int-page")
     try:
         # create as a draft
         result = _invoke(
@@ -197,7 +197,7 @@ def test_dry_run_makes_no_changes() -> None:
             "--parent",
             PARENT_PATH,
             "--title",
-            _unique("wgtl-dry"),
+            _unique("wt-dry"),
         ]
     )
     assert dry.exit_code == 0, dry.output

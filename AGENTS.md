@@ -4,7 +4,7 @@ Important context for AI coding agents working on this project.
 
 ## Project overview
 
-wgtl-api-cli is a Django/Wagtail package. The source code is in `src/wgtl_api_cli/`, with tests in `tests/` and a demo Wagtail site in `demo/`.
+wagtail-cli is a Django/Wagtail package. The source code is in `src/wagtail_cli/`, with tests in `tests/` and a demo Wagtail site in `demo/`.
 
 This project was created from the [cookiecutter-wagtail-package](https://github.com/wagtail/cookiecutter-wagtail-package) template and follows the [Wagtail package maintenance guidelines](https://wagtail.org/package-guidelines/).
 
@@ -25,7 +25,7 @@ just coverage    # Run tests with coverage report
 - Python: Ruff for linting and formatting (`ruff.toml`), prek hooks (`prek.toml`).
 - JavaScript/CSS/JSON/YAML: Prettier for formatting (`prettier.config.js`).
 - CSS: Stylelint with `@wagtail/stylelint-config-wagtail` (`stylelint.config.mjs`).
-- Tests: pytest with pytest-django. Test settings are in `src/wgtl_api_cli/test/settings.py`.
+- Tests: pytest with pytest-django. Test settings are in `src/wagtail_cli/test/settings.py`.
 - CI: GitHub Actions in `.github/workflows/`.
 
 Always run `just lint` and `just test` before considering work complete.
@@ -33,8 +33,8 @@ Always run `just lint` and `just test` before considering work complete.
 ## Project layout
 
 ```
-src/wgtl_api_cli/       # Package source code
-src/wgtl_api_cli/test/  # Django test app with settings, URLs
+src/wagtail_cli/       # Package source code
+src/wagtail_cli/test/  # Django test app with settings, URLs
 tests/                     # Test modules (pytest)
 demo/                      # Demo Wagtail site for development
 .github/workflows/         # CI: linting, tests, nightly builds, publishing

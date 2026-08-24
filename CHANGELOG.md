@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `wgtl`, a CLI client for the Wagtail v3 API, with full coverage of the
+- `wt`, a CLI client for the Wagtail v3 API, with full coverage of the
   shipped OpenAPI operations: pages (CRUD, find, publish/unpublish, copy, move,
   revert, aliases, copy-for-translation, revisions), images, documents,
   snippets (incl. actions and revisions), sites, locales, redirects, schema, and

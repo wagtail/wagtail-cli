@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import typer
 
-from wgtl_api_cli import parsing
-from wgtl_api_cli.resources import locales as locales_resources
+from wagtail_cli import parsing
+from wagtail_cli.resources import locales as locales_resources
 
 from ._shared import require_yes as _require_yes
 from .main import app, appify, emit, get_client

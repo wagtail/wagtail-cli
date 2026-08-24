@@ -9,8 +9,8 @@ The repo includes a simple demo application that can be run to develop the packa
 First, clone the repo:
 
 ```sh
-git clone git+https://github.com/org-name-or-username/wgtl-api-cli
-cd wgtl-api-cli
+git clone git+https://github.com/org-name-or-username/wagtail-cli
+cd wagtail-cli
 ```
 
 > Requirements: [`uv`](https://github.com/astral-sh/uv), [`just`](https://github.com/casey/just), [`prek`](https://prek.j178.dev/)

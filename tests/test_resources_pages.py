@@ -1,7 +1,7 @@
 import respx
 
-from wgtl_api_cli.resources._client import WgtlClient
-from wgtl_api_cli.resources.pages import (
+from wagtail_cli.resources._client import WgtlClient
+from wagtail_cli.resources.pages import (
     build_page_payload,
     convert_alias,
     copy_for_translation,

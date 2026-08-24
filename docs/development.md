@@ -1,13 +1,13 @@
 # Development
 
-Notes for contributors to `wgtl-api-cli`.
+Notes for contributors to `wagtail-cli`.
 
 ## Package layout
 
 Three layers; dependencies point strictly downward:
 
 ```
-src/wgtl_api_cli/
+src/wagtail_cli/
 ├── cli/            # Typer layer: argument parsing, orchestration only
 │   ├── main.py     # root app, global options, CliContext, get_client(), emit(), appify()
 │   ├── _shared.py  # shared is_tty / require_yes helpers
@@ -19,7 +19,7 @@ src/wgtl_api_cli/
 │   └── pages.py images.py documents.py snippets.py sites.py locales.py redirects.py schema.py
 ├── client/         # clientele-generated — never hand-edited
 │   └── openapi.json  # committed schema snapshot
-├── config.py       # config cascade + .wgtl.toml
+├── config.py       # config cascade + .wagtail-cli.toml
 ├── errors.py       # error hierarchy + exit-code mapping
 ├── output.py       # JSON/human rendering
 └── parsing.py      # --field parsing, @file/@-, page-ref resolution
@@ -67,7 +67,7 @@ environment provides one:
 
 ```bash
 just test-integration
-# uses WGTL_TEST_BASE_URL (default http://127.0.0.1:9001/api/v3) and WGTL_TEST_TOKEN
+# uses WAGTAIL_CLI_TEST_BASE_URL (default http://127.0.0.1:9001/api/v3) and WAGTAIL_CLI_TEST_TOKEN
 ```
 
 The demo project ships the v3 API; see the quickstart for creating a token.
@@ -85,7 +85,7 @@ just generate-client
 ```
 
 - The `-o` path **must be absolute** so clientele emits relative imports (a
-  relative path produces `src.wgtl_api_cli.client` imports that break wheel
+  relative path produces `src.wagtail_cli.client` imports that break wheel
   installs).
 - Review the resulting diff before committing — v3 is a preview and schema
   churn surfaces here.

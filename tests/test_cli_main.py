@@ -1,6 +1,6 @@
 from typer.testing import CliRunner
 
-from wgtl_api_cli.cli.main import app
+from wagtail_cli.cli.main import app
 
 
 runner = CliRunner()

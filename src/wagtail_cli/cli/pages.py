@@ -4,9 +4,9 @@ from typing import Any
 
 import typer
 
-from wgtl_api_cli import parsing
-from wgtl_api_cli.errors import UsageError
-from wgtl_api_cli.resources import pages as pages_resources
+from wagtail_cli import parsing
+from wagtail_cli.errors import UsageError
+from wagtail_cli.resources import pages as pages_resources
 
 from ._shared import is_tty as _is_tty  # noqa: F401
 from ._shared import require_yes as _require_yes

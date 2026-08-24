@@ -12,7 +12,7 @@ if sys.version_info >= (3, 11):
 else:
     import tomli as tomllib  # add `tomli; python_version<"3.11"` to deps
 
-USER_DOTFILE_NAME = ".wgtl.toml"
+USER_DOTFILE_NAME = ".wagtail-cli.toml"
 
 
 def _user_dotfile() -> Path:
@@ -46,8 +46,8 @@ def load_config(cli_url: str | None = None, cli_token: str | None = None) -> Con
         data = _read_dotfile(path)
         cfg.base_url = data.get("url", cfg.base_url)
         cfg.token = data.get("token", cfg.token)
-    cfg.base_url = os.environ.get("WAGTAIL_BASE_URL", cfg.base_url)
-    cfg.token = os.environ.get("WAGTAIL_TOKEN", cfg.token)
+    cfg.base_url = os.environ.get("WAGTAIL_CLI_BASE_URL", cfg.base_url)
+    cfg.token = os.environ.get("WAGTAIL_CLI_TOKEN", cfg.token)
     if cli_url:
         cfg.base_url = cli_url
     if cli_token:

@@ -4,7 +4,7 @@ import sys
 
 import typer
 
-from wgtl_api_cli.errors import UsageError
+from wagtail_cli.errors import UsageError
 
 
 def is_tty() -> bool:

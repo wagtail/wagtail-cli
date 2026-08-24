@@ -1,6 +1,6 @@
 import pytest
 
-from wgtl_api_cli.errors import (
+from wagtail_cli.errors import (
     AuthError,
     ForbiddenError,
     NetworkError,

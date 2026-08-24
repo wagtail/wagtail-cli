@@ -1,6 +1,6 @@
 # Command reference
 
-`wgtl` is organized as a Typer app with a `pages`/`images`/`documents`/
+`wt` is organized as a Typer app with a `pages`/`images`/`documents`/
 `snippets`/`sites`/`locales`/`redirects`/`schema` command groups and two
 top-level commands, `whoami` and `init`.
 
@@ -48,50 +48,50 @@ stderr.
 
 ---
 
-## `wgtl whoami`
+## `wt whoami`
 
 Print the authenticated user, profile, and groups.
 
-## `wgtl init`
+## `wt init`
 
 Interactive setup: prompts for URL + token (unless both flags are given),
-tests the connection, and writes `~/.wgtl.toml`.
+tests the connection, and writes `~/.wagtail-cli.toml`.
 
-## `wgtl schema`
+## `wt schema`
 
 Discover the content model.
 
 ```
-wgtl schema list
-wgtl schema show <TYPE>       # e.g. blog.BlogPage — raw JSON schema
+wt schema list
+wt schema show <TYPE>       # e.g. blog.BlogPage — raw JSON schema
 ```
 
-## `wgtl pages`
+## `wt pages`
 
 Read, create, and manage pages, including actions and revisions.
 
 ```
-wgtl pages list [--type T]* [--child-of REF] [--descendant-of REF]
+wt pages list [--type T]* [--child-of REF] [--descendant-of REF]
                 [--ancestor-of REF] [--translation-of N] [--locale CODE] [--site N]
                 [--search Q] [--search-operator and|or] [--order F]
                 [--limit N] [--offset N]
-wgtl pages find [--id N] [--path /blog/] [--site N]
-wgtl pages get <ID> [--version draft|live] [--html]
-wgtl pages create <TYPE> --parent REF --title T
+wt pages find [--id N] [--path /blog/] [--site N]
+wt pages get <ID> [--version draft|live] [--html]
+wt pages create <TYPE> --parent REF --title T
                 [--slug S] [--field K:V]... [--publish]
-wgtl pages update <ID> [--title T] [--slug S] [--field K:V]... [--publish] [--yes]
-wgtl pages delete <ID> [--yes]
-wgtl pages publish <ID>
-wgtl pages unpublish <ID>
-wgtl pages copy <ID> --destination REF [--slug S] [--title T]
+wt pages update <ID> [--title T] [--slug S] [--field K:V]... [--publish] [--yes]
+wt pages delete <ID> [--yes]
+wt pages publish <ID>
+wt pages unpublish <ID>
+wt pages copy <ID> --destination REF [--slug S] [--title T]
                 [--recursive/--no-recursive] [--keep-live/--no-keep-live]
-wgtl pages move <ID> --destination REF
-wgtl pages revert <ID> --revision N
-wgtl pages create-alias <ID> --destination REF
-wgtl pages convert-alias <ID>
-wgtl pages copy-for-translation <ID> --locale CODE
-wgtl pages revisions list <ID> [--limit N] [--offset N]
-wgtl pages revisions get <ID> <REVISION_ID>
+wt pages move <ID> --destination REF
+wt pages revert <ID> --revision N
+wt pages create-alias <ID> --destination REF
+wt pages convert-alias <ID>
+wt pages copy-for-translation <ID> --locale CODE
+wt pages revisions list <ID> [--limit N] [--offset N]
+wt pages revisions get <ID> <REVISION_ID>
 ```
 
 `REF` is a page id or a URL path (e.g. `/blog/`), resolved through the API's
@@ -99,88 +99,88 @@ find endpoint. `--field` values that start with `[` or `{` are parsed as JSON;
 `@file` reads a value from a file (`@-` = stdin). Multi-line rich-text bodies
 read from a `.md` file are sent with `format: db_markdown`.
 
-## `wgtl images`
+## `wt images`
 
 Upload and manage images.
 
 ```
-wgtl images list [--search Q] [--search-operator and|or] [--order F]
+wt images list [--search Q] [--search-operator and|or] [--order F]
                 [--limit N] [--offset N]
-wgtl images get <ID>
-wgtl images create <FILE> --title T [--field K:V]...     # multipart upload
-wgtl images update <ID> [--title T] [--field K:V]... [--yes]
-wgtl images delete <ID> [--yes]
+wt images get <ID>
+wt images create <FILE> --title T [--field K:V]...     # multipart upload
+wt images update <ID> [--title T] [--field K:V]... [--yes]
+wt images delete <ID> [--yes]
 ```
 
-## `wgtl documents`
+## `wt documents`
 
 Upload and manage documents.
 
 ```
-wgtl documents list [--search Q] [--search-operator and|or] [--order F]
+wt documents list [--search Q] [--search-operator and|or] [--order F]
                    [--limit N] [--offset N]
-wgtl documents get <ID>
-wgtl documents create <FILE> --title T [--field K:V]...  # multipart upload
-wgtl documents update <ID> [--title T] [--field K:V]... [--yes]
-wgtl documents delete <ID> [--yes]
+wt documents get <ID>
+wt documents create <FILE> --title T [--field K:V]...  # multipart upload
+wt documents update <ID> [--title T] [--field K:V]... [--yes]
+wt documents delete <ID> [--yes]
 ```
 
-## `wgtl snippets`
+## `wt snippets`
 
 Manage API-enabled snippets. The snippet type is always required (each snippet
 model lives in its own table).
 
 ```
-wgtl snippets list <TYPE> [--locale CODE] [--translation-of N]
+wt snippets list <TYPE> [--locale CODE] [--translation-of N]
                 [--search Q] [--search-operator and|or] [--order F]
                 [--limit N] [--offset N]
-wgtl snippets get <TYPE> <PK>
-wgtl snippets create <TYPE> [--field K:V]...
-wgtl snippets update <TYPE> <PK> [--field K:V]... [--yes]
-wgtl snippets delete <TYPE> <PK> [--yes]
-wgtl snippets publish <TYPE> <PK>
-wgtl snippets unpublish <TYPE> <PK>
-wgtl snippets revert <TYPE> <PK> --revision N
-wgtl snippets copy-for-translation <TYPE> <PK> --locale CODE
-wgtl snippets revisions list <TYPE> <PK> [--limit N] [--offset N]
-wgtl snippets revisions get <TYPE> <PK> <REVISION_ID>
+wt snippets get <TYPE> <PK>
+wt snippets create <TYPE> [--field K:V]...
+wt snippets update <TYPE> <PK> [--field K:V]... [--yes]
+wt snippets delete <TYPE> <PK> [--yes]
+wt snippets publish <TYPE> <PK>
+wt snippets unpublish <TYPE> <PK>
+wt snippets revert <TYPE> <PK> --revision N
+wt snippets copy-for-translation <TYPE> <PK> --locale CODE
+wt snippets revisions list <TYPE> <PK> [--limit N] [--offset N]
+wt snippets revisions get <TYPE> <PK> <REVISION_ID>
 ```
 
-## `wgtl sites`
+## `wt sites`
 
 Manage sites.
 
 ```
-wgtl sites list [--limit N] [--offset N]
-wgtl sites get <ID>
-wgtl sites create --field K:V...      # e.g. hostname, root_page_id (required)
-wgtl sites update <ID> --field K:V... [--yes]     # PUT: all required fields
-wgtl sites delete <ID> [--yes]
+wt sites list [--limit N] [--offset N]
+wt sites get <ID>
+wt sites create --field K:V...      # e.g. hostname, root_page_id (required)
+wt sites update <ID> --field K:V... [--yes]     # PUT: all required fields
+wt sites delete <ID> [--yes]
 ```
 
-## `wgtl locales`
+## `wt locales`
 
 Manage locales.
 
 ```
-wgtl locales list [--limit N] [--offset N]
-wgtl locales get <ID>
-wgtl locales create --field K:V...    # e.g. language_code (required)
-wgtl locales update <ID> --field K:V... [--yes]    # PUT: language_code required
-wgtl locales delete <ID> [--yes]
+wt locales list [--limit N] [--offset N]
+wt locales get <ID>
+wt locales create --field K:V...    # e.g. language_code (required)
+wt locales update <ID> --field K:V... [--yes]    # PUT: language_code required
+wt locales delete <ID> [--yes]
 ```
 
-## `wgtl redirects`
+## `wt redirects`
 
 Manage redirects.
 
 ```
-wgtl redirects list [--order F] [--limit N] [--offset N]
-wgtl redirects find [--id N] [--path /old/]
-wgtl redirects get <ID>
-wgtl redirects create --field K:V...  # e.g. old_path (required)
-wgtl redirects update <ID> --field K:V... [--yes]   # PUT: old_path required
-wgtl redirects delete <ID> [--yes]
+wt redirects list [--order F] [--limit N] [--offset N]
+wt redirects find [--id N] [--path /old/]
+wt redirects get <ID>
+wt redirects create --field K:V...  # e.g. old_path (required)
+wt redirects update <ID> --field K:V... [--yes]   # PUT: old_path required
+wt redirects delete <ID> [--yes]
 ```
 
 ---
@@ -196,8 +196,8 @@ Commands that perform an action (`publish`, `unpublish`, `revert`,
 preview them with `--dry-run` instead.
 
 ```
-wgtl --dry-run pages publish 42
-wgtl pages delete 42 --yes
+wt --dry-run pages publish 42
+wt pages delete 42 --yes
 ```
 
 ---

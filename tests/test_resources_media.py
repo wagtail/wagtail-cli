@@ -2,15 +2,15 @@ import json
 
 import respx
 
-from wgtl_api_cli.resources._client import WgtlClient
-from wgtl_api_cli.resources.documents import (
+from wagtail_cli.resources._client import WgtlClient
+from wagtail_cli.resources.documents import (
     create_document,
     delete_document,
     get_document,
     list_documents,
     update_document,
 )
-from wgtl_api_cli.resources.images import (
+from wagtail_cli.resources.images import (
     create_image,
     delete_image,
     get_image,

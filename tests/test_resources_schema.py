@@ -1,7 +1,7 @@
 import respx
 
-from wgtl_api_cli.resources._client import WgtlClient
-from wgtl_api_cli.resources.schema import get_type_schema, list_types
+from wagtail_cli.resources._client import WgtlClient
+from wagtail_cli.resources.schema import get_type_schema, list_types
 
 
 BASE = "https://x.test/api/v3"

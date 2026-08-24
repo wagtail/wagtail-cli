@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import typer
 
-from wgtl_api_cli import parsing
-from wgtl_api_cli.resources import sites as sites_resources
+from wagtail_cli import parsing
+from wagtail_cli.resources import sites as sites_resources
 
 from ._shared import is_tty as _is_tty  # noqa: F401
 from ._shared import require_yes as _require_yes

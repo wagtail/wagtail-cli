@@ -2,7 +2,7 @@ import respx
 
 from typer.testing import CliRunner
 
-from wgtl_api_cli.cli.main import app
+from wagtail_cli.cli.main import app
 
 
 BASE = "https://x.test/api/v3"
@@ -10,8 +10,8 @@ runner = CliRunner()
 
 
 def _env(monkeypatch):
-    monkeypatch.setenv("WAGTAIL_BASE_URL", BASE)
-    monkeypatch.setenv("WAGTAIL_TOKEN", "tok")
+    monkeypatch.setenv("WAGTAIL_CLI_BASE_URL", BASE)
+    monkeypatch.setenv("WAGTAIL_CLI_TOKEN", "tok")
 
 
 @respx.mock

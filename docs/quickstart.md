@@ -1,17 +1,17 @@
 # Quickstart
 
-This walkthrough drives the Wagtail v3 API with `wgtl` from end to end: install,
+This walkthrough drives the Wagtail v3 API with `wt` from end to end: install,
 point it at a site, verify auth, and publish a page with rich-text (Markdown) content.
 
 ## 1. Install
 
 ```bash
 # one-shot (no install)
-uvx --from wgtl-api-cli wgtl --help
+uvx --from wagtail-cli wt --help
 
 # or install permanently
-uv tool install wgtl-api-cli
-wgtl --help
+uv tool install wagtail-cli
+wt --help
 ```
 
 ## 2. Configure a site
@@ -37,12 +37,12 @@ Then configure the CLI:
 
 ```bash
 # env vars (simplest; also sets it for scripts)
-export WAGTAIL_BASE_URL="http://127.0.0.1:9001/api/v3"
-export WAGTAIL_TOKEN="wagtail_xxxxxxxxxxxxxxxxxxxxxxxx"
+export WAGTAIL_CLI_BASE_URL="http://127.0.0.1:9001/api/v3"
+export WAGTAIL_CLI_TOKEN="wagtail_xxxxxxxxxxxxxxxxxxxxxxxx"
 
 # or persist it once:
-wgtl init
-# prompts for URL + token and writes ~/.wgtl.toml
+wt init
+# prompts for URL + token and writes ~/.wagtail-cli.toml
 ```
 
 See [Configuration](configuration.md) for the full precedence rules.
@@ -50,16 +50,16 @@ See [Configuration](configuration.md) for the full precedence rules.
 ## 3. Verify authentication
 
 ```bash
-wgtl whoami
+wt whoami
 # {"user": {"username": "demo", ...}, "profile": {...}, "groups": []}
 ```
 
 ## 4. Browse pages and the content model
 
 ```bash
-wgtl pages list --limit 5        # paginated, JSON when piped
-wgtl schema list                 # registered page types and snippets
-wgtl schema show blog.BlogPage   # the raw JSON read/create/patch schema
+wt pages list --limit 5        # paginated, JSON when piped
+wt schema list                 # registered page types and snippets
+wt schema show blog.BlogPage   # the raw JSON read/create/patch schema
 ```
 
 `pages list` is a good sanity check: an error here usually means a bad URL,
@@ -80,7 +80,7 @@ EOF
 Create and publish a page whose `body` field is rich text:
 
 ```bash
-wgtl pages create blog.BlogPage \
+wt pages create blog.BlogPage \
   --parent /blog/ \
   --title "A Philosophy of Bread" \
   --field body:@post.md \
@@ -103,8 +103,8 @@ What happens:
 ## 6. Verify it's live
 
 ```bash
-wgtl pages list --search "Philosophy of Bread"
-wgtl pages get <ID> --version live
+wt pages list --search "Philosophy of Bread"
+wt pages get <ID> --version live
 ```
 
 Open the page in a browser if you like:
@@ -116,7 +116,7 @@ Every mutating command supports `--dry-run`, which prints the request that
 *would* be sent without sending it:
 
 ```bash
-wgtl pages create blog.BlogPage --parent /blog/ \
+wt pages create blog.BlogPage --parent /blog/ \
   --title "Dry" --field body:@post.md --dry-run
 # POST http://127.0.0.1:9001/api/v3/pages/
 # { ...payload... }

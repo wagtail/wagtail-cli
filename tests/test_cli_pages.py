@@ -4,7 +4,7 @@ import respx
 
 from typer.testing import CliRunner
 
-from wgtl_api_cli.cli.main import app
+from wagtail_cli.cli.main import app
 
 
 BASE = "https://x.test/api/v3"
@@ -12,8 +12,8 @@ runner = CliRunner()
 
 
 def _env(monkeypatch):
-    monkeypatch.setenv("WAGTAIL_BASE_URL", BASE)
-    monkeypatch.setenv("WAGTAIL_TOKEN", "tok")
+    monkeypatch.setenv("WAGTAIL_CLI_BASE_URL", BASE)
+    monkeypatch.setenv("WAGTAIL_CLI_TOKEN", "tok")
 
 
 @respx.mock
@@ -165,7 +165,7 @@ def test_pages_delete_with_yes(monkeypatch):
 
 def test_pages_delete_without_yes_exit_2_non_tty(monkeypatch):
     _env(monkeypatch)
-    monkeypatch.setattr("wgtl_api_cli.cli.pages._is_tty", lambda: False)
+    monkeypatch.setattr("wagtail_cli.cli.pages._is_tty", lambda: False)
     result = runner.invoke(app, ["pages", "delete", "5"])
     assert result.exit_code == 2
     assert "--yes" in result.stderr or "--yes" in result.output
@@ -174,7 +174,7 @@ def test_pages_delete_without_yes_exit_2_non_tty(monkeypatch):
 @respx.mock
 def test_pages_update_without_yes_exit_2_non_tty_no_http(monkeypatch):
     _env(monkeypatch)
-    monkeypatch.setattr("wgtl_api_cli.cli.pages._is_tty", lambda: False)
+    monkeypatch.setattr("wagtail_cli.cli.pages._is_tty", lambda: False)
     result = runner.invoke(app, ["pages", "update", "5", "--title", "New"])
     assert result.exit_code == 2
     assert "--yes" in result.stderr or "--yes" in result.output

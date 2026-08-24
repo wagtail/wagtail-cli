@@ -4,25 +4,25 @@ from pathlib import Path
 
 import typer
 
-from wgtl_api_cli import parsing
-from wgtl_api_cli.errors import UsageError
-from wgtl_api_cli.resources import documents as documents_resources
+from wagtail_cli import parsing
+from wagtail_cli.errors import UsageError
+from wagtail_cli.resources import images as images_resources
 
 from ._shared import is_tty as _is_tty  # noqa: F401
 from ._shared import require_yes as _require_yes
 from .main import app, appify, emit, get_client
 
 
-documents_app = typer.Typer(
-    name="documents",
-    help="List, view, upload, and manage documents.",
+images_app = typer.Typer(
+    name="images",
+    help="List, view, upload, and manage images.",
     no_args_is_help=True,
 )
 
 
-@documents_app.command("list")
+@images_app.command("list")
 @appify
-def list_documents(
+def list_images(
     ctx: typer.Context,
     search: str | None = typer.Option(None, "--search", help="Full-text search query."),
     search_operator: str | None = typer.Option(
@@ -34,11 +34,11 @@ def list_documents(
     limit: int | None = typer.Option(None, "--limit", help="Maximum items per page."),
     offset: int | None = typer.Option(None, "--offset", help="Pagination offset."),
 ) -> None:
-    """List documents with optional filters, ordering, and pagination."""
+    """List images with optional filters, ordering, and pagination."""
     client = get_client(ctx)
     emit(
         ctx,
-        documents_resources.list_documents(
+        images_resources.list_images(
             client,
             search=search,
             search_operator=search_operator,
@@ -49,34 +49,34 @@ def list_documents(
     )
 
 
-@documents_app.command("get")
+@images_app.command("get")
 @appify
-def get_document(
+def get_image(
     ctx: typer.Context,
-    document_id: int = typer.Argument(help="Document ID."),
+    image_id: int = typer.Argument(help="Image ID."),
 ) -> None:
-    """Fetch a single document by ID."""
+    """Fetch a single image by ID."""
     client = get_client(ctx)
-    emit(ctx, documents_resources.get_document(client, document_id))
+    emit(ctx, images_resources.get_image(client, image_id))
 
 
-@documents_app.command("create")
+@images_app.command("create")
 @appify
-def create_document(
+def create_image(
     ctx: typer.Context,
     file: Path = typer.Argument(  # noqa: B008
-        help="Path to the document file to upload."
+        help="Path to the image file to upload."
     ),
-    title: str = typer.Option(..., "--title", help="Document title."),
+    title: str = typer.Option(..., "--title", help="Image title."),
     field: list[str] | None = typer.Option(  # noqa: B008
         None, "--field", help="Set an extra form field KEY:VALUE (repeatable)."
     ),
 ) -> None:
-    """Upload a document (multipart/form-data)."""
+    """Upload an image (multipart/form-data)."""
     if not file.is_file():
         raise UsageError(f"Cannot read file: {file}")
     client = get_client(ctx)
-    result = documents_resources.create_document(
+    result = images_resources.create_image(
         client,
         file=file,
         title=title,
@@ -85,40 +85,40 @@ def create_document(
     emit(ctx, result)
 
 
-@documents_app.command("update")
+@images_app.command("update")
 @appify
-def update_document(
+def update_image(
     ctx: typer.Context,
-    document_id: int = typer.Argument(help="Document ID."),
-    title: str | None = typer.Option(None, "--title", help="New document title."),
+    image_id: int = typer.Argument(help="Image ID."),
+    title: str | None = typer.Option(None, "--title", help="New image title."),
     field: list[str] | None = typer.Option(  # noqa: B008
         None, "--field", help="Set a field KEY:VALUE (repeatable)."
     ),
     yes: bool = typer.Option(False, "--yes", help="Skip confirmation."),
 ) -> None:
-    """Update (PATCH) a document's metadata. Sends only provided fields."""
-    if not _require_yes(ctx, yes, f"update document {document_id}"):
+    """Update (PATCH) an image's metadata. Sends only provided fields."""
+    if not _require_yes(ctx, yes, f"update image {image_id}"):
         return
     body: dict = {}
     if title:
         body["title"] = title
     body.update(parsing.parse_fields(field or []))
     client = get_client(ctx)
-    emit(ctx, documents_resources.update_document(client, document_id, body))
+    emit(ctx, images_resources.update_image(client, image_id, body))
 
 
-@documents_app.command("delete")
+@images_app.command("delete")
 @appify
-def delete_document(
+def delete_image(
     ctx: typer.Context,
-    document_id: int = typer.Argument(help="Document ID."),
+    image_id: int = typer.Argument(help="Image ID."),
     yes: bool = typer.Option(False, "--yes", help="Skip confirmation."),
 ) -> None:
-    """Delete a document (confirmation required unless --yes)."""
-    if not _require_yes(ctx, yes, f"delete document {document_id}"):
+    """Delete an image (confirmation required unless --yes)."""
+    if not _require_yes(ctx, yes, f"delete image {image_id}"):
         return
     client = get_client(ctx)
-    emit(ctx, documents_resources.delete_document(client, document_id))
+    emit(ctx, images_resources.delete_image(client, image_id))
 
 
-app.add_typer(documents_app, name="documents")
+app.add_typer(images_app, name="images")

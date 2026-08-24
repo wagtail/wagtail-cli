@@ -1,7 +1,7 @@
 """OpenAPI coverage-gap check.
 
 Drift detector between the committed v3 OpenAPI schema snapshot
-(``src/wgtl_api_cli/client/openapi.json``) and the CLI command surface.
+(``src/wagtail_cli/client/openapi.json``) and the CLI command surface.
 
 * A schema operation with no mapping row fails — we shipped an API endpoint
   with no CLI command.
@@ -17,7 +17,7 @@ from pathlib import Path
 
 
 SCHEMA_PATH = (
-    Path(__file__).parent / ".." / "src" / "wgtl_api_cli" / "client" / "openapi.json"
+    Path(__file__).parent / ".." / "src" / "wagtail_cli" / "client" / "openapi.json"
 )
 
 # (HTTP_METHOD, path_prefix) -> human CLI invocation.
@@ -26,101 +26,107 @@ SCHEMA_PATH = (
 # covers the operation (for humans); the test only asserts the key is mapped.
 MAPPING: dict[tuple[str, str], str] = {
     # whoami
-    ("GET", "/api/v3/whoami/"): "wgtl whoami",
+    ("GET", "/api/v3/whoami/"): "wt api whoami",
     # schema
-    ("GET", "/api/v3/schema/"): "wgtl schema list",
-    ("GET", "/api/v3/schema/{type_name}/"): "wgtl schema show <type>",
+    ("GET", "/api/v3/schema/"): "wt api schema list",
+    ("GET", "/api/v3/schema/{type_name}/"): "wt api schema show <type>",
     # pages (CRUD + find)
-    ("GET", "/api/v3/pages/"): "wgtl pages list",
-    ("POST", "/api/v3/pages/"): "wgtl pages create",
-    ("GET", "/api/v3/pages/find/"): "wgtl pages find",
-    ("GET", "/api/v3/pages/{page_id}/"): "wgtl pages get",
-    ("PATCH", "/api/v3/pages/{page_id}/"): "wgtl pages update",
-    ("DELETE", "/api/v3/pages/{page_id}/"): "wgtl pages delete",
+    ("GET", "/api/v3/pages/"): "wt api pages list",
+    ("POST", "/api/v3/pages/"): "wt api pages create",
+    ("GET", "/api/v3/pages/find/"): "wt api pages find",
+    ("GET", "/api/v3/pages/{page_id}/"): "wt api pages get",
+    ("PATCH", "/api/v3/pages/{page_id}/"): "wt api pages update",
+    ("DELETE", "/api/v3/pages/{page_id}/"): "wt api pages delete",
     # pages actions
-    ("POST", "/api/v3/pages/{page_id}/actions/publish/"): "wgtl pages publish",
-    ("POST", "/api/v3/pages/{page_id}/actions/unpublish/"): "wgtl pages unpublish",
-    ("POST", "/api/v3/pages/{page_id}/actions/copy/"): "wgtl pages copy",
-    ("POST", "/api/v3/pages/{page_id}/actions/move/"): "wgtl pages move",
-    ("POST", "/api/v3/pages/{page_id}/actions/revert/"): "wgtl pages revert",
+    ("POST", "/api/v3/pages/{page_id}/actions/publish/"): "wt api pages publish",
+    ("POST", "/api/v3/pages/{page_id}/actions/unpublish/"): "wt api pages unpublish",
+    ("POST", "/api/v3/pages/{page_id}/actions/copy/"): "wt api pages copy",
+    ("POST", "/api/v3/pages/{page_id}/actions/move/"): "wt api pages move",
+    ("POST", "/api/v3/pages/{page_id}/actions/revert/"): "wt api pages revert",
     (
         "POST",
         "/api/v3/pages/{page_id}/actions/create_alias/",
-    ): "wgtl pages create-alias",
+    ): "wt api pages create-alias",
     (
         "POST",
         "/api/v3/pages/{page_id}/actions/convert_alias/",
-    ): "wgtl pages convert-alias",
+    ): "wt api pages convert-alias",
     (
         "POST",
         "/api/v3/pages/{page_id}/actions/copy_for_translation/",
-    ): "wgtl pages copy-for-translation",
+    ): "wt api pages copy-for-translation",
     (
         "DELETE",
         "/api/v3/pages/{page_id}/actions/delete/",
-    ): "wgtl pages delete (canonical delete action)",
+    ): "wt api pages delete (canonical delete action)",
     # page revisions
-    ("GET", "/api/v3/pages/{page_id}/revisions/"): "wgtl pages revisions list",
+    ("GET", "/api/v3/pages/{page_id}/revisions/"): "wt api pages revisions list",
     (
         "GET",
         "/api/v3/pages/{page_id}/revisions/{revision_id}/",
-    ): "wgtl pages revisions get",
+    ): "wt api pages revisions get",
     # images
-    ("GET", "/api/v3/images/"): "wgtl images list",
-    ("POST", "/api/v3/images/"): "wgtl images create",
-    ("GET", "/api/v3/images/{image_id}/"): "wgtl images get",
-    ("PATCH", "/api/v3/images/{image_id}/"): "wgtl images update",
-    ("DELETE", "/api/v3/images/{image_id}/"): "wgtl images delete",
+    ("GET", "/api/v3/images/"): "wt api images list",
+    ("POST", "/api/v3/images/"): "wt api images create",
+    ("GET", "/api/v3/images/{image_id}/"): "wt api images get",
+    ("PATCH", "/api/v3/images/{image_id}/"): "wt api images update",
+    ("DELETE", "/api/v3/images/{image_id}/"): "wt api images delete",
     # documents
-    ("GET", "/api/v3/documents/"): "wgtl documents list",
-    ("POST", "/api/v3/documents/"): "wgtl documents create",
-    ("GET", "/api/v3/documents/{document_id}/"): "wgtl documents get",
-    ("PATCH", "/api/v3/documents/{document_id}/"): "wgtl documents update",
-    ("DELETE", "/api/v3/documents/{document_id}/"): "wgtl documents delete",
+    ("GET", "/api/v3/documents/"): "wt api documents list",
+    ("POST", "/api/v3/documents/"): "wt api documents create",
+    ("GET", "/api/v3/documents/{document_id}/"): "wt api documents get",
+    ("PATCH", "/api/v3/documents/{document_id}/"): "wt api documents update",
+    ("DELETE", "/api/v3/documents/{document_id}/"): "wt api documents delete",
     # snippets (type-parameterized CRUD + actions + revisions)
-    ("GET", "/api/v3/snippets/{type}/"): "wgtl snippets list",
-    ("POST", "/api/v3/snippets/{type}/"): "wgtl snippets create",
-    ("GET", "/api/v3/snippets/{type}/{pk}/"): "wgtl snippets get",
-    ("PATCH", "/api/v3/snippets/{type}/{pk}/"): "wgtl snippets update",
-    ("DELETE", "/api/v3/snippets/{type}/{pk}/"): "wgtl snippets delete",
-    ("POST", "/api/v3/snippets/{type}/{pk}/actions/publish/"): "wgtl snippets publish",
+    ("GET", "/api/v3/snippets/{type}/"): "wt api snippets list",
+    ("POST", "/api/v3/snippets/{type}/"): "wt api snippets create",
+    ("GET", "/api/v3/snippets/{type}/{pk}/"): "wt api snippets get",
+    ("PATCH", "/api/v3/snippets/{type}/{pk}/"): "wt api snippets update",
+    ("DELETE", "/api/v3/snippets/{type}/{pk}/"): "wt api snippets delete",
+    (
+        "POST",
+        "/api/v3/snippets/{type}/{pk}/actions/publish/",
+    ): "wt api snippets publish",
     (
         "POST",
         "/api/v3/snippets/{type}/{pk}/actions/unpublish/",
-    ): "wgtl snippets unpublish",
-    ("POST", "/api/v3/snippets/{type}/{pk}/actions/revert/"): "wgtl snippets revert",
+    ): "wt api snippets unpublish",
+    ("POST", "/api/v3/snippets/{type}/{pk}/actions/revert/"): "wt api snippets revert",
     (
         "POST",
         "/api/v3/snippets/{type}/{pk}/actions/copy_for_translation/",
-    ): "wgtl snippets copy-for-translation",
-    ("GET", "/api/v3/snippets/{type}/{pk}/revisions/"): "wgtl snippets revisions list",
+    ): "wt api snippets copy-for-translation",
+    (
+        "GET",
+        "/api/v3/snippets/{type}/{pk}/revisions/",
+    ): "wt api snippets revisions list",
     (
         "GET",
         "/api/v3/snippets/{type}/{pk}/revisions/{revision_id}/",
-    ): "wgtl snippets revisions get",
+    ): "wt api snippets revisions get",
     (
         "DELETE",
         "/api/v3/snippets/{type}/{pk}/actions/delete/",
-    ): "wgtl snippets delete (canonical delete action)",
+    ): "wt api snippets delete (canonical delete action)",
     # sites
-    ("GET", "/api/v3/sites/"): "wgtl sites list",
-    ("POST", "/api/v3/sites/"): "wgtl sites create",
-    ("GET", "/api/v3/sites/{site_id}/"): "wgtl sites get",
-    ("PUT", "/api/v3/sites/{site_id}/"): "wgtl sites update",
-    ("DELETE", "/api/v3/sites/{site_id}/"): "wgtl sites delete",
+    ("GET", "/api/v3/sites/"): "wt api sites list",
+    ("POST", "/api/v3/sites/"): "wt api sites create",
+    ("GET", "/api/v3/sites/{site_id}/"): "wt api sites get",
+    ("PUT", "/api/v3/sites/{site_id}/"): "wt api sites update",
+    ("DELETE", "/api/v3/sites/{site_id}/"): "wt api sites delete",
     # locales
-    ("GET", "/api/v3/locales/"): "wgtl locales list",
-    ("POST", "/api/v3/locales/"): "wgtl locales create",
-    ("GET", "/api/v3/locales/{locale_id}/"): "wgtl locales get",
-    ("PUT", "/api/v3/locales/{locale_id}/"): "wgtl locales update",
-    ("DELETE", "/api/v3/locales/{locale_id}/"): "wgtl locales delete",
+    ("GET", "/api/v3/locales/"): "wt api locales list",
+    ("POST", "/api/v3/locales/"): "wt api locales create",
+    ("GET", "/api/v3/locales/{locale_id}/"): "wt api locales get",
+    ("PUT", "/api/v3/locales/{locale_id}/"): "wt api locales update",
+    ("DELETE", "/api/v3/locales/{locale_id}/"): "wt api locales delete",
     # redirects (CRUD + find)
-    ("GET", "/api/v3/redirects/"): "wgtl redirects list",
-    ("POST", "/api/v3/redirects/"): "wgtl redirects create",
-    ("GET", "/api/v3/redirects/find/"): "wgtl redirects find",
-    ("GET", "/api/v3/redirects/{redirect_id}/"): "wgtl redirects get",
-    ("PUT", "/api/v3/redirects/{redirect_id}/"): "wgtl redirects update",
-    ("DELETE", "/api/v3/redirects/{redirect_id}/"): "wgtl redirects delete",
+    ("GET", "/api/v3/redirects/"): "wt api redirects list",
+    ("POST", "/api/v3/redirects/"): "wt api redirects create",
+    ("GET", "/api/v3/redirects/find/"): "wt api redirects find",
+    ("GET", "/api/v3/redirects/{redirect_id}/"): "wt api redirects get",
+    ("PUT", "/api/v3/redirects/{redirect_id}/"): "wt api redirects update",
+    ("DELETE", "/api/v3/redirects/{redirect_id}/"): "wt api redirects delete",
 }
 
 

@@ -2,7 +2,7 @@ import respx
 
 from typer.testing import CliRunner
 
-from wgtl_api_cli.cli.main import app
+from wagtail_cli.cli.main import app
 
 
 BASE = "https://x.test/api/v3"
@@ -10,8 +10,8 @@ runner = CliRunner()
 
 
 def _env(monkeypatch):
-    monkeypatch.setenv("WAGTAIL_BASE_URL", BASE)
-    monkeypatch.setenv("WAGTAIL_TOKEN", "tok")
+    monkeypatch.setenv("WAGTAIL_CLI_BASE_URL", BASE)
+    monkeypatch.setenv("WAGTAIL_CLI_TOKEN", "tok")
 
 
 def _png(tmp_path):
@@ -65,7 +65,7 @@ def test_images_update_with_yes(monkeypatch):
 
 def test_images_update_without_yes_non_tty(monkeypatch):
     _env(monkeypatch)
-    monkeypatch.setattr("wgtl_api_cli.cli.images._is_tty", lambda: False)
+    monkeypatch.setattr("wagtail_cli.cli.images._is_tty", lambda: False)
     result = runner.invoke(app, ["images", "update", "7", "--title", "New"])
     assert result.exit_code == 2
     assert "--yes" in result.stderr or "--yes" in result.output
@@ -127,7 +127,7 @@ def test_documents_create_multipart(monkeypatch, tmp_path):
 @respx.mock
 def test_documents_delete_requires_yes(monkeypatch):
     _env(monkeypatch)
-    monkeypatch.setattr("wgtl_api_cli.cli.documents._is_tty", lambda: False)
+    monkeypatch.setattr("wagtail_cli.cli.documents._is_tty", lambda: False)
     result = runner.invoke(app, ["documents", "delete", "3"])
     assert result.exit_code == 2
     assert "--yes" in result.stderr or "--yes" in result.output

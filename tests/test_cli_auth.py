@@ -2,7 +2,7 @@ import respx
 
 from typer.testing import CliRunner
 
-from wgtl_api_cli.cli.main import app
+from wagtail_cli.cli.main import app
 
 
 BASE = "https://x.test/api/v3"
@@ -10,8 +10,8 @@ runner = CliRunner()
 
 
 def _env(monkeypatch):
-    monkeypatch.setenv("WAGTAIL_BASE_URL", BASE)
-    monkeypatch.setenv("WAGTAIL_TOKEN", "tok")
+    monkeypatch.setenv("WAGTAIL_CLI_BASE_URL", BASE)
+    monkeypatch.setenv("WAGTAIL_CLI_TOKEN", "tok")
 
 
 @respx.mock
@@ -35,11 +35,11 @@ def test_whoami_auth_error_exit_4(monkeypatch):
 
 
 def test_whoami_unconfigured_exit_2(monkeypatch):
-    monkeypatch.delenv("WAGTAIL_BASE_URL", raising=False)
-    monkeypatch.delenv("WAGTAIL_TOKEN", raising=False)
+    monkeypatch.delenv("WAGTAIL_CLI_BASE_URL", raising=False)
+    monkeypatch.delenv("WAGTAIL_CLI_TOKEN", raising=False)
     result = runner.invoke(app, ["--url", BASE, "whoami"])  # url but no token
     assert result.exit_code == 2
-    assert "wgtl init" in result.output
+    assert "wt init" in result.output
 
 
 def test_conflicting_output_flags_exit_2_no_traceback():
@@ -53,19 +53,19 @@ def test_conflicting_output_flags_exit_2_no_traceback():
 @respx.mock
 def test_init_writes_dotfile(monkeypatch, tmp_path):
     monkeypatch.setattr(
-        "wgtl_api_cli.config._user_dotfile", lambda: tmp_path / ".wgtl.toml"
+        "wagtail_cli.config._user_dotfile", lambda: tmp_path / ".wagtail-cli.toml"
     )
     respx.get(f"{BASE}/whoami/").respond(200, json={"user": {"username": "admin"}})
     result = runner.invoke(app, ["--url", BASE, "--token", "tok123", "init"])
     assert result.exit_code == 0
-    data = (tmp_path / ".wgtl.toml").read_text()
+    data = (tmp_path / ".wagtail-cli.toml").read_text()
     assert 'url = "https://x.test/api/v3"' in data and 'token = "tok123"' in data
 
 
 @respx.mock
 def test_init_dry_run_writes_nothing(monkeypatch, tmp_path):
     monkeypatch.setattr(
-        "wgtl_api_cli.config._user_dotfile", lambda: tmp_path / ".wgtl.toml"
+        "wagtail_cli.config._user_dotfile", lambda: tmp_path / ".wagtail-cli.toml"
     )
     # No route is registered: if any request is made, respx raises and the
     # test fails. Dry-run must skip both network and filesystem writes.
@@ -73,6 +73,6 @@ def test_init_dry_run_writes_nothing(monkeypatch, tmp_path):
         app, ["--dry-run", "--url", BASE, "--token", "tok123", "init"]
     )
     assert result.exit_code == 0
-    assert not (tmp_path / ".wgtl.toml").exists()
+    assert not (tmp_path / ".wagtail-cli.toml").exists()
     assert "dry-run: would write" in result.output
     assert "tok123" not in result.output  # token redacted

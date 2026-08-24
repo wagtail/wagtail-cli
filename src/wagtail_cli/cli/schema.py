@@ -4,8 +4,8 @@ from typing import Any
 
 import typer
 
-from wgtl_api_cli import output
-from wgtl_api_cli.resources import schema as schema_resources
+from wagtail_cli import output
+from wagtail_cli.resources import schema as schema_resources
 
 from .main import app, appify, emit, get_client
 

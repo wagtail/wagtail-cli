@@ -9,14 +9,14 @@ from typing import Any
 
 import typer
 
-from wgtl_api_cli import __version__, output
-from wgtl_api_cli.config import load_config
-from wgtl_api_cli.errors import UsageError, WgtlError
-from wgtl_api_cli.resources._client import DryRunRequest, WgtlClient
+from wagtail_cli import __version__, output
+from wagtail_cli.config import load_config
+from wagtail_cli.errors import UsageError, WgtlError
+from wagtail_cli.resources._client import DryRunRequest, WgtlClient
 
 
 app = typer.Typer(
-    name="wgtl",
+    name="wt",
     help="CLI client for the Wagtail v3 API.",
     no_args_is_help=True,
 )
@@ -93,7 +93,8 @@ def get_client(ctx: typer.Context) -> WgtlClient:
     cfg = load_config(cli_url=cc.url, cli_token=cc.token)
     if not cfg.is_configured:
         raise UsageError(
-            "Not configured. Run `wgtl init` or set WAGTAIL_BASE_URL / WAGTAIL_TOKEN."
+            "Not configured. Run `wt init` or set WAGTAIL_CLI_BASE_URL / \
+            WAGTAIL_CLI_TOKEN."
         )
     return WgtlClient(
         cfg.base_url,
@@ -142,3 +143,8 @@ def appify(fn: Callable[..., Any]) -> Callable[..., Any]:
             raise typer.Exit(code=e.exit_code) from e
 
     return wrapper
+
+
+def cli() -> None:
+    """Console entry point (Typer app)."""
+    app()

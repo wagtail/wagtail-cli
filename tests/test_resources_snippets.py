@@ -2,8 +2,8 @@ import json
 
 import respx
 
-from wgtl_api_cli.resources._client import WgtlClient
-from wgtl_api_cli.resources.snippets import (
+from wagtail_cli.resources._client import WgtlClient
+from wagtail_cli.resources.snippets import (
     copy_snippet_for_translation,
     create_snippet,
     delete_snippet,

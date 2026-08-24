@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import typer
 
-from wgtl_api_cli.config import Config, save_user_config
-from wgtl_api_cli.resources._client import WgtlClient
+from wagtail_cli.config import Config, save_user_config
+from wagtail_cli.resources._client import WgtlClient
 
 from .main import app, appify, emit, get_client
 
@@ -27,7 +27,7 @@ def init(
         None, "--token", help="API token (skips the prompt)."
     ),
 ) -> None:
-    """Configure credentials interactively and save them to ~/.wgtl.toml."""
+    """Configure credentials interactively and save them to ~/.wagtail-cli.toml."""
     cc = ctx.obj
     url = url or cc.url
     token = token or cc.token
@@ -57,10 +57,10 @@ def init(
         redacted = (token[:4] + "…") if token else ""
         typer.echo(
             f"dry-run: would write token for url={url} (token={redacted}) "
-            "to ~/.wgtl.toml. No file was written; no connection was made."
+            "to ~/.wagtail-cli.toml. No file was written; no connection was made."
         )
         return
 
     save_user_config(Config(base_url=url, token=token))
     who = f" as {username}" if username else ""
-    typer.echo(f"Connected. Config written to ~/.wgtl.toml{who}.")
+    typer.echo(f"Connected. Config written to ~/.wagtail-cli.toml{who}.")

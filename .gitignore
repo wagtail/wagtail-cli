@@ -27,4 +27,4 @@ bakerydemo
 wagtail
 
 # Local CLI credential dotfile (contains an API token)
-/.wgtl.toml
+/.wagtail-cli.toml

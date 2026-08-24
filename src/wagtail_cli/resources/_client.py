@@ -8,7 +8,7 @@ from typing import Any
 
 import httpx
 
-from wgtl_api_cli.errors import NetworkError, error_for_status
+from wagtail_cli.errors import NetworkError, error_for_status
 
 
 @dataclass

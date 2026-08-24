@@ -1,7 +1,7 @@
 import pytest
 
-from wgtl_api_cli.errors import UsageError
-from wgtl_api_cli.parsing import parse_fields, resolve_page_ref
+from wagtail_cli.errors import UsageError
+from wagtail_cli.parsing import parse_fields, resolve_page_ref
 
 
 def test_plain_string():

@@ -7,7 +7,7 @@ This project uses [cookiecutter](https://cookiecutter.readthedocs.io/en/stable/)
 The repository root contains the full, runnable package:
 
 ```
-├── src/wgtl_api_cli/   # The Django app (source code)
+├── src/wagtail_cli/   # The Django app (source code)
 ├── tests/                 # Test suite
 ├── demo/                  # Demo Wagtail site
 ├── .github/workflows/     # CI configuration
@@ -41,7 +41,7 @@ It then overlays the contents of `template/` on top, so files like `template/REA
 
 ### 2. Rename project directories
 
-Any directory named `wgtl_api_cli` is renamed to `wgtl_api_cli`, which cookiecutter then resolves to the user's chosen project name in snake_case.
+Any directory named `wagtail_cli` is renamed to `wagtail_cli`, which cookiecutter then resolves to the user's chosen project name in snake_case.
 
 ### 3. Replace placeholders in file contents
 
@@ -49,12 +49,12 @@ The hook performs text replacements across all text files, converting placeholde
 
 | Placeholder | Cookiecutter variable | Example output |
 |---|---|---|
-| `wgtl_api_cli` | `wgtl_api_cli` | `wagtail_color_picker` |
-| `wgtl-api-cli` | `wgtl-api-cli` | `wagtail-color-picker` |
+| `wagtail_cli` | `wagtail_cli` | `wagtail_color_picker` |
+| `wagtail-cli` | `wagtail-cli` | `wagtail-color-picker` |
 | `WgtlApiCli` | `WgtlApiCli` | `WagtailColorPicker` |
-| `wgtl-api-cli` | `wgtl-api-cli` | `Wagtail Color Picker` |
+| `wagtail-cli` | `wagtail-cli` | `Wagtail Color Picker` |
 | `Experimental CLI API client for Wagtail` | `Experimental CLI API client for Wagtail` | `A color picker field for Wagtail` |
-| `https://github.com/org-name-or-username/wgtl-api-cli` | `https://github.com/wagtail/wgtl-api-cli` | `https://github.com/user/wagtail-color-picker` |
+| `https://github.com/org-name-or-username/wagtail-cli` | `https://github.com/wagtail/wagtail-cli` | `https://github.com/user/wagtail-color-picker` |
 | `2026` | `2026` | `2026` |
 
 Only text files are processed (`.py`, `.md`, `.json`, `.toml`, `.yml`, `.yaml`, `.js`, `.css`, `.html`, `.xml`, `.ini`, `.cfg`, `.sh`, `.bat`, and dotfiles).

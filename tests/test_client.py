@@ -2,8 +2,8 @@ import httpx
 import pytest
 import respx
 
-from wgtl_api_cli.errors import AuthError, NetworkError, NotFoundError, ValidationError
-from wgtl_api_cli.resources._client import DryRunRequest, WgtlClient
+from wagtail_cli.errors import AuthError, NetworkError, NotFoundError, ValidationError
+from wagtail_cli.resources._client import DryRunRequest, WgtlClient
 
 
 BASE = "https://x.test/api/v3"

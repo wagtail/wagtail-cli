@@ -915,7 +915,7 @@ wheels = [
 ]
 
 [[package]]
-name = "wgtl-api-cli"
+name = "wagtail-cli"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [

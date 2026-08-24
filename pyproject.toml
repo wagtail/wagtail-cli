@@ -1,5 +1,5 @@
 [project]
-name = "wgtl-api-cli"
+name = "wagtail-cli"
 version = "0.1.0"
 description = "CLI client for the Wagtail v3 API"
 readme = "README.md"
@@ -29,16 +29,16 @@ dependencies = [
 ]
 
 [project.scripts]
-wgtl = "wgtl_api_cli.cli.main:app"
+wt = "wagtail_cli.cli.main:cli"
 
 [project.urls]
-Homepage = "https://github.com/org-name-or-username/wgtl-api-cli"
-Repository = "https://github.com/org-name-or-username/wgtl-api-cli"
-Changelog = "https://github.com/org-name-or-username/wgtl-api-cli/blob/main/CHANGELOG.md"
-Documentation = "https://github.com/org-name-or-username/wgtl-api-cli/tree/main/docs"
-Issues = "https://github.com/org-name-or-username/wgtl-api-cli/issues"
+Homepage = "https://github.com/org-name-or-username/wagtail-cli"
+Repository = "https://github.com/org-name-or-username/wagtail-cli"
+Changelog = "https://github.com/org-name-or-username/wagtail-cli/blob/main/CHANGELOG.md"
+Documentation = "https://github.com/org-name-or-username/wagtail-cli/tree/main/docs"
+Issues = "https://github.com/org-name-or-username/wagtail-cli/issues"
 # Add funding link if needed.
-# Funding = "https://github.com/org-name-or-username/wgtl-api-cli"
+# Funding = "https://github.com/org-name-or-username/wagtail-cli"
 
 [dependency-groups]
 dev = [
@@ -53,7 +53,7 @@ requires = ["uv_build>=0.11.19,<0.12"]
 build-backend = "uv_build"
 
 [tool.uv.build-backend]
-module-name = "wgtl_api_cli"
+module-name = "wagtail_cli"
 source-exclude = [
     ".*",
     "*.js",
@@ -64,4 +64,4 @@ source-exclude = [
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-markers = ["integration: requires a live Wagtail v3 site (WGTL_TEST_BASE_URL/WGTL_TEST_TOKEN)"]
+markers = ["integration: requires a live Wagtail v3 site (WAGTAIL_CLI_TEST_BASE_URL/WAGTAIL_CLI_TEST_TOKEN)"]

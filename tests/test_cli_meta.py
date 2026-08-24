@@ -4,7 +4,7 @@ import respx
 
 from typer.testing import CliRunner
 
-from wgtl_api_cli.cli.main import app
+from wagtail_cli.cli.main import app
 
 
 BASE = "https://x.test/api/v3"
@@ -12,8 +12,8 @@ runner = CliRunner()
 
 
 def _env(monkeypatch):
-    monkeypatch.setenv("WAGTAIL_BASE_URL", BASE)
-    monkeypatch.setenv("WAGTAIL_TOKEN", "tok")
+    monkeypatch.setenv("WAGTAIL_CLI_BASE_URL", BASE)
+    monkeypatch.setenv("WAGTAIL_CLI_TOKEN", "tok")
 
 
 # --- sites ---
@@ -71,7 +71,7 @@ def test_sites_update_put(monkeypatch):
 @respx.mock
 def test_sites_delete_requires_yes(monkeypatch):
     _env(monkeypatch)
-    monkeypatch.setattr("wgtl_api_cli.cli.sites._is_tty", lambda: False)
+    monkeypatch.setattr("wagtail_cli.cli.sites._is_tty", lambda: False)
     result = runner.invoke(app, ["sites", "delete", "5"])
     assert result.exit_code == 2
     assert "--yes" in result.stderr or "--yes" in result.output
