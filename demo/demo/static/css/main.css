@@ -33,12 +33,10 @@ each detail view
   --orange: #c55302;
   --dark-orange: #833701;
   --font--primary: 'Marcellus', serif;
-  /* stylelint-disable */
   --font--secondary:
     -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Roboto,
     'Helvetica Neue', Arial, sans-serif, Apple Color Emoji, 'Segoe UI Emoji',
     'Segoe UI Symbol', 'Noto Color Emoji';
-  /* stylelint-enable */
   --font-sm: 1rem;
   --font-md: 1.125rem;
 }
@@ -400,39 +398,32 @@ caption {
 }
 
 /* Richtext Styles */
-/* stylelint-disable-next-line selector-class-pattern */
 .block-paragraph_block p {
   color: var(--dark);
 }
 
-/* stylelint-disable selector-class-pattern */
 .block-paragraph_block a,
 .block-ingredients_list a {
   text-decoration: underline;
 }
-/* stylelint-enable selector-class-pattern */
 
-/* stylelint-disable-next-line selector-class-pattern */
 .block-embed_block iframe {
   aspect-ratio: 16 / 9;
   width: 100%;
   height: 100%;
 }
 
-/* stylelint-disable-next-line selector-class-pattern */
 .block-paragraph_block iframe {
   aspect-ratio: 16 / 9;
   width: 100%;
   height: 100%;
 }
 
-/* stylelint-disable-next-line selector-class-pattern */
 :is(.block-table_block, .block-typed_table_block) :is(table, tr, td, th) {
   border: 1px solid var(--dark);
   padding: 0.25em;
 }
 
-/* stylelint-disable-next-line selector-class-pattern */
 :is(.block-table_block, .block-typed_table_block) table {
   margin-bottom: 30px;
 }

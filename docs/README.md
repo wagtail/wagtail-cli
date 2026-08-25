@@ -13,7 +13,7 @@ The repository root contains the full, runnable package:
 ├── .github/workflows/     # CI configuration
 ├── justfile               # Task runner recipes
 ├── pyproject.toml         # Package metadata and build config
-├── package.json           # Node.js tooling (Prettier, Stylelint)
+├── package.json           # Node.js tooling (Prettier)
 └── template/              # Files that differ for generated packages
     ├── README.md
     ├── CONTRIBUTING.md

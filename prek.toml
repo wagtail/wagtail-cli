@@ -45,10 +45,3 @@ name = "npm run lint:format"
 entry = "npm run lint:format"
 language = "system"
 types_or = ["css", "scss", "javascript", "ts", "tsx", "json", "yaml"]
-
-[[repos.hooks]]
-id = "lint-css"
-name = "npm run lint:css"
-entry = "npm run lint:css"
-language = "system"
-types_or = ["css", "scss"]

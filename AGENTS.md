@@ -15,7 +15,7 @@ just help        # View all commands
 just install     # Install Python and Node.js dependencies
 just demo        # Run the demo Wagtail site (migrate + load data + runserver)
 just test        # Run tests with pytest
-just lint        # Run all linters (Ruff, prek, Prettier, Stylelint)
+just lint        # Run all linters (Ruff, prek, Prettier)
 just format      # Run all formatters (Ruff, Prettier)
 just coverage    # Run tests with coverage report
 ```
@@ -24,7 +24,6 @@ just coverage    # Run tests with coverage report
 
 - Python: Ruff for linting and formatting (`ruff.toml`), prek hooks (`prek.toml`).
 - JavaScript/CSS/JSON/YAML: Prettier for formatting (`prettier.config.js`).
-- CSS: Stylelint with `@wagtail/stylelint-config-wagtail` (`stylelint.config.mjs`).
 - Tests: pytest. The unit suite lives in `tests/` and needs no Django app; Django settings for the broader tooling live in the `demo/` site.
 - CI: GitHub Actions in `.github/workflows/`.
 
@@ -43,5 +42,4 @@ demo/                      # Demo Wagtail site for development
 
 - Follow [Semantic Versioning](https://semver.org/) for releases.
 - Use [Keep a Changelog](https://keepachangelog.com/) format for CHANGELOG.md.
-- CSS should follow the Wagtail stylelint config conventions.
 - Refer to [CONTRIBUTING.md](CONTRIBUTING.md) for the full contribution workflow.
