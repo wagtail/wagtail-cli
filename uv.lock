@@ -919,7 +919,6 @@ name = "wagtail-cli"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
-    { name = "clientele", extra = ["cli"] },
     { name = "httpx" },
     { name = "pydantic" },
     { name = "tomli", marker = "python_full_version < '3.11'" },
@@ -928,6 +927,7 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "clientele", extra = ["cli"] },
     { name = "pytest" },
     { name = "pytest-cov" },
     { name = "respx" },
@@ -936,7 +936,6 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "clientele", extras = ["cli"], specifier = ">=1.2" },
     { name = "httpx", specifier = ">=0.27" },
     { name = "pydantic", specifier = ">=2" },
     { name = "tomli", marker = "python_full_version < '3.11'", specifier = ">=2" },
@@ -945,6 +944,7 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "clientele", extras = ["cli"], specifier = ">=1.2" },
     { name = "pytest", specifier = ">=8.1.1" },
     { name = "pytest-cov", specifier = ">=7.1.0" },
     { name = "respx", specifier = ">=0.21" },

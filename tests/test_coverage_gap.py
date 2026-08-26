@@ -1,7 +1,7 @@
 """OpenAPI coverage-gap check.
 
 Drift detector between the committed v3 OpenAPI schema snapshot
-(``src/wagtail_cli/client/openapi.json``) and the CLI command surface.
+(``tests/clientele_client/openapi.json``) and the CLI command surface.
 
 * A schema operation with no mapping row fails — we shipped an API endpoint
   with no CLI command.
@@ -16,9 +16,7 @@ import json
 from pathlib import Path
 
 
-SCHEMA_PATH = (
-    Path(__file__).parent / ".." / "src" / "wagtail_cli" / "client" / "openapi.json"
-)
+SCHEMA_PATH = Path(__file__).parent / "clientele_client" / "openapi.json"
 
 # (HTTP_METHOD, path_prefix) -> human CLI invocation.
 # path_prefix uses the OpenAPI path template placeholders ({page_id}, {type},

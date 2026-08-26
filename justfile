@@ -36,15 +36,15 @@ coverage:
 
 # Regenerate the clientele client from the committed OpenAPI snapshot.
 # NOTE: must pass the output dir as an ABSOLUTE path so clientele generates
-# relative imports (src.wagtail_cli.client would break a wheel install).
-# The generated client at src/wagtail_cli/client/ is committed and never
+# relative imports (tests.clientele_client would break a wheel install).
+# The generated client at tests/clientele_client/ is committed and never
 # hand-edited; review the resulting diff before committing.
 generate-client:
-    uv run clientele start-api -f 'src/wagtail_cli/client/openapi.json' -o "$(pwd)/src/wagtail_cli/client/" --regen
-    rm -f src/wagtail_cli/client/pyproject.toml
+    uv run clientele start-api -f 'tests/clientele_client/openapi.json' -o "$(pwd)/tests/clientele_client/" --regen
+    rm -f tests/clientele_client/pyproject.toml
     # clientele overwrites __init__.py with empty content on regen; re-apply
     # the GENERATED marker so it stays durable. Recipe owns this marker.
-    printf '%s\n' '# GENERATED — see justfile generate-client' > src/wagtail_cli/client/__init__.py
+    printf '%s\n' '# GENERATED — see justfile generate-client' > tests/clientele_client/__init__.py
 
 
 # Run the integration test suite against a live Wagtail v3 API.

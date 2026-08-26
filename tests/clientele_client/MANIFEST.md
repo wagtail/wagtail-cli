@@ -21,5 +21,5 @@ CLIENTELE VERSION: 2.3.0
 Regenerate using this command:
 
 ```sh
-clientele start-api -f src/wgtl_api_cli/client/openapi.json -o /Users/thibaudcolas/Dev/wagtail/wgtl-api-cli/src/wgtl_api_cli/client/  --regen
+clientele start-api -f tests/clientele_client/openapi.json -o /Users/thibaudcolas/Dev/wagtail/wagtail-cli/tests/clientele_client/  --regen
 ```

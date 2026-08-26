@@ -7,10 +7,10 @@ exposes the expected surface.
 
 from pathlib import Path
 
-from wagtail_cli.client import client, schemas
+from clientele_client import client, schemas
 
 
-SNAPSHOT = Path(__file__).parent.parent / "src/wagtail_cli/client/openapi.json"
+SNAPSHOT = Path(__file__).parent / "clientele_client" / "openapi.json"
 
 
 def test_page_type_schema_present():

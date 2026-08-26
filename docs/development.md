@@ -17,20 +17,28 @@ src/wagtail_cli/
 ├── resources/      # hand-written facade; the only layer CLI code talks to
 │   ├── _client.py  # WgtlClient transport (auth, errors, dry-run, verbose)
 │   └── pages.py images.py documents.py snippets.py sites.py locales.py redirects.py schema.py
-├── client/         # clientele-generated — never hand-edited
-│   └── openapi.json  # committed schema snapshot
 ├── config.py       # config cascade + .wagtail-cli.toml
 ├── errors.py       # error hierarchy + exit-code mapping
 ├── output.py       # JSON/human rendering
 └── parsing.py      # --field parsing, @file/@-, page-ref resolution
 ```
 
+Tests carry the dev-only, clientele-generated client (see below):
+
+```
+tests/
+└── clientele_client/   # clientele-generated — never hand-edited
+    └── openapi.json    # committed schema snapshot
+```
+
 - `cli/` commands call `resources/` functions, never HTTP directly.
 - `resources/` builds payloads and calls `WgtlClient`; content fields
   (page types, some snippet types) are site-model-specific and are handled as
   generic dicts.
-- `client/` is generated from the committed `openapi.json` and only consulted
-  for stable, cross-project schemas.
+- `tests/clientele_client/` is generated from the committed `openapi.json` and
+  only consulted for stable, cross-project schemas; it lives under `tests/`
+  because it is a dev-time artifact (clientele is a dev dependency) and is
+  excluded from the built wheel.
 
 ## Setting up
 
@@ -57,8 +65,8 @@ Four test layers:
   command. Fails when the API gains an endpoint with no command (drift) or a
   command with no endpoint (stale).
 - **Generated smoke** (`tests/test_generated_smoke.py`) — asserts the generated
-  `client/` package imports and exposes the expected schema classes, so a botched
-  regen fails CI.
+  `clientele_client/` package imports and exposes the expected schema classes, so
+  a botched regen fails CI.
 
 ### Integration tests
 
@@ -78,24 +86,25 @@ The demo project ships the v3 API; see the quickstart for creating a token.
 
 ## Regenerating the client
 
-The `client/` package is generated from the committed OpenAPI snapshot:
+The `tests/clientele_client/` package is generated from the committed OpenAPI
+snapshot:
 
 ```bash
 just generate-client
 ```
 
 - The `-o` path **must be absolute** so clientele emits relative imports (a
-  relative path produces `src.wagtail_cli.client` imports that break wheel
+  relative path produces `tests.clientele_client` imports that break wheel
   installs).
 - Review the resulting diff before committing — v3 is a preview and schema
   churn surfaces here.
 - `just generate-client` re-applies the `# GENERATED` marker to
-  `client/__init__.py` (clientele zeroes it on regen).
+  `clientele_client/__init__.py` (clientele zeroes it on regen).
 
 ## Adding a command
 
-1. Find the operation in `client/openapi.json` (or the API docs); note the
-   request path, method, body fields, and parameters.
+1. Find the operation in `tests/clientele_client/openapi.json` (or the API
+   docs); note the request path, method, body fields, and parameters.
 2. Add a `resources/` function building the payload and calling the transport
    (or add a method to the existing resource module).
 3. Add a `cli/` command in the matching module that parses args, builds the
