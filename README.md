@@ -1,5 +1,7 @@
 # wagtail-cli
 
+> 🚧 This is a prototype / early MVP. Feedback very welcome! See [CMS with AI, not AI CMS: Wagtail 8.0’s new API](https://wagtail.org/blog/cms-with-ai-not-ai-cms-wagtail-80s-new-api/) for context.
+
 A command-line client for the Wagtail v3 API. Install it, point it at a Wagtail
 site's API, and drive CMS operations (pages, images, documents, snippets, sites,
 locales, redirects, schema) from your terminal — handy for automation and
