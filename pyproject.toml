@@ -31,13 +31,11 @@ dependencies = [
 wt = "wagtail_cli.cli.main:cli"
 
 [project.urls]
-Homepage = "https://github.com/org-name-or-username/wagtail-cli"
-Repository = "https://github.com/org-name-or-username/wagtail-cli"
-Changelog = "https://github.com/org-name-or-username/wagtail-cli/blob/main/CHANGELOG.md"
-Documentation = "https://github.com/org-name-or-username/wagtail-cli/tree/main/docs"
-Issues = "https://github.com/org-name-or-username/wagtail-cli/issues"
-# Add funding link if needed.
-# Funding = "https://github.com/org-name-or-username/wagtail-cli"
+Homepage = "https://github.com/wagtail/wagtail-cli"
+Repository = "https://github.com/wagtail/wagtail-cli"
+Changelog = "https://github.com/wagtail/wagtail-cli/blob/main/CHANGELOG.md"
+Documentation = "https://github.com/wagtail/wagtail-cli/tree/main/docs"
+Issues = "https://github.com/wagtail/wagtail-cli/issues"
 
 [dependency-groups]
 dev = [

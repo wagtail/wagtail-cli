@@ -9,7 +9,7 @@ The repo includes a simple demo application that can be run to develop the packa
 First, clone the repo:
 
 ```sh
-git clone git+https://github.com/org-name-or-username/wagtail-cli
+git clone git+https://github.com/wagtail/wagtail-cli
 cd wagtail-cli
 ```
 
