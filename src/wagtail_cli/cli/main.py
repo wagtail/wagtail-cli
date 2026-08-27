@@ -14,7 +14,6 @@ from typing import Any
 
 import typer
 
-from click import Context
 from typer.main import get_command
 
 from wagtail_cli import __version__, output
@@ -227,7 +226,7 @@ def _print_enhanced_version() -> None:
 
 def _print_enhanced_help() -> None:
     cmd = get_command(app)
-    ctx = Context(cmd, info_name="wt")
+    ctx = typer.Context(cmd, info_name="wt")
     typer.echo(cmd.get_help(ctx))
     manage_py = Path.cwd() / "manage.py"
     if manage_py.is_file():
