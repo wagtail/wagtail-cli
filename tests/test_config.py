@@ -1,10 +1,4 @@
-import sys
-
-
-if sys.version_info >= (3, 11):
-    import tomllib
-else:
-    import tomli as tomllib
+import tomllib
 
 from wagtail_cli.config import Config, load_config, save_user_config
 
