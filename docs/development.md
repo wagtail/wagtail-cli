@@ -18,6 +18,7 @@ src/wagtail_cli/
 │   ├── _client.py  # WgtlClient transport (auth, errors, dry-run, verbose)
 │   └── pages.py images.py documents.py snippets.py sites.py locales.py redirects.py schema.py
 ├── config.py       # config cascade + .wagtail-cli.toml
+├── docs.py         # docs.wagtail.org URL resolution + reference/search logic
 ├── errors.py       # error hierarchy + exit-code mapping
 ├── output.py       # JSON/human rendering
 └── parsing.py      # --field parsing, @file/@-, page-ref resolution

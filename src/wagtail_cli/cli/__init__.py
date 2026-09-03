@@ -5,6 +5,7 @@ from __future__ import annotations
 # before command groups attach to them.
 from . import (  # noqa: F401
     auth,
+    docs,
     documents,
     images,
     locales,

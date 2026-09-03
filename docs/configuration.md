@@ -10,7 +10,7 @@ Settings are resolved from highest to lowest priority:
 | Priority | Source | Example |
 |---|---|---|
 | 1 (highest) | CLI flags | `--url`, `--token` |
-| 2 | Environment variables | `WAGTAIL_CLI_BASE_URL`, `WAGTAIL_CLI_TOKEN` |
+| 2 | Environment variables | `WAGTAIL_CLI_BASE_URL`, `WAGTAIL_CLI_TOKEN`, `WAGTAIL_CLI_DOCS_URL` |
 | 3 | Project dotfile | `./.wagtail-cli.toml` |
 | 4 (lowest) | User dotfile | `~/.wagtail-cli.toml` |
 
@@ -23,6 +23,7 @@ while the environment sets `token`; both apply.
 ```bash
 export WAGTAIL_CLI_BASE_URL="https://cms.example.com/api/v3/"
 export WAGTAIL_CLI_TOKEN="wagtail_abc123def456"
+export WAGTAIL_CLI_DOCS_URL="https://pr-123.docs.test"  # optional: docs site for `wt docs`
 ```
 
 Setting these (or the dotfiles) is all you need for scripts and CI. `--url`

@@ -1,10 +1,11 @@
 # Command reference
 
-`wt` is organized as a Typer app with one nested command group, `api` (all
-Wagtail v3 API operations, including the setup commands `whoami` and `init`),
-a `start` command that scaffolds a new Django/Wagtail project, and a
-delegation rule: any command `wt` doesn't know is forwarded to the current
-project's Django management runner.
+`wt` is organized as a Typer app with two nested command groups, `api` (all
+Wagtail v3 API operations, including the setup commands `whoami` and `init`)
+and `docs` (read docs.wagtail.org from the terminal), a `start` command that
+scaffolds a new Django/Wagtail project, and a delegation rule: any command
+`wt` doesn't know is forwarded to the current project's Django management
+runner.
 
 ## Global options
 
@@ -38,9 +39,9 @@ wt --help      # CLI help, plus ./manage.py --help when present
 
 ## Delegation
 
-Any `wt <command>` that is not `api`, `start`, `--version`, or `--help` is
-delegated to the current project's Django management command runner, in this
-order:
+Any `wt <command>` that is not `api`, `docs`, `start`, `--version`, or
+`--help` is delegated to the current project's Django management command
+runner, in this order:
 
 1. `./manage.py` if that file exists in the current directory;
 2. `django-admin` if the `DJANGO_SETTINGS_MODULE` environment variable is set;
@@ -98,6 +99,70 @@ Options (all override the defaults, which mirror `wagtail start`):
 wt start myproject                    # default custom template
 wt start myproject ./site --template https://example.com/tmpl.zip -e py -e html
 ```
+
+---
+
+## `wt docs`
+
+Read Wagtail documentation from docs.wagtail.org as Markdown, in the style of
+the Stripe CLI docs viewer.
+
+```
+wt docs [PATH]
+wt docs api [OPERATION]
+wt docs search QUERY
+```
+
+`PATH` accepts a full docs.wagtail.org URL (including PR preview builds on
+other hosts), a path starting with a language or version segment, or a bare
+page path:
+
+```bash
+wt docs releases/8.0                            # en/<version>/releases/8.0
+wt docs /stable/releases/8.0.html               # explicit version
+wt docs https://docs.wagtail.org/en/latest/topics/images.html
+wt docs                                         # docs index (table of contents)
+```
+
+Options (placed before `api` / `search` / `PATH`):
+
+| Option | Description |
+|---|---|
+| `--docs-url URL` | Docs site base URL. Defaults to `WAGTAIL_CLI_DOCS_URL`, then `https://docs.wagtail.org`. Useful to read docs from a PR build. |
+| `--version V` | Docs version: `stable`, `latest`, or e.g. `7.2`. Defaults to the locally installed Wagtail version, then `stable`. Pages missing in that version fall back to `stable` with a note. |
+| `--language LANG` | Docs language (default: `en`, the only language published today). |
+
+### `wt docs api`
+
+Look up the Wagtail v3 API reference. With no argument, lists all operations.
+With an operation, prints that section of the reference:
+
+```bash
+wt docs api                             # index of all operations
+wt docs api "GET /api/v3/documents/"    # exact section
+wt docs api get documents               # lenient: method and prefix optional
+wt docs api "GET /cms-api/v3/documents" # custom API mounts normalize too
+```
+
+The operation query's HTTP method is optional (leading or trailing), and the
+`/api/v3/`, `/api/v3-preview/`, and `/cms-api/v3/` prefixes are optional. If a
+query is ambiguous (`wt docs api documents`), the matching operations are
+listed so you can disambiguate. If nothing matches, the error notes that
+operations may be project-specific (apps can add API endpoints) and points to
+`wt docs api` for the index.
+
+### `wt docs search`
+
+Search the docs via the site's search engine:
+
+```bash
+wt docs search picture                  # concise results: title, path, snippet
+wt docs search --json picture           # raw search API response as JSON
+```
+
+Results are scoped to the resolved docs version (`project:wagtail/<version>`);
+when a non-stable version yields no results, a note suggests
+`--version stable`.
 
 ---
 

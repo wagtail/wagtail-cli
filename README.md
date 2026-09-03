@@ -5,7 +5,8 @@
 A command-line client for the Wagtail v3 API. Install it, point it at a Wagtail
 site's API, and drive CMS operations (pages, images, documents, snippets, sites,
 locales, redirects, schema) from your terminal — handy for automation and
-AI-orchestrated content management.
+AI-orchestrated content management. It can also put the Wagtail documentation
+in your terminal: `wt docs releases/8.0` prints the release notes as Markdown.
 
 ## Installation
 
@@ -30,6 +31,14 @@ wt api schema list   # discover page types
 
 Or run `wt api init` once to save these to `~/.wagtail-cli.toml` interactively.
 
+Reading the Wagtail docs needs no configuration at all:
+
+```bash
+wt docs releases/8.0    # release notes, as Markdown
+wt docs api             # index of v3 API operations
+wt docs search picture  # search the docs
+```
+
 Create and publish a blog page from a Markdown file:
 
 ```bash
@@ -47,6 +56,8 @@ to the API as `{"format": "db_markdown", "content": …}`.
   `wt api init` and `wt api whoami`.
 - **`wt start …`** — scaffold a new Django/Wagtail project (mirrors
   `wagtail start` / `django-admin startproject`; default custom base-page template).
+- **`wt docs …`** — read docs.wagtail.org as Markdown: `wt docs releases/8.0`,
+  `wt docs api` for the v3 API reference, `wt docs search picture` to search.
 - **Delegation** — any other `wt <command>` is forwarded to `./manage.py` (if
   present) or `django-admin` (when `DJANGO_SETTINGS_MODULE` is set), so `wt`
   also fronts Django commands like `wt runserver`/`wt makemigrations`.
