@@ -53,5 +53,3 @@ generate-client:
 # CLI's httpx client; use the plain-HTTP loopback URL for local runs.
 test-integration:
     WAGTAIL_CLI_TEST_BASE_URL=$${WAGTAIL_CLI_TEST_BASE_URL:-http://127.0.0.1:9001/api/v3} uv run pytest -m integration
-
-
