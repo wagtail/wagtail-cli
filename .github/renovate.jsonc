@@ -1,11 +1,7 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
 
-  "extends": [
-    "config:recommended",
-    ":enablePreCommit",
-    "helpers:pinGitHubActionDigests",
-  ],
+  "extends": ["config:recommended", "helpers:pinGitHubActionDigests"],
 
   // Run about bi-weekly.
   "schedule": ["* * 3,22 * *"],
@@ -37,25 +33,10 @@
       "automerge": true,
     },
 
-    // Auto-merge all Python dependencies…
+    // Auto-merge all Python dependencies.
     {
       "matchManagers": ["pep621"],
       "automerge": true,
-    },
-
-    // …except for packages whose bounds are intentionally conservative.
-    {
-      "matchManagers": ["pep621"],
-      "matchPackageNames": ["django", "wagtail"],
-      "enabled": false,
-    },
-
-    // CI Python versions are intentionally pinned (lower-bound, compatibility matrix, experimental).
-    {
-      "matchManagers": ["github-actions"],
-      "matchDepNames": ["python"],
-      "matchFileNames": [".github/workflows/test.yml"],
-      "enabled": false,
     },
   ],
 }
