@@ -7,15 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-09-04
+
 ### Added
 
-- `wt docs` command: read docs.wagtail.org as Markdown from the terminal, in
-  the style of the Stripe CLI docs viewer. `wt docs [PATH]` fetches a page
-  (accepting full URLs, version-qualified paths, or bare page paths, with
-  version detection from the locally installed Wagtail), `wt docs api`
-  looks up v3 API reference operations, and `wt docs search` queries the
-  site's search engine. The docs site can be overridden with `--docs-url` or
-  `WAGTAIL_CLI_DOCS_URL`, e.g. to read docs from a PR build.
+- `wt docs` command: read docs.wagtail.org as Markdown from the terminal.
 
 ## [0.1.1] - 2026-08-27
 

@@ -1,6 +1,6 @@
 [project]
 name = "wagtail-cli"
-version = "0.1.1"
+version = "0.2.0"
 description = "CLI client for the Wagtail v3 API"
 readme = "README.md"
 license = "BSD-3-Clause"

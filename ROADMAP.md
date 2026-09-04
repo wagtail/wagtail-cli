@@ -6,6 +6,10 @@ This roadmap represents the current vision for this project, and is subject to c
 
 Support features of Wagtail’s v3 API [released in Wagtail 8.0](https://docs.wagtail.org/en/latest/releases/8.0.html).
 
+## [v3 API feedback](https://github.com/wagtail/wagtail/discussions/14531)
+
+Iterate on the CLI based on feedback from API users.
+
 ## [Write API follow-ups](https://github.com/wagtail/roadmap/issues/239) support
 
 Support for additions that will be [released in Wagtail 8.1](https://docs.wagtail.org/en/latest/releases/8.1.html).
