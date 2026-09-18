@@ -51,7 +51,8 @@ plugins:
           - reference/api.md
           - reference/configuration.md
         Contributing:
-          - contributing/documentation.md
+          - CONTRIBUTING.md
+          - contributing/development.md
   - mkdocstrings:
       handlers:
         python:
