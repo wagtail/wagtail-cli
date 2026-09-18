@@ -1,67 +1,115 @@
 ---
-name: wagtail-cli
-description: Drive a Wagtail site's v3 API from the terminal with the wt command-line client. Use this skill when reading or changing CMS content (pages, images, documents, snippets, sites, locales, redirects), scaffolding a Wagtail project, reading Wagtail docs, or running Django management commands through wt delegation.
+name: wagtail-api
+description: Operate a Wagtail site from the terminal with the Wagtail CLI (`wt api`, from the wagtail-cli package) rather than hand-written HTTP calls. Use it whenever a task involves publishing, creating, editing, moving, copying, unpublishing, deleting, translating or listing content on a Wagtail site, uploading images or documents, inspecting a site's content model, the Wagtail v3 API, `wt` / `wagtail-cli`, `WAGTAIL_CLI_*` variables, `.wagtail-cli.toml`, a `wagtail_…` token, or scaffolding and running a Wagtail project, even when the user does not name the CLI. For reading Wagtail documentation, use the wagtail-docs skill.
 ---
 
-# wagtail-cli
+# wagtail-api (`wt api`)
 
-Instructions for using `wt`, the command-line client for the Wagtail v3 API,
-to manage CMS content reliably from an agent or script.
+`wt` is a scriptable client for the Wagtail v3 API, plus a front-end for
+Django management commands (its docs reader is covered by the wagtail-docs
+skill). This file is enough for most tasks;
+read [references/commands.md](references/commands.md) for a flag you cannot
+find here and [references/writing-content.md](references/writing-content.md)
+before building a payload beyond a title. Full documentation:
+<https://wagtail.github.io/wagtail-cli/> (LLM digest at `/llms-full.txt`).
 
-## When to use this skill
+## Before you start
 
-- Read or change content on a Wagtail site: pages, images, documents,
-  snippets, sites, locales, redirects.
-- Discover a site's content model before creating or updating content.
-- Scaffold a new Django/Wagtail project (`wt start`).
-- Read Wagtail documentation or the v3 API reference in the terminal (`wt docs`).
-- Run Django management commands in an existing project via delegation
-  (`wt runserver`, `wt makemigrations`).
+Users normally will not say where the site is or how to log in. `wt` reads
+`WAGTAIL_CLI_BASE_URL` / `WAGTAIL_CLI_TOKEN`, then `./.wagtail-cli.toml`, then
+`~/.wagtail-cli.toml`, so just run:
 
-## Setup
+```bash
+wt --json api whoami
+```
 
-1. Check the CLI is available: `wt --version`. Install with
-   `uv tool install wagtail-cli` if missing.
-2. Get an API base URL and token. Configure with environment variables
-   (`WAGTAIL_CLI_BASE_URL`, `WAGTAIL_CLI_TOKEN`) or run `wt api init` once to
-   write `~/.wagtail-cli.toml`. Flags `--url` / `--token` override per call.
-3. Verify credentials: `wt api whoami`. A 401 or 403 exit code means the token
-   is wrong or lacks permission — stop and ask for a working token rather than
-   retrying.
+Exit 0 means you are set. Exit 2 "Not configured" means the user must
+provide the API base URL (like `https://cms.example.com/api/v3/`) and a token,
+via those variables or `wt api init`; ask rather than guessing a URL or
+searching for tokens. Exit 3 is an unreachable URL, exit 4 a bad token.
 
-## Workflow for content tasks
+Tokens carry the permissions of the user they belong to. In a Django
+project, `wt api_tokens create --user=<name>` mints one.
 
-1. **Discover the content model first**: `wt api schema list`, then
-   `wt api schema show <type>` for the exact fields of a page or snippet type.
-2. **Find the target**: `wt api pages list --search "…"`,
-   `wt api pages find --path /blog/`, or list with `--type` filters.
-3. **Dry-run every mutation**: mutating commands accept `--dry-run`, which
-   prints the exact request without sending it. Run it, check the payload,
-   then run again without `--dry-run`.
-4. **Create or update with `--field key:value`**:
-   - Values starting with `[` or `{` are parsed as JSON.
-   - `@path` reads a value from a file, `@-` from stdin; a `.md` file is sent
-     as `db_markdown` rich text, a `.json` file as parsed JSON.
-   - Create page drafts without `--publish`; add `--publish` to make them live.
-5. **Confirm destructive commands**: on non-interactive runs, `update` and
-   `delete` require `--yes`; they never prompt when piped.
-6. **Verify the result**: `wt api pages get <ID> --version live`.
+## Working efficiently
 
-## Rules for reliable output
+- Put global flags before `api`: `wt --json --dry-run api pages create …`.
+  Use `--json` and `jq`; pass `--limit` on lists (server cap is 20 by
+  default, above it is a 400; page with `--offset`).
+- Check a type's write schema once, then trust it:
+  `wt --json api schema show blog.BlogPage | jq '.create.required, (.create.properties | keys)'`.
+- `--dry-run` shows the request without sending it. On `update`, dry-run
+  without `--publish` or you only see the publish call.
+- Skip `--help` for things covered here. For an operation's exact generated
+  API reference, `wt docs api "POST /pages/"` (see the wagtail-docs skill).
 
-- Always pass `--json` when another tool parses the output; human tables are
-  for terminals only. `-v` logs HTTP traffic to stderr, not stdout.
-- Exit codes are meaningful: 0 success, 2 usage error, 3 network error, 4 auth
-  error (401), 5 permission (403), 6 not found (404), 7 validation
-  (400/422). Check the exit code before parsing stdout.
-- Errors print an RFC 7807 problem body to stderr — surface it verbatim when
-  reporting failures.
-- Actions (`publish`, `unpublish`, `revert`, `copy-for-translation`) run
-  immediately without confirmation — always preview with `--dry-run` first.
+## Command map
 
-## Reference
+| Group | Operations |
+| --- | --- |
+| `wt api whoami`, `wt api init` | auth check; save URL + token |
+| `wt api schema list \| show TYPE` | content types; read/create/patch JSON schemas |
+| `wt api pages …` | list, find, get, create, update, delete, publish, unpublish, copy, move, revert, create-alias, convert-alias, copy-for-translation, revisions |
+| `wt api images …`, `wt api documents …` | list, get, create (upload), update (metadata), delete |
+| `wt api snippets TYPE …` | list, get, create, update, delete, publish, unpublish, revert, copy-for-translation, revisions |
+| `wt api sites …`, `wt api locales …`, `wt api redirects …` | CRUD; `redirects find --path` |
+| `wt start NAME [DIR]` | scaffold a project |
+| `wt <other>` | forwarded to `./manage.py` or `django-admin` |
 
-- Command reference: <https://wagtail.github.io/wagtail-cli/usage/>
-- Configuration precedence (flags > env > project dotfile > user dotfile):
-  <https://wagtail.github.io/wagtail-cli/reference/configuration/>
-- Full docs digest for LLMs: <https://wagtail.github.io/wagtail-cli/llms-full.txt>
+## Rules that are easy to get wrong
+
+1. **Unwritable fields are silently dropped.** A create/update succeeds even
+   if you pass a field missing from `create`/`patch` properties; the response
+   just shows it empty. Check the schema, and read the result back. Only a
+   developer can fix it (`APIField("name", writable=True)`).
+2. **`update` and `delete` need `--yes`** off a TTY, or they exit 2. Actions
+   (`publish`, `unpublish`, `move`, `copy`, `revert`, …) run without a prompt.
+3. **Page references.** `--parent` and `--destination` take an id or a URL
+   path like `/blog/`. List filters (`--child-of`, `--descendant-of`,
+   `--ancestor-of`) take an id or `root`. Path to id:
+   `wt --json api pages find --path /blog/` (the `location` ends in `/pages/<id>/`).
+4. **Live vs draft.** `find --path` only resolves live pages (404 = draft).
+   Authenticated `list`/`get` include drafts and expose no `live` flag, so
+   use `find --path` or the public URL to tell. There is no anonymous mode;
+   an unauthenticated `curl "$WAGTAIL_CLI_BASE_URL/pages/?child_of=4"` lists live pages only.
+5. **`pages get` returns the live version.** `--version draft` gives the
+   latest revision (the help text says the opposite). `--html` renders rich
+   text as display HTML.
+6. **Create is a draft unless `--publish`.** `update --publish` PATCHes then
+   publishes. A 422 on `slug` is a sibling collision; pass a unique `--slug`.
+7. **StreamField and child relations are replaced whole on update.** Read,
+   edit the full list, resend.
+8. **Markdown input only works for top-level page rich-text fields.** Many
+   `body` fields are StreamFields; build blocks instead (see the reference).
+9. **A 422 naming a child relation** usually means the type requires at
+   least one row; supply it (see the reference).
+10. **Sites, locales, redirects update with PUT:** resend every required
+    field (`hostname` + `root_page_id`, `language_code`, `old_path`).
+11. **Deletes are permanent** and take descendants along. Prefer `unpublish`
+    when the user only wants something off the site.
+12. **Image and document `update` cannot replace the file.**
+
+For `--field` value parsing, rich text, StreamField blocks, child relations,
+uploads, snippets and worked recipes, read
+[references/writing-content.md](references/writing-content.md).
+
+## Errors
+
+Errors print `Error (<status>): <title>: <detail>` plus the RFC 7807 body on
+stderr; a 422's `errors` array names the field. Exit codes: 2 usage
+(missing `--yes`, unconfigured), 3 network, 4 bad token, 5 no permission,
+6 not found (wrong id, unknown type, draft looked up by path), 7 validation.
+`-v` logs the HTTP exchange.
+
+## Scaffolding and Django commands
+
+```bash
+wt start mysite                          # django-admin startproject with a Wagtail template
+wt migrate; wt runserver                 # any other command goes to ./manage.py or django-admin
+```
+
+## Reporting back
+
+By default, say what changed and how to find it: ids, titles, public URLs,
+live or draft, and anything you had to decide on the user's behalf. Commands
+and payloads are usually noise unless the user asks or something failed.

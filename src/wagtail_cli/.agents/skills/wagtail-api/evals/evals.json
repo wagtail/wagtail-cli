@@ -1,0 +1,53 @@
+{
+  "skill_name": "wagtail-api",
+  "notes": "Prompts are written the way a CLI user would ask: no API URL, token, binary path or output format. Runs rely on `wt` being on PATH and configured through env vars or a dotfile (for the demo: ./.wagtail-cli.toml at the repo root, gitignored). The harness asks each run to save its final reply as response.md so it can be graded. Fixtures on the demo site: BlogIndexPage id 4 at /blog/, Person id 1, published BlogPages 5 'Rye bread guide', 6 'Spelt bread guide', 7 'Delete me', 10 'Remove me', each with three body blocks. Each eval has a baseline_variant so with-skill and baseline runs touch different objects and do not race.",
+  "evals": [
+    {
+      "id": 1,
+      "name": "publish-markdown-post",
+      "prompt": "Publish a new blog post with the Wagtail CLI on our Wagtail demo site titled \"Sourdough starter basics\" in the blog section (the blog index lives at /blog/). The post content is in /tmp/eval-post.md; keep its headings and paragraphs.",
+      "baseline_variant": {"Sourdough starter basics": "Sourdough starter tips"},
+      "expected_output": "A live blog.BlogPage under /blog/ with that title whose StreamField body holds the two headings and two paragraphs from the Markdown file, with the required author relation supplied. The reply is a few lines: id, URL, live, and any guess made (for example the author).",
+      "files": ["/tmp/eval-post.md"],
+      "expectations": [
+        "A blog.BlogPage with the requested title exists under /blog/",
+        "The page is live (its public URL returns 200 anonymously)",
+        "Body has heading blocks for both Markdown headings",
+        "Body has paragraph blocks containing both Markdown paragraphs",
+        "Body has no leftover Markdown envelope or raw Markdown syntax",
+        "The reply names the page id or public URL",
+        "The reply is concise (under 200 words) and does not list the commands run"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "add-image-block-keep-content",
+      "prompt": "Add /tmp/eval-hero.png at the top of the \"Rye bread guide\" post on our Wagtail site as a captioned image with the caption \"A fresh loaf\". Keep the rest of the post as it is, and publish.",
+      "baseline_variant": {"Rye bread guide": "Spelt bread guide"},
+      "expected_output": "An image exists for the upload; the page's live body starts with an image_block referencing it with caption 'A fresh loaf', followed by the original three blocks unchanged; the page is published. The reply is a few lines.",
+      "files": ["/tmp/eval-hero.png"],
+      "expectations": [
+        "An image was uploaded and the live body starts with an image_block referencing it",
+        "The image block caption is 'A fresh loaf'",
+        "All three original blocks are kept, in order, after the new block",
+        "The reply names the page or image (id or URL)",
+        "The reply is concise (under 200 words) and does not list the commands run"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "unpublish-not-delete-and-list",
+      "prompt": "Take the \"Delete me\" page off our Wagtail site, but keep it as a draft in case we need it back. Then tell me which pages are still live under /blog/.",
+      "baseline_variant": {"Delete me": "Remove me"},
+      "expected_output": "The page is unpublished, not deleted, and still retrievable by id. The reply says it was unpublished and lists the live pages under /blog/ (at least 'Rye bread guide' and 'Spelt bread guide'), excluding the unpublished one, without a command transcript.",
+      "files": [],
+      "expectations": [
+        "The target page still exists (not deleted)",
+        "The target page is no longer publicly reachable (404 on its URL)",
+        "The reply lists 'Rye bread guide' and 'Spelt bread guide' as live",
+        "The reply does not list the unpublished page as live",
+        "The reply is concise (under 200 words) and does not list the commands run"
+      ]
+    }
+  ]
+}
