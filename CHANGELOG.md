@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- MkDocs documentation site (Material theme), published to GitHub Pages on every push to `main`. Build locally with `just docs-build` / `just docs-serve`.
+- LLM-friendly docs output: `llms.txt` and `llms-full.txt` digests at the site root, via `mkdocs-llmstxt`.
+- Agent skills discovery: the docs publish the package's agent skill under `.well-known/agent-skills/`, with machine-readable indexes at `.well-known/agent-skills/index.json` and `.well-known/ai-catalog.json`.
+
 ### Changed
 
 - The demo site now runs Django 6.1 and Wagtail 8.0. Supporting this requires Python 3.12+, so the package's minimum supported Python version is raised from 3.11 to 3.12.

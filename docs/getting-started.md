@@ -1,7 +1,14 @@
-# Quickstart
+# Getting started
 
-This walkthrough drives the Wagtail v3 API with `wt` from end to end: install,
-point it at a site, verify auth, and publish a page with rich-text (Markdown) content.
+`wt` is a command-line client for the Wagtail v3 API. This walkthrough drives
+the API with `wt` from end to end: install, point it at a site, verify auth,
+and publish a page with rich-text (Markdown) content.
+
+## Requirements
+
+- Python 3.12 or newer.
+- A Wagtail site exposing the v3 API (Wagtail 8.0 or newer). The demo site in
+  this repository ships with the v3 API mounted at `/api/v3/`.
 
 ## 1. Install
 
@@ -16,8 +23,8 @@ wt --help
 
 ## 2. Configure a site
 
-You need two things: the API base URL and a token. The demo site in this repo
-ships with the v3 API mounted at `/api/v3/`; start it and create a token:
+You need two things: the API base URL and a token. Start the demo site and
+create a token:
 
 ```bash
 # from the repo root, in the demo/ project
@@ -45,7 +52,7 @@ wt api init
 # prompts for URL + token and writes ~/.wagtail-cli.toml
 ```
 
-See [Configuration](configuration.md) for the full precedence rules.
+See [Configuration](reference/configuration.md) for the full precedence rules.
 
 ## 3. Verify authentication
 
@@ -124,3 +131,10 @@ wt api pages create blog.BlogPage --parent /blog/ \
 
 `update` and `delete` also require confirmation (`--yes`) on a non-interactive
 terminal, to keep scripts from destructively mutating content by accident.
+
+## Next steps
+
+- [Usage](usage.md) – the full command reference, every command and flag.
+- [Configuration](reference/configuration.md) – the config cascade, dotfiles,
+  and environment variables.
+- [Agent skills](agent-skills.md) – point an AI agent at the published skill.

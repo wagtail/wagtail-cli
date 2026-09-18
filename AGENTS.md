@@ -18,6 +18,8 @@ just test        # Run tests with pytest
 just lint        # Run all linters (Ruff, prek, Prettier)
 just format      # Run all formatters (Ruff, Prettier)
 just coverage    # Run tests with coverage report
+just docs-build  # Build the MkDocs documentation site (strict mode)
+just docs-serve  # Serve the docs locally at http://localhost:8001
 ```
 
 ## Quality assurance
@@ -35,6 +37,7 @@ Always run `just lint` and `just test` before considering work complete.
 src/wagtail_cli/       # Package source code
 tests/                     # Test modules (pytest)
 demo/                      # Demo Wagtail site for development
+docs/                      # MkDocs documentation site source (published to GitHub Pages)
 .github/workflows/         # CI: linting, tests, nightly builds, publishing
 ```
 

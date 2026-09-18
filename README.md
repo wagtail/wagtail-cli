@@ -66,10 +66,13 @@ to the API as `{"format": "db_markdown", "content": …}`.
 
 ## Documentation
 
-- [Quickstart](docs/quickstart.md) — end-to-end walkthrough against the demo site.
-- [Configuration](docs/configuration.md) — config cascade, dotfiles, environment variables.
-- [Command reference](docs/commands.md) — every command and flag.
-- [Development](docs/development.md) — layout, testing, and how to add commands.
+The documentation is published at <https://wagtail.github.io/wagtail-cli/>.
+
+- [Getting started](docs/getting-started.md) — end-to-end walkthrough against the demo site.
+- [Command reference](docs/usage.md) — every command and flag.
+- [Configuration](docs/reference/configuration.md) — config cascade, dotfiles, environment variables.
+- [Agent skills](docs/agent-skills.md) — the machine-readable skill published for AI agents.
+- [Development guide](docs/contributing/development.md) — layout, testing, and how to add commands.
 
 ## Development
 
@@ -80,4 +83,4 @@ just lint              # lint with Ruff
 just test-integration  # run integration tests against a live site
 ```
 
-See the [development guide](docs/development.md) for details.
+See the [development guide](docs/contributing/development.md) for details.

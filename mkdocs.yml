@@ -1,0 +1,83 @@
+site_name: wagtail-cli
+repo_url: https://github.com/wagtail/wagtail-cli
+site_url: https://wagtail.github.io/wagtail-cli
+edit_uri: edit/main/docs/
+repo_name: wagtail-cli
+
+site_description: 'CLI client for the Wagtail v3 API'
+dev_addr: localhost:8001
+
+theme:
+  name: material
+  font: false
+  logo: theme/favicon.png
+  favicon: theme/favicon.png
+  palette:
+    scheme: default
+    primary: white
+  features:
+    - content.code.copy
+  custom_dir: docs/theme
+
+markdown_extensions:
+  - admonition
+  - sane_lists
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.magiclink
+  - pymdownx.superfences
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+plugins:
+  - search
+  - llmstxt:
+      full_output: llms-full.txt
+      # Only include docs pages that are relevant to users of the project.
+      sections:
+        Getting started:
+          - index.md
+          - getting-started.md
+        Usage:
+          - usage.md
+        Reference:
+          - reference/api.md
+          - reference/configuration.md
+        Contributing:
+          - contributing/documentation.md
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
+          options:
+            show_source: true
+            show_root_heading: false
+            heading_level: 3
+  - mkdocs-simple-hooks:
+      hooks:
+        on_post_build: 'docs.hooks:on_post_build'
+
+# Excluded from the site: not part of the published docs.
+exclude_docs: README.md
+
+nav:
+  - Home: index.md
+  - Getting started: getting-started.md
+  - Usage: usage.md
+  - Reference:
+      - API: reference/api.md
+      - Configuration: reference/configuration.md
+  - Agent skills: agent-skills.md
+  - Contributing:
+      - Contributing guidelines: https://github.com/wagtail/wagtail-cli/blob/main/CONTRIBUTING.md
+      - Development guide: contributing/development.md
+      - Documentation & tooling: contributing/documentation.md
+  - Security policy: https://github.com/wagtail/wagtail-cli/blob/main/SECURITY.md
+  - Roadmap: https://github.com/wagtail/wagtail-cli/blob/main/ROADMAP.md

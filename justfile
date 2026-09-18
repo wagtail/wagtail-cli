@@ -43,6 +43,14 @@ coverage:
     uv run pytest --cov src/wagtail_cli
     uv run coverage report -m
 
+# Build the documentation site.
+docs-build:
+    uv run mkdocs build --strict
+
+# Build the documentation site and serve it locally.
+docs-serve:
+    uv run mkdocs serve --strict
+
 # Regenerate the clientele client from the committed OpenAPI snapshot.
 # NOTE: must pass the output dir as an ABSOLUTE path so clientele generates
 # relative imports (tests.clientele_client would break a wheel install).

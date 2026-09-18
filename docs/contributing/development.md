@@ -79,7 +79,8 @@ just test-integration
 # uses WAGTAIL_CLI_TEST_BASE_URL (default http://127.0.0.1:9001/api/v3) and WAGTAIL_CLI_TEST_TOKEN
 ```
 
-The demo project ships the v3 API; see the quickstart for creating a token.
+The demo project ships the v3 API; see [Getting started](../getting-started.md)
+for creating a token.
 
 > The demo site's HTTPS cert is a self-signed dev cert the httpx client doesn't
 > trust — use the plain-HTTP `http://127.0.0.1:9001/api/v3` loopback URL for
@@ -115,10 +116,12 @@ just generate-client
 4. If the command consumes/creates content, update `tests/test_coverage_gap.py`
    so the operation stays mapped.
 5. Add a unit test with `CliRunner` + respx asserting URL, method, and payload.
-6. Update `docs/commands.md`.
+6. Update the [command reference](../usage.md).
 
 ## Contributing
 
-Run `just lint` and `just test` before finishing. See
-[CONTRIBUTING.md](../CONTRIBUTING.md) for the contribution workflow and
-[CHANGELOG.md](../CHANGELOG.md) for release notes.
+Run `just lint` and `just test` before finishing. See the
+[contributing guidelines](https://github.com/wagtail/wagtail-cli/blob/main/CONTRIBUTING.md)
+for the contribution workflow and the
+[changelog](https://github.com/wagtail/wagtail-cli/blob/main/CHANGELOG.md) for
+release notes.

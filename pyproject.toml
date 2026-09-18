@@ -45,6 +45,12 @@ dev = [
     # The committed generated client requires clientele 2.3 (clientele.schemas,
     # clientele.api.Query, and the cli extra all appeared by 2.3.0).
     "clientele[cli]>=2.3",
+    # Documentation.
+    "mkdocs>=1.6.0",
+    "mkdocs-material>=9.5.0",
+    "mkdocstrings[python]>=0.27.0",
+    "mkdocs-llmstxt>=0.5.0",
+    "mkdocs-simple-hooks>=0.1.5",
 ]
 demo = [
     # Dependencies for the demo Wagtail site in demo/.

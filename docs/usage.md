@@ -7,6 +7,9 @@ scaffolds a new Django/Wagtail project, and a delegation rule: any command
 `wt` doesn't know is forwarded to the current project's Django management
 runner.
 
+New to the CLI? Follow [Getting started](getting-started.md) for an
+end-to-end walkthrough first.
+
 ## Global options
 
 Available on `wt api` invocations (placed before `api` on the command line):
