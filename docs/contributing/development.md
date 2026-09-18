@@ -121,7 +121,7 @@ just generate-client
 ## Contributing
 
 Run `just lint` and `just test` before finishing. See the
-[contributing guidelines](https://github.com/wagtail/wagtail-cli/blob/main/CONTRIBUTING.md)
+[contributing guidelines](https://github.com/wagtail/wagtail-cli/blob/main/docs/CONTRIBUTING.md)
 for the contribution workflow and the
 [changelog](https://github.com/wagtail/wagtail-cli/blob/main/CHANGELOG.md) for
 release notes.

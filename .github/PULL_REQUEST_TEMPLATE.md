@@ -1,4 +1,4 @@
-<!-- For guidance on making a great pull request, be sure to check CONTRIBUTING.md -->
+<!-- For guidance on making a great pull request, be sure to check docs/CONTRIBUTING.md -->
 
 <!-- Insert the issue number that you're fixing here, if any -->
 Fixes #...

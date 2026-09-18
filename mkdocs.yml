@@ -65,7 +65,11 @@ plugins:
         on_post_build: 'docs.hooks:on_post_build'
 
 # Excluded from the site: not part of the published docs.
-exclude_docs: README.md
+exclude_docs: |
+  README.md
+  CONTRIBUTING.md
+  SECURITY.md
+  ROADMAP.md
 
 nav:
   - Home: index.md
@@ -76,8 +80,8 @@ nav:
       - Configuration: reference/configuration.md
   - Agent skills: agent-skills.md
   - Contributing:
-      - Contributing guidelines: https://github.com/wagtail/wagtail-cli/blob/main/CONTRIBUTING.md
+      - Contributing guidelines: https://github.com/wagtail/wagtail-cli/blob/main/docs/CONTRIBUTING.md
       - Development guide: contributing/development.md
       - Documentation & tooling: contributing/documentation.md
-  - Security policy: https://github.com/wagtail/wagtail-cli/blob/main/SECURITY.md
-  - Roadmap: https://github.com/wagtail/wagtail-cli/blob/main/ROADMAP.md
+  - Security policy: https://github.com/wagtail/wagtail-cli/blob/main/docs/SECURITY.md
+  - Roadmap: https://github.com/wagtail/wagtail-cli/blob/main/docs/ROADMAP.md

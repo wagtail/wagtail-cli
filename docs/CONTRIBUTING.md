@@ -70,6 +70,6 @@ Create a pull request with your changes so that it can be code reviewed by a mai
 On the `main` branch:
 
 1. Update the version number in `pyproject.toml`.
-2. Update the [CHANGELOG](CHANGELOG.md) and [ROADMAP](ROADMAP.md).
+2. Update the [CHANGELOG](../CHANGELOG.md) and [ROADMAP](ROADMAP.md).
 3. Commit and tag the release. (`git commit -m "Release v0.1.1" & git tag -a v0.1.1 -m "Release v0.1.1" && git push --tags`)
 4. Create a GitHub release from the tag. The CI will automatically build and publish the package to PyPI.

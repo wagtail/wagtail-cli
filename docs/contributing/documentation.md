@@ -74,4 +74,4 @@ The hook reads host metadata from the `site_url` in `mkdocs.yml`, so no URLs are
 
 ## Contributing to these docs
 
-Make changes to the relevant Markdown file in `docs/` or to `mkdocs.yml`, then verify with `just docs-build`. See the [contributing guidelines](https://github.com/wagtail/wagtail-cli/blob/main/CONTRIBUTING.md) for the general workflow.
+Make changes to the relevant Markdown file in `docs/` or to `mkdocs.yml`, then verify with `just docs-build`. See the [contributing guidelines](https://github.com/wagtail/wagtail-cli/blob/main/docs/CONTRIBUTING.md) for the general workflow.
