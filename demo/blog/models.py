@@ -81,10 +81,10 @@ class Person(
     ]
 
     api_fields = [
-        APIField("first_name"),
-        APIField("last_name"),
-        APIField("job_title"),
-        APIField("image"),
+        APIField("first_name", writable=True),
+        APIField("last_name", writable=True),
+        APIField("job_title", writable=True),
+        APIField("image", writable=True),
     ]
 
     @property
@@ -146,7 +146,7 @@ class BlogPersonRelationship(Orderable, models.Model):
 
     api_fields = [
         APIField("page"),
-        APIField("person"),
+        APIField("person", writable=True),
     ]
 
 
@@ -195,13 +195,13 @@ class BlogPage(Page):
     ]
 
     api_fields = [
-        APIField("introduction"),
-        APIField("image"),
-        APIField("body"),
-        APIField("subtitle"),
+        APIField("introduction", writable=True),
+        APIField("image", writable=True),
+        APIField("body", writable=True),
+        APIField("subtitle", writable=True),
         APIField("tags"),
-        APIField("date_published"),
-        APIField("blog_person_relationship"),
+        APIField("date_published", writable=True),
+        APIField("blog_person_relationship", writable=True),
     ]
 
     def authors(self):
@@ -241,8 +241,8 @@ class BlogIndexPage(RoutablePageMixin, Page):
     ]
 
     api_fields = [
-        APIField("introduction"),
-        APIField("image"),
+        APIField("introduction", writable=True),
+        APIField("image", writable=True),
     ]
 
     subpage_types = ["blog.BlogPage"]
