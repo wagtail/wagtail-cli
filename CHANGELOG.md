@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Split the `wagtail-cli` agent skill into `wagtail-api` and `wagtail-docs`. `wagtail-api` is rewritten from evaluated runs against the demo site: a short `SKILL.md` focused on configuration, gotchas and a reporting default, with `references/commands.md` and `references/writing-content.md` for the full command surface and content payloads. `wagtail-docs` is a few lines on `wt docs` so agents stop fetching docs.wagtail.org pages by hand. The docs build now publishes each skill directory, not just `SKILL.md`, and the skills are bundled in the wheel and sdist under `wagtail_cli/.agents/skills/`.
+- Demo site: declare the blog and person API fields as writable so the v3 API accepts content writes.
 - The demo site now runs Django 6.1 and Wagtail 8.0. Supporting this requires Python 3.12+, so the package's minimum supported Python version is raised from 3.11 to 3.12.
 - Migrate the demo site's `EMAIL_BACKEND` setting to `MAILERS`, deprecated in Django 6.1.
 

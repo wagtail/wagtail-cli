@@ -65,8 +65,10 @@ build-backend = "uv_build"
 
 [tool.uv.build-backend]
 module-name = "wagtail_cli"
+# The agent skills under src/wagtail_cli/.agents/ are bundled with the package;
+# do not exclude dotfiles wholesale. Skill evals are development-only.
 source-exclude = [
-    ".*",
+    "**/.agents/skills/*/evals",
     "*.js",
     "*.json",
     "*.ini",

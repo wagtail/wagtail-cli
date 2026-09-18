@@ -1,7 +1,8 @@
 """MkDocs build hook publishing the package's agent skills.
 
-Copies the skills bundled with the package (under the package's
-``.agents/skills/*/SKILL.md``) into the built site under
+Copies the skills bundled with the package (each directory under the
+package's ``.agents/skills/`` holding a ``SKILL.md`` plus any ``references/``,
+``scripts/`` or ``assets/``) into the built site under
 ``.well-known/agent-skills/`` and generates two discovery catalogs:
 
 - ``.well-known/agent-skills/index.json`` – the agent skills discovery format.
@@ -42,8 +43,11 @@ SKILL_MIME = "application/agent-skills+md"
 SKILL_VERSION = "1.0.0"
 # Human-readable catalog titles keyed by skill directory name.
 SKILL_DISPLAY_NAMES = {
-    "wagtail-cli": "wagtail-cli",
+    "wagtail-api": "Wagtail API via the wagtail-cli",
+    "wagtail-docs": "Wagtail documentation via the wagtail-cli",
 }
+# Skill subdirectories that are development-only and must not be published.
+SKILL_IGNORE = shutil.ignore_patterns("evals", "__pycache__", ".*")
 
 
 # --- Helpers -----------------------------------------------------------------
@@ -122,8 +126,11 @@ def on_post_build(config: dict[str, Any], **kwargs: Any) -> None:
     site_root = _site_root(config)
     host = _host(config)
 
-    # Directory where the skills land in the built site.
+    # Directory where the skills land in the built site. MkDocs does not clean
+    # hidden directories between builds, so start from an empty one to avoid
+    # publishing skills that were renamed or removed.
     skills_out = site_dir / WELL_KNOWN_DIR
+    shutil.rmtree(skills_out, ignore_errors=True)
     skills_out.mkdir(parents=True, exist_ok=True)
 
     # Discover and copy all SKILL.md files.
@@ -133,8 +140,11 @@ def on_post_build(config: dict[str, Any], **kwargs: Any) -> None:
     for skill_path in _discover_skills():
         name = skill_path.parent.name
         target_dir = skills_out / name
-        target_dir.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(skill_path, target_dir / "SKILL.md")
+        # Copy the whole skill directory: SKILL.md links to its references/
+        # with relative paths, so they must be published alongside it.
+        shutil.copytree(
+            skill_path.parent, target_dir, ignore=SKILL_IGNORE, dirs_exist_ok=True
+        )
 
         # Parse frontmatter for metadata.
         frontmatter = _parse_frontmatter(skill_path.read_text(encoding="utf-8"))
