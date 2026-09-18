@@ -29,6 +29,15 @@ format:
 test:
     uv run pytest
 
+test-lowest-deps:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    lowest_python=$(uv run python -c 'import tomllib; print(tomllib.load(open("pyproject.toml","rb"))["project"]["requires-python"].removeprefix(">=").strip())')
+    uv run --isolated --python "$lowest_python" --resolution lowest-direct pytest
+
+test-highest-deps:
+    uv run --isolated --resolution highest pytest
+
 # Run tests with coverage.
 coverage:
     uv run pytest --cov src/wagtail_cli

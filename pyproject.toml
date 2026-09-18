@@ -20,7 +20,8 @@ classifiers = [
 # See: https://devguide.python.org/versions/#supported-versions
 requires-python = ">=3.11"
 dependencies = [
-    "typer>=0.12",
+    # 0.15.4 is the oldest typer that supports the CLI's `X | None` annotations.
+    "typer>=0.15.4",
     "httpx>=0.27",
     "pydantic>=2",
 ]
@@ -41,7 +42,14 @@ dev = [
     "respx>=0.21",
     "ruff>=0.6",
     "pytest-cov>=7.1.0",
-    "clientele[cli]>=1.2",
+    # The committed generated client requires clientele 2.3 (clientele.schemas,
+    # clientele.api.Query, and the cli extra all appeared by 2.3.0).
+    "clientele[cli]>=2.3",
+]
+demo = [
+    # Dependencies for the demo Wagtail site in demo/.
+    "django>=5.2",
+    "wagtail>=7.0",
 ]
 
 [build-system]

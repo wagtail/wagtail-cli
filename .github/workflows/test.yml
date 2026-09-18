@@ -40,7 +40,7 @@ jobs:
           persist-credentials: false
       - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
       - uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3 # v4.0.0
-      - run: uv sync --dev
+      - run: uv sync --dev --group demo
       - run: just coverage
       - run: uv run ./demo/manage.py check
       - run: uv run ./demo/manage.py makemigrations --check --noinput
@@ -81,7 +81,7 @@ jobs:
             resolution: lowest-direct
           - python: '3.13'
             resolution: highest
-          # Skipped (see test-highest-deps): latest Python, latest Django, latest Wagtail.
+          # Skipped (see test-highest-deps): latest Python.
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -89,6 +89,6 @@ jobs:
       - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
         with:
           python-version: ${{ matrix.python }}
-      - run: uv run --resolution ${{ matrix.resolution }} --with '${{ matrix.packages }}' pytest
+      - run: uv run --resolution ${{ matrix.resolution }} pytest
         env:
           DB: sqlite
