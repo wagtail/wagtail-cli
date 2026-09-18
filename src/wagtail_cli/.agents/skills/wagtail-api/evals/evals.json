@@ -6,7 +6,9 @@
       "id": 1,
       "name": "publish-markdown-post",
       "prompt": "Publish a new blog post with the Wagtail CLI on our Wagtail demo site titled \"Sourdough starter basics\" in the blog section (the blog index lives at /blog/). The post content is in /tmp/eval-post.md; keep its headings and paragraphs.",
-      "baseline_variant": {"Sourdough starter basics": "Sourdough starter tips"},
+      "baseline_variant": {
+        "Sourdough starter basics": "Sourdough starter tips"
+      },
       "expected_output": "A live blog.BlogPage under /blog/ with that title whose StreamField body holds the two headings and two paragraphs from the Markdown file, with the required author relation supplied. The reply is a few lines: id, URL, live, and any guess made (for example the author).",
       "files": ["/tmp/eval-post.md"],
       "expectations": [
@@ -23,7 +25,7 @@
       "id": 2,
       "name": "add-image-block-keep-content",
       "prompt": "Add /tmp/eval-hero.png at the top of the \"Rye bread guide\" post on our Wagtail site as a captioned image with the caption \"A fresh loaf\". Keep the rest of the post as it is, and publish.",
-      "baseline_variant": {"Rye bread guide": "Spelt bread guide"},
+      "baseline_variant": { "Rye bread guide": "Spelt bread guide" },
       "expected_output": "An image exists for the upload; the page's live body starts with an image_block referencing it with caption 'A fresh loaf', followed by the original three blocks unchanged; the page is published. The reply is a few lines.",
       "files": ["/tmp/eval-hero.png"],
       "expectations": [
@@ -38,7 +40,7 @@
       "id": 3,
       "name": "unpublish-not-delete-and-list",
       "prompt": "Take the \"Delete me\" page off our Wagtail site, but keep it as a draft in case we need it back. Then tell me which pages are still live under /blog/.",
-      "baseline_variant": {"Delete me": "Remove me"},
+      "baseline_variant": { "Delete me": "Remove me" },
       "expected_output": "The page is unpublished, not deleted, and still retrievable by id. The reply says it was unpublished and lists the live pages under /blog/ (at least 'Rye bread guide' and 'Spelt bread guide'), excluding the unpublished one, without a command transcript.",
       "files": [],
       "expectations": [
