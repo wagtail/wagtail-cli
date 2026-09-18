@@ -1,20 +1,22 @@
-# wagtail-cli
+# [Wagtail CLI](https://wagtail.github.io/wagtail-cli)
 
-> 🚧 This is a prototype / early MVP. Feedback very welcome! See [CMS with AI, not AI CMS: Wagtail 8.0's new API](https://wagtail.org/blog/cms-with-ai-not-ai-cms-wagtail-80s-new-api/) for context.
+> 🚧 This is a prototype. Feedback very welcome! See [CMS with AI, not AI CMS: Wagtail 8.0's new API](https://wagtail.org/blog/cms-with-ai-not-ai-cms-wagtail-80s-new-api/) and [Prototyping a new CLI for Wagtail](https://wagtail.org/blog/prototyping-a-cli-for-wagtail/) for context.
 
-A command-line client for the Wagtail v3 API. Install it, point it at a site's
-API, and your CMS is available from the terminal — for local dev, live sites,
-and AI agents. Manage pages, images, documents, snippets, sites, locales, and
-redirects, read the Wagtail docs as Markdown, and scaffold new projects.
+Speed up and automate Wagtail operations with the command line. Key features:
+
+- v3 write API client. 50+ CMS admin operations available from the terminal. To help manage local development and live sites. Manage pages, images, documents, snippets, sites, locales, redirects, and more.
+- Read and search Wagtail docs as Markdown.
+- Scaffold new Django/Wagtail projects.
 
 ## Installation
 
-Pick the command for your preferred package installer. The console script is
-`wt` (the package name is `wagtail-cli`):
+Install [`wagtail-cli`](https://pypi.org/project/wagtail-cli/) from PyPI with your preferred package manager, then use the `wt` CLI. Example with `uv`:
 
 ```bash
-uv tool install wagtail-cli      # permanent install; then run `wt …`
-uvx --from wagtail-cli wt       # one-shot, no install
+# Permanent install:
+uv tool install wagtail-cli
+# One-off usage:
+uvx --from wagtail-cli wt
 ```
 
 ## Quick start
@@ -27,8 +29,6 @@ wt api whoami        # verify authentication
 wt api pages list    # browse pages
 wt api schema list   # discover page types
 ```
-
-Or run `wt api init` once to save these to `~/.wagtail-cli.toml` interactively.
 
 Reading the Wagtail docs needs no configuration at all:
 
@@ -66,21 +66,11 @@ to the API as `{"format": "db_markdown", "content": …}`.
 
 ## Documentation
 
-The documentation is published at <https://wagtail.github.io/wagtail-cli/>.
+- [Getting started](https://wagtail.github.io/wagtail-cli/getting-started/) — end-to-end walkthrough against the demo site.
+- [Command reference](https://wagtail.github.io/wagtail-cli/usage/) — every command and flag.
+- [Configuration](https://wagtail.github.io/wagtail-cli/reference/configuration/) — config cascade, dotfiles, environment variables.
+- [Agent skills](https://wagtail.github.io/wagtail-cli/agent-skills/) — the machine-readable skill published for AI agents.
 
-- [Getting started](docs/getting-started.md) — end-to-end walkthrough against the demo site.
-- [Command reference](docs/usage.md) — every command and flag.
-- [Configuration](docs/reference/configuration.md) — config cascade, dotfiles, environment variables.
-- [Agent skills](docs/agent-skills.md) — the machine-readable skill published for AI agents.
-- [Development guide](docs/contributing/development.md) — layout, testing, and how to add commands.
-
-## Development
-
-```bash
-just install           # set up the environment
-just test              # run the test suite
-just lint              # lint with Ruff
-just test-integration  # run integration tests against a live site
-```
+## Contributing
 
 See the [development guide](docs/contributing/development.md) for details.
