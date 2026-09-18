@@ -73,10 +73,9 @@ jobs:
     needs: lint
     strategy:
       matrix:
-        # Supported versions of Python, excluding oldest and newest.
+        # Supported versions of Python, excluding the newest (covered by
+        # test-highest-deps).
         include:
-          - python: '3.11'
-            resolution: lowest-direct
           - python: '3.12'
             resolution: lowest-direct
           - python: '3.13'

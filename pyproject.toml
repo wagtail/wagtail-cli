@@ -12,13 +12,13 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
 ]
 # See: https://devguide.python.org/versions/#supported-versions
-requires-python = ">=3.11"
+# Must stay compatible with the demo group: Django 6.1 requires Python >=3.12.
+requires-python = ">=3.12"
 dependencies = [
     # 0.15.4 is the oldest typer that supports the CLI's `X | None` annotations.
     "typer>=0.15.4",
@@ -48,8 +48,9 @@ dev = [
 ]
 demo = [
     # Dependencies for the demo Wagtail site in demo/.
-    "django>=5.2",
-    "wagtail>=7.0",
+    # Wagtail 8.0 supports Django 5.2/6.0/6.1, and Django 6.1 requires Python >=3.12.
+    "django>=6.1",
+    "wagtail>=8.0",
 ]
 
 [build-system]

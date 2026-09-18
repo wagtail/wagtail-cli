@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- The demo site now runs Django 6.1 and Wagtail 8.0. Supporting this requires Python 3.12+, so the package's minimum supported Python version is raised from 3.11 to 3.12.
+- Migrate the demo site's `EMAIL_BACKEND` setting to `MAILERS`, deprecated in Django 6.1.
+
 ## [0.2.0] - 2026-09-04
 
 ### Added
