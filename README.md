@@ -1,12 +1,11 @@
 # wagtail-cli
 
-> 🚧 This is a prototype / early MVP. Feedback very welcome! See [CMS with AI, not AI CMS: Wagtail 8.0’s new API](https://wagtail.org/blog/cms-with-ai-not-ai-cms-wagtail-80s-new-api/) for context.
+> 🚧 This is a prototype / early MVP. Feedback very welcome! See [CMS with AI, not AI CMS: Wagtail 8.0's new API](https://wagtail.org/blog/cms-with-ai-not-ai-cms-wagtail-80s-new-api/) for context.
 
-A command-line client for the Wagtail v3 API. Install it, point it at a Wagtail
-site's API, and drive CMS operations (pages, images, documents, snippets, sites,
-locales, redirects, schema) from your terminal — handy for automation and
-AI-orchestrated content management. It can also put the Wagtail documentation
-in your terminal: `wt docs releases/8.0` prints the release notes as Markdown.
+A command-line client for the Wagtail v3 API. Install it, point it at a site's
+API, and your CMS is available from the terminal — for local dev, live sites,
+and AI agents. Manage pages, images, documents, snippets, sites, locales, and
+redirects, read the Wagtail docs as Markdown, and scaffold new projects.
 
 ## Installation
 
@@ -51,17 +50,18 @@ to the API as `{"format": "db_markdown", "content": …}`.
 
 ## Command surface
 
-- **`wt api …`** — all Wagtail v3 API operations (`pages`, `images`,
-  `documents`, `snippets`, `sites`, `locales`, `redirects`, `schema`), plus
-  `wt api init` and `wt api whoami`.
-- **`wt start …`** — scaffold a new Django/Wagtail project (mirrors
-  `wagtail start` / `django-admin startproject`; default custom base-page template).
-- **`wt docs …`** — read docs.wagtail.org as Markdown: `wt docs releases/8.0`,
-  `wt docs api` for the v3 API reference, `wt docs search picture` to search.
+- **`wt api`** — the whole v3 API as commands: `pages`, `images`, `documents`,
+  `snippets`, `sites`, `locales`, `redirects`, `schema`, plus `wt api init`
+  and `wt api whoami`.
+- **`wt docs`** — docs.wagtail.org as Markdown: release notes, the v3 API
+  reference, and search.
+- **`wt start`** — scaffold a new Django/Wagtail project (mirrors
+  `wagtail start` / `django-admin startproject`, with a custom base page model
+  as the default).
 - **Delegation** — any other `wt <command>` is forwarded to `./manage.py` (if
   present) or `django-admin` (when `DJANGO_SETTINGS_MODULE` is set), so `wt`
-  also fronts Django commands like `wt runserver`/`wt makemigrations`.
-- **`wt --version` / `wt --help`** — custom, enhanced with detected Wagtail/Django
+  also fronts Django commands like `wt runserver` and `wt makemigrations`.
+- **`wt --version` / `wt --help`** — enhanced with detected Wagtail/Django
   versions and `./manage.py --help` when available.
 
 ## Documentation
