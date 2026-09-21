@@ -19,6 +19,11 @@ from typer.main import get_command
 from wagtail_cli import __version__, output
 from wagtail_cli.config import load_config
 from wagtail_cli.errors import UsageError, WgtlError
+from wagtail_cli.interpreter import (
+    find_project_python,
+    is_django_available,
+    package_version,
+)
 from wagtail_cli.resources._client import DryRunRequest, WgtlClient
 
 
@@ -188,9 +193,6 @@ def cli() -> None:
     if not first or first in _KNOWN_GROUPS or first.startswith("-"):
         app()
         return
-    # `cli()` is the console entry point and runs outside Typer's runner, so
-    # we exit here via SystemExit, not typer.Exit (which is only meaningful
-    # inside a Typer command context).
     target = resolve_delegate(argv)
     if target is None:
         typer.echo(
@@ -199,6 +201,17 @@ def cli() -> None:
             err=True,
         )
         raise SystemExit(1)
+    if target[0] == sys.executable and not is_django_available():
+        typer.echo(
+            "Note: Django is not importable in the environment running wt, so "
+            "the command may fail. If the project uses a virtualenv, activate "
+            "it first, or run wt inside the project environment with "
+            "`uv run --with wagtail-cli wt ...`.",
+            err=True,
+        )
+    # `cli()` is the console entry point and runs outside Typer's runner, so
+    # we exit here via SystemExit, not typer.Exit (which is only meaningful
+    # inside a Typer command context).
     raise SystemExit(subprocess.call(target))  # noqa: S603  # argv is user-authored CLI args forwarded verbatim to the Django runner
 
 
@@ -209,11 +222,18 @@ def resolve_delegate(args: list[str]) -> list[str] | None:
     """Resolve the command to run for a delegated invocation.
 
     Returns the argv to run, or None when there is nothing to delegate to.
+    The project's own interpreter is preferred so that an isolated install of
+    wt (uv tool, pipx) runs manage.py with the environment holding Django.
     """
     manage_py = Path.cwd() / "manage.py"
     if manage_py.is_file():
-        return [sys.executable, str(manage_py), *args]
+        return [find_project_python() or sys.executable, str(manage_py), *args]
     if os.environ.get("DJANGO_SETTINGS_MODULE"):
+        python = find_project_python()
+        if python is not None:
+            # Equivalent to django-admin, but uses the resolved interpreter
+            # rather than whatever django-admin happens to be on PATH.
+            return [python, "-m", "django", *args]
         return ["django-admin", *args]
     return None
 
@@ -230,12 +250,16 @@ def _capture(cmd: list[str]) -> str | None:
 
 def _print_enhanced_version() -> None:
     typer.echo(f"wagtail-cli {__version__}")
-    wagtail_ver = _capture(["wagtail", "--version"])
-    if wagtail_ver:
-        typer.echo(f"Wagtail: {wagtail_ver}")
-    django_ver = _capture(["django-admin", "--version"])
-    if django_ver:
-        typer.echo(f"Django: {django_ver}")
+    # Report the versions of the project's environment, which may differ from
+    # the environment wt itself is installed in (uv tool, pipx).
+    python = find_project_python()
+    if python is not None:
+        wagtail_ver = package_version(python, "wagtail")
+        if wagtail_ver:
+            typer.echo(f"Wagtail: {wagtail_ver}")
+        django_ver = package_version(python, "django")
+        if django_ver:
+            typer.echo(f"Django: {django_ver}")
     raise SystemExit(0)
 
 
@@ -243,9 +267,10 @@ def _print_enhanced_help() -> None:
     cmd = get_command(app)
     ctx = typer.Context(cmd, info_name="wt")
     typer.echo(cmd.get_help(ctx))
+    python = find_project_python()
     manage_py = Path.cwd() / "manage.py"
-    if manage_py.is_file():
-        out = _capture([sys.executable, str(manage_py), "--help"])
+    if python is not None and manage_py.is_file():
+        out = _capture([python, str(manage_py), "--help"])
         if out:
             typer.echo("\n--- ./manage.py --help ---\n")
             typer.echo(out)

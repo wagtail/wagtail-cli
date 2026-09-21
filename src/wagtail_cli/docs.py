@@ -14,6 +14,8 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from urllib.parse import urlsplit
 
+from wagtail_cli.interpreter import find_project_python, package_version
+
 
 DEFAULT_DOCS_URL = "https://docs.wagtail.org"
 DEFAULT_LANGUAGE = "en"
@@ -53,10 +55,20 @@ def normalize_wagtail_version(raw: str) -> str | None:
 
 
 def detect_wagtail_version() -> str | None:
-    """Return the docs version of the locally installed Wagtail, if any."""
+    """Return the docs version of the locally installed Wagtail, if any.
+
+    Falls back to querying the surrounding project's interpreter, so an
+    isolated install of wt (uv tool, pipx) still detects the project's
+    Wagtail version.
+    """
+    raw = None
     try:
         raw = importlib.metadata.version("wagtail")
     except importlib.metadata.PackageNotFoundError:
+        python = find_project_python()
+        if python is not None:
+            raw = package_version(python, "wagtail")
+    if raw is None:
         return None
     return normalize_wagtail_version(raw)
 

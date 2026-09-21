@@ -21,6 +21,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The demo site now runs Django 6.1 and Wagtail 8.0. Supporting this requires Python 3.12+, so the package's minimum supported Python version is raised from 3.11 to 3.12.
 - Migrate the demo site's `EMAIL_BACKEND` setting to `MAILERS`, deprecated in Django 6.1.
 
+### Fixed
+
+- Delegated Django commands (for example `wt runserver` with a `manage.py` in the current directory) now run with the project's own interpreter rather than the one `wt` is installed in. This fixes running `wt` from an isolated install (`uv tool install wagtail-cli`, pipx), where Django is not available: the CLI resolves the active `$VIRTUAL_ENV` or a `.venv` / `venv` directory in the current directory, and prints a hint when it still cannot find a suitable interpreter. The `DJANGO_SETTINGS_MODULE` fallback now prefers `python -m django` with the resolved interpreter over a PATH `django-admin`.
+- `wt --version` and `wt --help` detect the project's Wagtail and Django versions through the project's interpreter, so isolated installs report the versions of the site being worked on rather than coming up empty.
+- `wt docs` resolves the default docs version from the project's Wagtail installation when Wagtail is not installed alongside `wt`, falling back to `stable` only when no project Wagtail can be found.
+
 ## [0.2.0] - 2026-09-04
 
 ### Added

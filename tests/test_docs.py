@@ -53,6 +53,47 @@ def test_resolve_version_no_wagtail_installed(monkeypatch):
     assert docs.resolve_version() == "stable"
 
 
+# --- detect_wagtail_version ---
+
+
+def test_detect_wagtail_version_uses_current_interpreter(monkeypatch):
+    monkeypatch.setattr(docs.importlib.metadata, "version", lambda name: "8.0.1")
+    calls = []
+    monkeypatch.setattr(
+        docs, "package_version", lambda python, package: calls.append(package)
+    )
+    assert docs.detect_wagtail_version() == "8.0"
+
+
+def test_detect_wagtail_version_falls_back_to_project_python(monkeypatch):
+    def raise_missing(name):
+        raise docs.importlib.metadata.PackageNotFoundError(name)
+
+    monkeypatch.setattr(docs.importlib.metadata, "version", raise_missing)
+    monkeypatch.setattr(docs, "find_project_python", lambda: "/opt/venv/bin/python")
+    monkeypatch.setattr(docs, "package_version", lambda python, package: "7.2.4")
+    assert docs.detect_wagtail_version() == "7.2"
+
+
+def test_detect_wagtail_version_none_without_project_python(monkeypatch):
+    def raise_missing(name):
+        raise docs.importlib.metadata.PackageNotFoundError(name)
+
+    monkeypatch.setattr(docs.importlib.metadata, "version", raise_missing)
+    monkeypatch.setattr(docs, "find_project_python", lambda: None)
+    assert docs.detect_wagtail_version() is None
+
+
+def test_detect_wagtail_version_none_when_project_lacks_wagtail(monkeypatch):
+    def raise_missing(name):
+        raise docs.importlib.metadata.PackageNotFoundError(name)
+
+    monkeypatch.setattr(docs.importlib.metadata, "version", raise_missing)
+    monkeypatch.setattr(docs, "find_project_python", lambda: "/opt/venv/bin/python")
+    monkeypatch.setattr(docs, "package_version", lambda python, package: None)
+    assert docs.detect_wagtail_version() is None
+
+
 @pytest.mark.parametrize(
     ("raw", "expected"),
     [

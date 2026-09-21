@@ -21,6 +21,13 @@ uv tool install wagtail-cli
 wt --help
 ```
 
+> `wt` installed in isolation (uv tool, pipx) runs outside your project's
+> environment. Delegated Django commands (for example `wt runserver`) and
+> `wt --version` automatically prefer your project's interpreter: the active
+> `$VIRTUAL_ENV`, or a `.venv` / `venv` directory in the current directory.
+> Alternatively run `wt` inside the project environment with
+> `uv run --with wagtail-cli wt ...`.
+
 ## 2. Configure a site
 
 You need two things: the API base URL and a token. Start the demo site and
