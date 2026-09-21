@@ -50,7 +50,7 @@ wt api pages create blog.BlogPage --parent /blog/ \
 - **Working with an agent?** See [Agent skills](agent-skills.md) for the
   machine-readable skill published with these docs.
 - **Contributing?** Read the
-  [contribution guidelines](https://github.com/wagtail/wagtail-cli/blob/main/docs/CONTRIBUTING.md)
+  [contribution guidelines](CONTRIBUTING.md)
   and the [development guide](contributing/development.md).
 
 ## License

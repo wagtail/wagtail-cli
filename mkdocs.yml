@@ -51,7 +51,8 @@ plugins:
           - reference/api.md
           - reference/configuration.md
         Contributing:
-          - CONTRIBUTING.md
+          # CONTRIBUTING.md, ROADMAP.md, and CHANGELOG.md are on the site but
+          # omitted from the LLM digest.
           - contributing/development.md
   - mkdocstrings:
       handlers:
@@ -68,9 +69,7 @@ plugins:
 # Excluded from the site: not part of the published docs.
 exclude_docs: |
   README.md
-  CONTRIBUTING.md
   SECURITY.md
-  ROADMAP.md
 
 nav:
   - Home: index.md
@@ -81,8 +80,8 @@ nav:
       - Configuration: reference/configuration.md
   - Agent skills: agent-skills.md
   - Contributing:
-      - Contributing guidelines: https://github.com/wagtail/wagtail-cli/blob/main/docs/CONTRIBUTING.md
+      - Contributing guidelines: CONTRIBUTING.md
       - Development guide: contributing/development.md
-      - Documentation & tooling: contributing/documentation.md
   - Security policy: https://github.com/wagtail/wagtail-cli/blob/main/docs/SECURITY.md
-  - Roadmap: https://github.com/wagtail/wagtail-cli/blob/main/docs/ROADMAP.md
+  - Roadmap: ROADMAP.md
+  - Changelog: CHANGELOG.md

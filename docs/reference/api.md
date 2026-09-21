@@ -1,7 +1,6 @@
 # API reference
 
-This page is generated from the package's
-[docstrings](../contributing/documentation.md#keeping-docstrings-in-sync) with
+This page is generated from the package's docstrings with
 [mkdocstrings](https://mkdocstrings.com/). Update the source code, not this
 page, when the API changes.
 
