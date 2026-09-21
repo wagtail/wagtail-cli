@@ -13,7 +13,7 @@ Each suite (`wagtail_api_skill.yaml`, `wagtail_docs_skill.yaml`) runs every test
 - Task completion: both arms are asked for the exact terminal commands, and a grader runs them. `graders/run_api_commands.py` injects `--dry-run --json` into every `wt … api` invocation and runs the block against dummy credentials, then grades the exact requests (method, URL, params, body) — a hallucinated flag exits 2 and matches nothing, and no live Wagtail site is needed. `graders/run_docs_commands.py` runs `wt docs` commands as-is and checks the retrieved content.
 - Gotchas with no command answer are graded by rubric, using a second model (`deepseek/deepseek-v4.1-flash`) from a different family so the suite is not grading itself.
 
-Caveats: dry-run grading proves the CLI accepts the commands and builds the right request, not that a live site would accept the payload; the `--dry-run` rewrite drops `VAR=$(wt …)` capture, so prompts supply concrete inputs rather than values discovered from earlier commands.
+Caveats: dry-run grading proves the CLI accepts the commands and builds the right request, not that a live site would accept the payload; the `--dry-run` rewrite drops `VAR=$(wt …)` capture, so prompts supply concrete inputs rather than values discovered from earlier commands. The `read`, `grep`, `glob` and `list` tools are disabled explicitly on both arms: the promptfoo opencode:sdk provider turns them on by default whenever `working_dir` is set, even with `'*': false`, which let the baseline read the repo (including the eval configs, the skills and this README) and answer from there instead of from its own knowledge. Disabling them means the skill tool loads `SKILL.md` only — `references/` files linked from it are unreachable, so `SKILL.md` needs to stand alone. The repo's `AGENTS.md` is still injected into the context of both arms by OpenCode; it describes the project but not the CLI, so it does not teach the baseline any commands.
 
 ## Requirements
 
@@ -39,29 +39,23 @@ WT_EVAL_MODEL=qwen/qwen3.8-27b just eval
 
 ## Results snapshot
 
-Single fresh runs, `--no-cache`, promptfoo 0.123.1. Agent runs are noisy — the create row below flipped between arms between sessions, so treat a one-run delta as indicative and confirm with `--repeat 3` before acting. "Activation" is the two skill-arm rows asserting the skill loads (or does not).
+Post-leak-fix numbers (see caveats): `--no-cache --repeat 3`, promptfoo 0.123.1, one model per suite, arms with all filesystem tools disabled. The pre-fix snapshot (2026-09-19) measured all three models with the baseline able to read the repo, so those numbers are not comparable and were dropped; rerun the other models with `WT_EVAL_MODEL` to repopulate the table. "Activation" is the two skill-arm rows asserting the skill loads (or does not).
 
-### wagtail-api (8 graded rows + 2 activation)
-
-| Model | baseline | skill | activation |
-| --- | --- | --- | --- |
-| z-ai/glm-5.3-flash | 8/8 | 9/10 | 2/2 |
-| qwen/qwen3.8-27b | 5/8 | 10/10 | 2/2 |
-| qwen/qwen3.5-9b | 2/8 | 8/10 | 2/2 |
-
-- glm's one skill-arm miss: the create row — it used generic block names (`heading`, `paragraph`) and `--field author_id:1` instead of the demo's `heading_block`/`paragraph_block` blocks and the required `blog_person_relationship` child relation from the skill's reference, even with the skill loaded.
-- qwen3.8-27b's baseline misses: it twice answered without using `wt` at all (unpublish, list); its one empty response (StreamField rubric) was a provider error, not an answer.
-- qwen3.5-9b is the local-model test case: without the skill it mostly does not use `wt` at all (2/8); with it, activation works and most tasks come out right (8/10), but it still misses demo-specific payload shapes, and two rubric rows show it answering from generic Django knowledge instead of the skill (serialization quirks instead of `APIField(..., writable=True)`).
-
-### wagtail-docs (4 graded rows + 2 activation)
+### wagtail-api (8 graded rows + 2 activation), z-ai/glm-5.3-flash, eval-ChC-2026-09-21T15:06:49
 
 | Model | baseline | skill | activation |
 | --- | --- | --- | --- |
-| z-ai/glm-5.3-flash | 4/4 | 4/4 | 2/2 |
-| qwen/qwen3.8-27b | 2/4 | 4/4 | 2/2 |
-| qwen/qwen3.5-9b | 2/4 | 3/4 | 2/2 |
+| z-ai/glm-5.3-flash | 3/24 | 20/30 | 6/6 |
 
-- qwen3.8-27b's baseline missed both lookups that need the reader: one empty response (provider error) and one rubric fail — it recommended parsing HTML with pandoc/trafilatura rather than `wt docs`.
-- qwen3.5-9b's baseline invented a docs path (`…/images.html.md`, from the table of contents listing) that 404s; its one skill-arm rubric miss recommended an MCP-based "wagtail-docs skill" instead of the CLI's `wt docs` reader.
+- The one baseline pass is the StreamField replace-whole rubric, answered correctly from generic Wagtail knowledge; every command row now fails honestly — the model suggests `git clone` of the Wagtail repo or generic curl against the API instead of `wt`.
+- The three skill-arm misses are the create, update-draft and image-upload rows, 0/3 each: with `references/` unreachable (read tools disabled) the model gets the command surface wrong from `SKILL.md` alone — `--field key=value` instead of `KEY:VALUE`, `--file` instead of the positional file argument, and generic block/relation shapes instead of the demo's. The skill needs to stand alone or the eval needs a fixture working_dir; the pre-fix runs did not show these misses because the model could read `references/` from the repo.
 
-Last updated: 2026-09-19.
+### wagtail-docs (4 graded rows + 2 activation), z-ai/glm-5.3-flash, eval-Y0n-2026-09-21T15:06:49
+
+| Model | baseline | skill | activation |
+| --- | --- | --- | --- |
+| z-ai/glm-5.3-flash | 0/12 | 18/18 | 6/6 |
+
+- Clean sweep for the skill arm across all three repeats, and the baseline now fails every row from pure memory (clone-the-repo and curl advice, invented docs paths) — the intended contrast.
+
+Last updated: 2026-09-21.

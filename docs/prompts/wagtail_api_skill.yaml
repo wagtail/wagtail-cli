@@ -8,7 +8,13 @@ prompts:
 
 # The model list comes from opencode.json (loaded via OPENCODE_CONFIG in the
 # `eval` recipe). The arms differ only in the `skill` tool and permission;
-# a trailing '"*": deny' would shadow the allow, so order matters.
+# a trailing '"*": deny' would shadow the allow, so order matters. With
+# `working_dir` set, the promptfoo opencode:sdk provider turns on the
+# read-only filesystem tools (read, grep, glob, list) even when `'*': false`
+# — they must be disabled explicitly or the "no tools" baseline can read the
+# repo (and this file, the skills, and the README) and answer from there.
+# The skill arm loses them too, so the delta stays a single tool; SKILL.md
+# is written to be self-contained because references/ is then unreachable.
 providers:
   - id: opencode:sdk
     label: baseline
@@ -19,6 +25,10 @@ providers:
       working_dir: ../..
       tools:
         '*': false
+        read: false
+        grep: false
+        glob: false
+        list: false
       permission:
         external_directory: deny
       custom_agent:
@@ -39,6 +49,10 @@ providers:
       <<: *opencode
       tools:
         '*': false
+        read: false
+        grep: false
+        glob: false
+        list: false
         skill: true
       permission:
         skill:
