@@ -59,6 +59,42 @@ def test_docs_bare_path_fetches_page():
 
 
 @respx.mock
+def test_docs_outline_flag_prints_only_headings():
+    respx.get(f"{DOCS}/en/stable/topics/images.html.md").respond(
+        200,
+        text=(
+            "# Images\n\nIntro.\n\n## Usage\n\nText.\n\n"
+            "### Rendering\n\n```python\n# not a heading\n```\n"
+        ),
+    )
+    result = runner.invoke(app, ["docs", "topics/images.html", "--outline"])
+    assert result.exit_code == 0
+    assert result.output == "Images\n  Usage\n    Rendering\n"
+
+
+@respx.mock
+def test_docs_outline_flag_before_path():
+    respx.get(f"{DOCS}/en/stable/topics/images.html.md").respond(
+        200, text="# Images\n\nIntro.\n\n## Usage\n"
+    )
+    result = runner.invoke(app, ["docs", "--outline", "topics/images.html"])
+    assert result.exit_code == 0
+    assert result.output == "Images\n  Usage\n"
+
+
+@respx.mock
+def test_docs_outline_on_index_shows_full_page_headings():
+    respx.get(f"{DOCS}/en/stable/index.html.md").respond(
+        200,
+        text="# Welcome\n\nIntro.\n\n## Index\n\n"
+        "* [Getting started](getting_started/index.html.md)\n\n## About\n",
+    )
+    result = runner.invoke(app, ["docs", "--outline"])
+    assert result.exit_code == 0
+    assert result.output == "Welcome\n  Index\n  About\n"
+
+
+@respx.mock
 def test_docs_full_url():
     respx.get(f"{DOCS}/en/stable/releases/8.0.html.md").respond(
         200, text="# Release notes"

@@ -27,7 +27,8 @@ wt docs https://docs.wagtail.org/en/latest/topics/streamfield.html
 ```
 
 `wt docs` with no path prints the table of contents, one path per line.
-Pages can be long: pipe through `head` or `grep -A` when you need one section.
+Pages can be long: use `--outline` to see only a page's headings before
+reading one section in full, or pipe through `head` or `grep -A`.
 
 ## Search by keyword
 

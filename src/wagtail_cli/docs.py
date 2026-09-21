@@ -29,6 +29,8 @@ _WAGTAIL_VERSION_RE = re.compile(r"^(\d+\.\d+)")
 _API_PREFIX_RE = re.compile(r"^(?:cms-api|api)/(?:v3(?:-preview)?)/")
 _HTTP_METHODS = {"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"}
 _OPERATION_HEADING_RE = re.compile(r"^### (\w+) (/\S+)\s*$")
+_HEADING_RE = re.compile(r"^(#{1,6}) (.+?)\s*#*\s*$")
+_FENCE_RE = re.compile(r"^(`{3,}|~{3,})")
 
 
 def resolve_docs_url(
@@ -200,6 +202,26 @@ def parse_operations(markdown: str) -> list[Operation]:
             Operation(method=method, path=path, heading=f"{method} {path}", body=body)
         )
     return operations
+
+
+def extract_outline(markdown: str) -> str:
+    """Render a docs page's Markdown headings as an indented outline.
+
+    Scans lines for ATX headings (same line-based detection as
+    `parse_operations`), skipping fenced code blocks, and indents each
+    heading by its level.
+    """
+    lines = []
+    in_fence = False
+    for line in markdown.splitlines():
+        if match := _FENCE_RE.match(line):
+            in_fence = not in_fence
+            continue
+        if in_fence or not (match := _HEADING_RE.match(line)):
+            continue
+        level = len(match.group(1))
+        lines.append(f"{'  ' * (level - 1)}{match.group(2)}")
+    return "\n".join(lines)
 
 
 def normalize_operation_path(path: str) -> str:

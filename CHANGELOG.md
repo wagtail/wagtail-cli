@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - MkDocs documentation site (Material theme), published to GitHub Pages on every push to `main`. Build locally with `just docs-build` / `just docs-serve`.
 - LLM-friendly docs output: `llms.txt` and `llms-full.txt` digests at the site root, via `mkdocs-llmstxt`.
 - Agent skills discovery: the docs publish the package's agent skill under `.well-known/agent-skills/`, with machine-readable indexes at `.well-known/agent-skills/index.json` and `.well-known/ai-catalog.json`.
+- `wt docs [PATH] --outline`: print only a docs page's headings as an indented outline, for a quick look at a page's structure before reading it in full.
 
 ### Changed
 

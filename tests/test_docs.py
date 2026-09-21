@@ -238,6 +238,37 @@ def test_extract_index_section_missing():
         docs.extract_index_section("# Welcome\n\nNo index here.\n")
 
 
+# --- extract_outline ---
+
+
+def test_extract_outline_indents_by_heading_level():
+    md = (
+        "# Title\n\nIntro.\n\n## Section\n\nText.\n\n"
+        "### Subsection\n\nMore.\n\n#### Detail\n"
+    )
+    assert docs.extract_outline(md) == (
+        "Title\n  Section\n    Subsection\n      Detail"
+    )
+
+
+def test_extract_outline_skips_body_and_strips_hash_markers():
+    md = "# Title ##\n\n* [A](a.html.md)\n\nBody text, not a heading.\n"
+    assert docs.extract_outline(md) == "Title"
+
+
+def test_extract_outline_skips_headings_in_code_fences():
+    md = "# Title\n\n```python\n# not a heading\n```\n\n~~~\n# also not\n~~~\n"
+    assert docs.extract_outline(md) == "Title"
+
+
+def test_extract_outline_requires_heading_space():
+    assert docs.extract_outline("#hashtag not a heading\n") == ""
+
+
+def test_extract_outline_no_headings():
+    assert docs.extract_outline("Just some text.\n") == ""
+
+
 # --- parse_operations ---
 
 

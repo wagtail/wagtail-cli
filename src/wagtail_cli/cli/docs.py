@@ -31,6 +31,7 @@ class DocsContext:
     docs_url: str
     language: str
     version: str
+    outline: bool = False
 
 
 docs_app = typer.Typer(
@@ -118,10 +119,16 @@ def _fetch_page_markdown(
     return content
 
 
-def _show_docs_page(ctx: typer.Context, path: str | None) -> None:
+def _show_docs_page(
+    ctx: typer.Context, path: str | None, outline: bool = False
+) -> None:
     cc = _docs_context(ctx)
+    outline = outline or cc.outline
     resolved_path = path if path else ""
     content = _fetch_page_markdown(cc, resolved_path)
+    if outline:
+        typer.echo(docs.extract_outline(content))
+        return
     if not path:
         try:
             content = docs.extract_index_section(content)
@@ -155,15 +162,21 @@ def docs_callback(
             "locally installed Wagtail version, then stable."
         ),
     ),
+    outline: bool = typer.Option(
+        False,
+        "--outline",
+        help="Print only the page's headings as an indented outline.",
+    ),
 ) -> None:
     """Read Wagtail documentation. `wt docs [PATH]` prints a page as Markdown."""
     ctx.obj = DocsContext(
         docs_url=docs.resolve_docs_url(docs_url),
         language=language,
         version=docs.resolve_version(version),
+        outline=outline,
     )
     if ctx.invoked_subcommand is None:
-        _show_docs_page(ctx, None)
+        _show_docs_page(ctx, None, outline)
 
 
 @docs_app.command(name="path", hidden=True)
@@ -173,9 +186,14 @@ def docs_path(
     path: list[str] = typer.Argument(  # noqa: B008
         None, help="Docs path or URL."
     ),
+    outline: bool = typer.Option(
+        False,
+        "--outline",
+        help="Print only the page's headings as an indented outline.",
+    ),
 ) -> None:
     """Fetch a docs page by path or URL (hidden alias for `wt docs [PATH]`)."""
-    _show_docs_page(ctx, "/".join(path or []))
+    _show_docs_page(ctx, "/".join(path or []), outline)
 
 
 @docs_app.command()
