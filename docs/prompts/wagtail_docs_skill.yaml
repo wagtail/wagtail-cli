@@ -1,0 +1,155 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+
+# Promptfoo evals for the `wagtail-docs` agent skill.
+# Design, graders and requirements: README.md next to this file.
+
+prompts:
+  - '{{prompt}}'
+
+providers:
+  - id: opencode:sdk
+    label: baseline
+    config: &opencode
+      provider_id: tensorx
+      model: '{{ env.WT_EVAL_MODEL | default("z-ai/glm-5.3-flash", true) }}'
+      apiKey: '{{ env.TENSORX_API_KEY }}'
+      working_dir: ../..
+      tools:
+        '*': false
+      permission:
+        external_directory: deny
+      custom_agent:
+        description: Wagtail documentation question answering
+        temperature: 0
+        steps: 20
+        prompt: >-
+          You are answering a developer's question about the Wagtail
+          documentation and its v3 API reference. Answer directly and
+          concisely, using what you know plus whatever tools and reference
+          material you have — if you have neither, answer from memory rather
+          than asking for file access. When the question asks how to look
+          something up, reply with the exact terminal commands to run, as one
+          complete bash code block.
+
+  - id: opencode:sdk
+    label: skill
+    config:
+      <<: *opencode
+      tools:
+        '*': false
+        skill: true
+      permission:
+        skill:
+          '*': deny
+          wagtail-docs: allow
+        external_directory: deny
+
+evaluateOptions:
+  maxConcurrency: 2
+
+defaultTest:
+  options:
+    # The grader reads a list var; without this promptfoo fans it out into
+    # separate test cases.
+    disableVarExpansion: true
+    # Rubric grader: different model family from the one under test.
+    provider:
+      id: openai:chat:deepseek/deepseek-v4.1-flash
+      config:
+        apiBaseUrl: 'https://api.tensorx.ai/v1'
+        apiKey: '{{ env.TENSORX_API_KEY }}'
+        temperature: 0
+        max_tokens: 4096
+        response_format:
+          type: json_object
+  # A provider error surfaces as empty output; name it so it cannot be
+  # mistaken for a bad answer.
+  assert:
+    - type: javascript
+      value: |
+        return (output || '').trim().length > 0
+          ? { pass: true, score: 1, reason: 'Provider returned output' }
+          : { pass: false, score: 0, reason: 'EMPTY RESPONSE — provider error, not a model failure. Re-run this row.' };
+
+tests:
+  # --- Task completion, graded by running the answer ------------------------
+
+  - description: Find and read the page on StreamField validation
+    vars:
+      prompt: >-
+        I need to understand how StreamField block validation works in
+        Wagtail. Give me the exact terminal commands to find the
+        documentation page about it and read it.
+      expect_contains:
+        - StreamField validation
+        - clean()
+    assert: &run_docs
+      - type: python
+        value: file://graders/run_docs_commands.py
+
+  - description: Pull up the v3 API operation that creates a page
+    vars:
+      prompt: >-
+        I want to check the exact query parameters and request payload of the
+        Wagtail v3 API operation that creates a page. Give me the exact
+        terminal commands to pull up that operation's reference.
+      expect_contains:
+        - Create page
+        - POST /api/v3/pages/
+    assert: *run_docs
+
+  - description: Read the images topic
+    vars:
+      prompt: >-
+        Pull up the Wagtail documentation topic about working with images in
+        templates. Give me the exact terminal commands you would run.
+      expect_contains:
+        - How to use images in templates
+    assert: *run_docs
+
+  # --- Skill activation, on the skill arm only ------------------------------
+
+  - description: Activates on a documentation question
+    providers:
+      - skill
+    vars:
+      prompt: >-
+        How do StreamField blocks work in Wagtail? Point me at the
+        documentation.
+    assert:
+      - type: skill-used
+        value: wagtail-docs
+
+  - description: Does not activate on an unrelated task
+    providers:
+      - skill
+    vars:
+      prompt: >-
+        In Python, what is the difference between a list and a tuple? Answer
+        in one paragraph.
+    assert:
+      - type: skill-used
+        value:
+          name: wagtail-docs
+          max: 0
+
+  # --- Gotcha with no command answer, graded by rubric ----------------------
+
+  - description: Prefer the docs reader over fetching HTML
+    vars:
+      prompt: >-
+        An agent on our team keeps reading docs.wagtail.org by downloading
+        pages as HTML with curl. The output is noisy and it often misreads
+        the page structure. Is there a better way for it to read the Wagtail
+        documentation from the terminal?
+    assert:
+      - type: llm-rubric
+        value: >-
+          The answer recommends the Wagtail CLI's documentation reader (`wt
+          docs`, from the wagtail-cli package) instead of fetching HTML with
+          curl or WebFetch. It mentions at least two of: it prints pages as
+          Markdown; it needs no configuration or credentials; it can search
+          the docs (wt docs search); it can look up the v3 API reference (wt
+          docs api); it can pin a documentation version with --version; it
+          defaults to the locally installed Wagtail version. Suggesting only
+          a different HTML parser, without mentioning `wt docs`, fails.

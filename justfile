@@ -70,3 +70,24 @@ generate-client:
 # CLI's httpx client; use the plain-HTTP loopback URL for local runs.
 test-integration:
     WAGTAIL_CLI_TEST_BASE_URL=$${WAGTAIL_CLI_TEST_BASE_URL:-http://127.0.0.1:9001/api/v3} uv run pytest -m integration
+
+# Eval tooling; also needs the OpenCode CLI (https://opencode.ai/docs/).
+eval-init:
+    npm install -g promptfoo@latest @opencode-ai/sdk
+
+# Run the agent-skill evals (see docs/prompts/README.md).
+eval *args="":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    configs="docs/prompts/wagtail_api_skill.yaml docs/prompts/wagtail_docs_skill.yaml"
+    if [ $# -gt 0 ] && [[ "${1}" == *.yaml ]]; then
+        configs="${1}"
+        shift
+    fi
+    for config in ${configs}; do
+        OPENCODE_CONFIG="$PWD/docs/prompts/opencode.json" promptfoo eval -c "${config}" --no-cache "$@"
+    done
+
+# Open the promptfoo viewer for the most recent eval results.
+eval-view:
+    promptfoo view -y

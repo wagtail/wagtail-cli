@@ -1,0 +1,24 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "provider": {
+    "tensorx": {
+      "models": {
+        "z-ai/glm-5.3-flash": {
+          "name": "GLM 5.3 Flash"
+        },
+        "qwen/qwen3.8-27b": {
+          "name": "Qwen 3.8 27B"
+        }
+      },
+      "name": "TensorX",
+      "npm": "@ai-sdk/openai-compatible",
+      "options": {
+        "apiKey": "{env:TENSORX_API_KEY}",
+        "baseURL": "https://api.tensorx.ai/v1"
+      }
+    }
+  },
+  "skills": {
+    "paths": ["src/wagtail_cli/.agents/skills"]
+  }
+}

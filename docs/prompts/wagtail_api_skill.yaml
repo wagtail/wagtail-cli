@@ -1,0 +1,258 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+
+# Promptfoo evals for the `wagtail-api` agent skill.
+# Design, graders and requirements: README.md next to this file.
+
+prompts:
+  - '{{prompt}}'
+
+# The model list comes from opencode.json (loaded via OPENCODE_CONFIG in the
+# `eval` recipe). The arms differ only in the `skill` tool and permission;
+# a trailing '"*": deny' would shadow the allow, so order matters.
+providers:
+  - id: opencode:sdk
+    label: baseline
+    config: &opencode
+      provider_id: tensorx
+      model: '{{ env.WT_EVAL_MODEL | default("z-ai/glm-5.3-flash", true) }}'
+      apiKey: '{{ env.TENSORX_API_KEY }}'
+      working_dir: ../..
+      tools:
+        '*': false
+      permission:
+        external_directory: deny
+      custom_agent:
+        description: Wagtail site operations question answering
+        temperature: 0
+        steps: 20
+        prompt: >-
+          You are answering a developer's question about operating a Wagtail
+          site from the terminal. Answer directly and concisely, using what
+          you know plus whatever tools and reference material you have — if
+          you have neither, answer from memory rather than asking for file
+          access. When the question asks how to do something, reply with the
+          exact terminal commands to run, as one complete bash code block.
+
+  - id: opencode:sdk
+    label: skill
+    config:
+      <<: *opencode
+      tools:
+        '*': false
+        skill: true
+      permission:
+        skill:
+          '*': deny
+          wagtail-api: allow
+        external_directory: deny
+
+evaluateOptions:
+  maxConcurrency: 2
+
+defaultTest:
+  options:
+    # The graders read list vars; without this promptfoo fans them out into
+    # separate test cases.
+    disableVarExpansion: true
+    # Rubric grader: different model family from the one under test.
+    provider:
+      id: openai:chat:deepseek/deepseek-v4.1-flash
+      config:
+        apiBaseUrl: 'https://api.tensorx.ai/v1'
+        apiKey: '{{ env.TENSORX_API_KEY }}'
+        temperature: 0
+        max_tokens: 4096
+        response_format:
+          type: json_object
+  # A provider error surfaces as empty output; name it so it cannot be
+  # mistaken for a bad answer.
+  assert:
+    - type: javascript
+      value: |
+        return (output || '').trim().length > 0
+          ? { pass: true, score: 1, reason: 'Provider returned output' }
+          : { pass: false, score: 0, reason: 'EMPTY RESPONSE — provider error, not a model failure. Re-run this row.' };
+
+tests:
+  # --- Task completion, graded by dry-running the answer --------------------
+
+  - description: Publish a blog post with heading, paragraph and author
+    vars:
+      prompt: >-
+        On our Wagtail site, publish a new blog post in the blog section (the
+        blog index lives at /blog/) titled "Baking with rye". The body must
+        start with a heading reading "Why bake with rye" followed by a
+        paragraph reading "Rye flour gives a denser crumb.", and the post is
+        credited to author 1. Give me the exact terminal commands you would
+        run.
+      expect_requests:
+        - method: POST
+          url_suffix: /pages/
+          body:
+            meta:
+              type: blog.BlogPage
+              parent_id: /blog/
+              action: publish
+            title: Baking with rye
+            body:
+              - type: heading_block
+                value:
+                  heading_text: Why bake with rye
+              - type: paragraph_block
+                value: '<p>Rye flour gives a denser crumb.</p>'
+            blog_person_relationship:
+              - person_id: 1
+    assert: &run_api
+      - type: python
+        value: file://graders/run_api_commands.py
+
+  - description: Update a draft without publishing it
+    vars:
+      prompt: >-
+        On our Wagtail site, blog post 5 needs its title changed to "Rye
+        bread guide" and its search description to "How to bake with rye
+        flour." Save it as a draft — do not publish it. Give me the exact
+        terminal commands you would run.
+      expect_requests:
+        - method: PATCH
+          url_suffix: /pages/5/
+          body:
+            title: Rye bread guide
+            search_description: How to bake with rye flour.
+      forbid_methods:
+        - POST
+    assert: *run_api
+
+  - description: Take a page offline without deleting it
+    vars:
+      prompt: >-
+        Take the blog post with id 7 off our Wagtail site for now, but keep
+        it around so we can put it back later. Give me the exact terminal
+        commands you would run.
+      expect_requests:
+        - method: POST
+          url_suffix: /pages/7/actions/unpublish/
+      forbid_methods:
+        - DELETE
+    assert: *run_api
+
+  - description: List blog posts under a section within the page cap
+    vars:
+      prompt: >-
+        List the first 20 blog posts under the section with page id 4 on our
+        Wagtail site — the posts are blog.BlogPage pages. Give me the exact
+        terminal commands you would run.
+      expect_requests:
+        - method: GET
+          url_suffix: /pages/
+          params:
+            child_of: '4'
+            limit:
+              '$lte': 20
+    assert: *run_api
+
+  - description: Upload an image with a title
+    vars:
+      prompt: >-
+        Upload the image hero.png from the current directory to our Wagtail
+        site with the title "Hero loaf". Give me the exact terminal commands
+        you would run.
+      files:
+        hero.png: Placeholder — the dry-run never reads the file's bytes.
+      expect_requests:
+        - method: POST
+          url_suffix: /images/
+          body:
+            title: Hero loaf
+          file_required: true
+    assert: *run_api
+
+  # --- Skill activation, on the skill arm only ------------------------------
+
+  - description: Activates on a task that does not name the CLI
+    providers:
+      - skill
+    vars:
+      prompt: >-
+        Publish a new blog post on our Wagtail site titled "Sourdough starter
+        basics" in the blog section (the blog index lives at /blog/).
+    assert:
+      - type: skill-used
+        value: wagtail-api
+      - type: llm-rubric
+        value: >-
+          The reply must not invent or guess the site's API base URL or an API
+          token. It either uses whatever site configuration is already
+          available — for example by checking the connection first with a
+          whoami-style command — or asks the user for the site's URL and
+          token. A reply whose commands hard-code a placeholder or example
+          URL, or that invents credentials, fails.
+
+  - description: Does not activate on an unrelated task
+    providers:
+      - skill
+    vars:
+      prompt: >-
+        In Python, what is the difference between a list and a tuple? Answer
+        in one paragraph.
+    assert:
+      - type: skill-used
+        value:
+          name: wagtail-api
+          max: 0
+
+  # --- Gotchas with no command answer, graded by rubric ---------------------
+
+  - description: A field the API silently drops
+    vars:
+      prompt: >-
+        I'm editing content on our Wagtail site through its API and something
+        is off — when I send an update with a new value for one particular
+        field, the request succeeds but the field comes back empty or
+        unchanged. Other fields update fine. What is going on, and how do we
+        fix it?
+    assert:
+      - type: llm-rubric
+        value: >-
+          The answer explains that the field is not writable through the API
+          — the project has not declared it with APIField(..., writable=True)
+          — and that the API accepts the request but silently ignores the
+          field, which is why nothing errors. It says to check the type's
+          schema (a field listed for reading but missing from the
+          create/patch schemas is read-only) and that fixing it needs a
+          developer to change the model's APIField declaration, not a
+          different API call.
+
+  - description: pages get returns the live version
+    vars:
+      prompt: >-
+        I'm pulling a blog post from our Wagtail site with the Wagtail CLI
+        and I keep getting the old published content back, but I know there
+        are newer edits saved as a draft. How do I read the latest draft
+        version?
+    assert:
+      - type: llm-rubric
+        value: >-
+          The answer says that by default the CLI returns the live (published)
+          version of a page, and that the latest revision — including
+          draft-only edits — is read by requesting the draft version, for
+          example with --version draft on pages get. It may note that the
+          command's built-in help text states this the opposite way around.
+
+  - description: StreamField bodies are replaced whole
+    vars:
+      prompt: >-
+        I updated one block in the StreamField body of a Wagtail page through
+        its API and now the rest of the article's sections are gone. What
+        happened, and what is the right way to edit a single block without
+        losing the others?
+    assert:
+      - type: llm-rubric
+        value: >-
+          The answer explains that a StreamField body is replaced as a whole
+          on every update — sending a list with one block wipes the others —
+          and that the safe workflow is to read the current body first (the
+          draft version), edit the full list of blocks, and resend the
+          complete list. Mentioning that the same replace-whole rule applies
+          to child relations such as InlinePanel lists is a plus, not a
+          requirement.
