@@ -1,6 +1,6 @@
 # Development
 
-Notes for contributors to `wagtail-cli`.
+Notes for contributors to `wagtail-cli`. For project-wide design decisions, see the [design principles](design-principles.md).
 
 ## Package layout
 

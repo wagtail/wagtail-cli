@@ -54,6 +54,7 @@ plugins:
           # CONTRIBUTING.md, ROADMAP.md, and CHANGELOG.md are on the site but
           # omitted from the LLM digest.
           - contributing/development.md
+          - contributing/design-principles.md
   - mkdocstrings:
       handlers:
         python:
@@ -85,7 +86,7 @@ nav:
       - Skill evals: prompts/README.md
   - Contributing:
       - Contributing guidelines: CONTRIBUTING.md
+      - Design principles: contributing/design-principles.md
       - Development guide: contributing/development.md
-  - Security policy: https://github.com/wagtail/wagtail-cli/blob/main/docs/SECURITY.md
   - Roadmap: ROADMAP.md
   - Changelog: CHANGELOG.md

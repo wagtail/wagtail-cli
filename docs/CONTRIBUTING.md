@@ -1,6 +1,6 @@
 # Contributing guidelines
 
-Thank you for your interest in this project! We welcome all contributions, from bug reports to new features that align with [our roadmap](ROADMAP.md). Here are instructions for anyone wishing to contribute.
+Thank you for your interest in this project! We welcome all contributions, from bug reports to new features that align with [our roadmap](ROADMAP.md) and [design principles](contributing/design-principles.md). Here are instructions for anyone wishing to contribute.
 
 ## Installation
 
