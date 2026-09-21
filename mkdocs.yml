@@ -67,8 +67,10 @@ plugins:
         on_post_build: 'docs.hooks:on_post_build'
 
 # Excluded from the site: not part of the published docs.
+# Patterns are relative to the docs directory; only the root README.md is a
+# repo-only file — docs/prompts/README.md (skill evals) is published.
 exclude_docs: |
-  README.md
+  /README.md
   SECURITY.md
 
 nav:
@@ -78,7 +80,9 @@ nav:
   - Reference:
       - API: reference/api.md
       - Configuration: reference/configuration.md
-  - Agent skills: agent-skills.md
+  - Agent skills:
+      - Overview: agent-skills.md
+      - Skill evals: prompts/README.md
   - Contributing:
       - Contributing guidelines: CONTRIBUTING.md
       - Development guide: contributing/development.md

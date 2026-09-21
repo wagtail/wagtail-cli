@@ -7,6 +7,10 @@ wagtail-cli ships two [agent skills](https://agentskills.io/) that help agents g
 | `wagtail-api` | Operate a Wagtail site through `wt api`: content model discovery, pages, media, snippets, sites, locales, redirects, with the gotchas agents hit most and a `references/` directory for the full command surface and content payloads. |
 | `wagtail-docs` | Read and search docs.wagtail.org and the v3 API reference with `wt docs`, in a few lines, so agents stop fetching HTML pages. |
 
+## Testing the skills
+
+The skills are tested with [promptfoo evals](prompts/README.md), which compare the models' results with and without each skill loaded. See the skill evals page for how to run them and the latest results.
+
 ## Editing the skills
 
 Skills live under `src/wagtail_cli/.agents/skills/`, one directory per skill. `SKILL.md` is the entry point agents load; longer material lives in `references/` and is linked from `SKILL.md` with relative paths so agents only read it when needed. The post-build hook in `docs/hooks.py` publishes each skill directory automatically, minus the `evals/` directory used to test the skill.
