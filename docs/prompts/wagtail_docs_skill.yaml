@@ -14,11 +14,16 @@ providers:
       model: '{{ env.WT_EVAL_MODEL | default("z-ai/glm-5.3-flash", true) }}'
       apiKey: '{{ env.TENSORX_API_KEY }}'
       working_dir: ../..
-      # The arms differ only in the `skill` tool and permission. Note: with
-      # `working_dir` set, the promptfoo opencode:sdk provider turns on the
-      # read-only filesystem tools (read, grep, glob, list) even when `'*': false`
-      # — they must be disabled explicitly or the "no tools" baseline can read the
-      # repo (and this file, the skills, and the README) and answer from there.
+# The arms differ in the `skill` tool and permission. Note: with
+# `working_dir` set, the promptfoo opencode:sdk provider turns on the
+# read-only filesystem tools (read, grep, glob, list) even when `'*': false`
+# — they must be disabled explicitly or the "no tools" baseline can read the
+# repo (and this file, the skills, and the README) and answer from there.
+# The skill arm gets `read` back, scoped by permission to the skills
+# directory, so it can follow SKILL.md's links into references/; grep and
+# glob stay off because their permission rules match the search pattern
+# rather than the file path, so they cannot be scoped the same way (and
+# grep output would leak file contents regardless).
       tools:
         '*': false
         read: false
@@ -46,7 +51,7 @@ providers:
       <<: *opencode
       tools:
         '*': false
-        read: false
+        read: true
         grep: false
         glob: false
         list: false
@@ -56,6 +61,9 @@ providers:
           '*': deny
           wagtail-docs: allow
         external_directory: deny
+        read:
+          '*': deny
+          'src/wagtail_cli/.agents/skills/**': allow
 
 evaluateOptions:
   maxConcurrency: 2
