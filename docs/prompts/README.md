@@ -47,9 +47,11 @@ Single fresh runs, `--no-cache`, promptfoo 0.123.1. Agent runs are noisy — the
 | --- | --- | --- | --- |
 | z-ai/glm-5.3-flash | 8/8 | 9/10 | 2/2 |
 | qwen/qwen3.8-27b | 5/8 | 10/10 | 2/2 |
+| qwen/qwen3.5-9b | 2/8 | 8/10 | 2/2 |
 
 - glm's one skill-arm miss: the create row — it used generic block names (`heading`, `paragraph`) and `--field author_id:1` instead of the demo's `heading_block`/`paragraph_block` blocks and the required `blog_person_relationship` child relation from the skill's reference, even with the skill loaded.
-- qwen's baseline misses: it twice answered without using `wt` at all (unpublish, list); its one empty response (StreamField rubric) was a provider error, not an answer.
+- qwen3.8-27b's baseline misses: it twice answered without using `wt` at all (unpublish, list); its one empty response (StreamField rubric) was a provider error, not an answer.
+- qwen3.5-9b is the local-model test case: without the skill it mostly does not use `wt` at all (2/8); with it, activation works and most tasks come out right (8/10), but it still misses demo-specific payload shapes, and two rubric rows show it answering from generic Django knowledge instead of the skill (serialization quirks instead of `APIField(..., writable=True)`).
 
 ### wagtail-docs (4 graded rows + 2 activation)
 
@@ -57,7 +59,9 @@ Single fresh runs, `--no-cache`, promptfoo 0.123.1. Agent runs are noisy — the
 | --- | --- | --- | --- |
 | z-ai/glm-5.3-flash | 4/4 | 4/4 | 2/2 |
 | qwen/qwen3.8-27b | 2/4 | 4/4 | 2/2 |
+| qwen/qwen3.5-9b | 2/4 | 3/4 | 2/2 |
 
-- qwen's baseline missed both lookups that need the reader: one empty response (provider error) and one rubric fail — it recommended parsing HTML with pandoc/trafilatura rather than `wt docs`.
+- qwen3.8-27b's baseline missed both lookups that need the reader: one empty response (provider error) and one rubric fail — it recommended parsing HTML with pandoc/trafilatura rather than `wt docs`.
+- qwen3.5-9b's baseline invented a docs path (`…/images.html.md`, from the table of contents listing) that 404s; its one skill-arm rubric miss recommended an MCP-based "wagtail-docs skill" instead of the CLI's `wt docs` reader.
 
 Last updated: 2026-09-19.
