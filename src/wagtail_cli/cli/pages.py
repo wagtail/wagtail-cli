@@ -10,7 +10,7 @@ from wagtail_cli.resources import pages as pages_resources
 
 from ._shared import is_tty as _is_tty  # noqa: F401
 from ._shared import require_yes as _require_yes
-from .main import api_app, appify, emit, get_client
+from .main import api_app, appify, emit, get_cli_context, get_client
 
 
 pages_app = typer.Typer(
@@ -28,7 +28,7 @@ def _resolve_ref(ctx: typer.Context, raw: str) -> Any:
     """
     if raw.isdigit():
         return int(raw)
-    if ctx.obj.dry_run:
+    if get_cli_context(ctx).dry_run:
         return raw
     return parsing.resolve_page_ref(get_client(ctx), raw)
 

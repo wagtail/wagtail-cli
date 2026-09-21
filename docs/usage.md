@@ -160,7 +160,8 @@ Search the docs via the site's search engine:
 
 ```bash
 wt docs search picture                  # concise results: title, path, snippet
-wt docs search --json picture           # raw search API response as JSON
+wt --json docs search picture            # raw search API response as JSON
+wt docs search --json picture            # equivalent local form
 ```
 
 Results are scoped to the resolved docs version (`project:wagtail/<version>`);
@@ -171,9 +172,7 @@ when a non-stable version yields no results, a note suggests
 
 ## Output conventions
 
-- **JSON when piped**, human-readable when on a terminal.
-- `--json` / `--human` override auto-detection. Human lists render as a table
-  (id/title/name/label columns by default); details render as key/value lines.
+- `--json` / `--human` force the desired output format.
 - `--dry-run` prints `METHOD url`, `Params`, and the JSON body that would be
   sent, and makes no network call.
 - `schema show` always outputs JSON (the schema is the machine-readable contract).

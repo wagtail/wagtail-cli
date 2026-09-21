@@ -5,7 +5,7 @@ import typer
 from wagtail_cli.config import Config, save_user_config
 from wagtail_cli.resources._client import WgtlClient
 
-from .main import api_app, appify, emit, get_client
+from .main import api_app, appify, emit, get_cli_context, get_client
 
 
 @api_app.command(name="whoami")
@@ -28,7 +28,7 @@ def init(
     ),
 ) -> None:
     """Configure credentials interactively and save them to ~/.wagtail-cli.toml."""
-    cc = ctx.obj
+    cc = get_cli_context(ctx)
     url = url or cc.url
     token = token or cc.token
 

@@ -296,10 +296,28 @@ def test_docs_search_concise_list():
 
 
 @respx.mock
-def test_docs_search_json_flag():
+def test_docs_search_global_json_flag():
+    payload = {"count": 0, "query": "zzz", "results": []}
+    respx.get(f"{DOCS}/_/api/v3/search/").respond(200, json=payload)
+    result = runner.invoke(app, ["--json", "docs", "search", "zzz"])
+    assert result.exit_code == 0
+    assert json.loads(result.output) == payload
+
+
+@respx.mock
+def test_docs_search_local_json_flag():
     payload = {"count": 0, "query": "zzz", "results": []}
     respx.get(f"{DOCS}/_/api/v3/search/").respond(200, json=payload)
     result = runner.invoke(app, ["docs", "search", "--json", "zzz"])
+    assert result.exit_code == 0
+    assert json.loads(result.output) == payload
+
+
+@respx.mock
+def test_docs_search_local_json_overrides_global_human():
+    payload = {"count": 0, "query": "zzz", "results": []}
+    respx.get(f"{DOCS}/_/api/v3/search/").respond(200, json=payload)
+    result = runner.invoke(app, ["--human", "docs", "search", "--json", "zzz"])
     assert result.exit_code == 0
     assert json.loads(result.output) == payload
 

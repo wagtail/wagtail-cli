@@ -10,7 +10,7 @@ import typer
 from wagtail_cli import __version__, docs
 from wagtail_cli.errors import NetworkError, NotFoundError, UsageError, WgtlError
 
-from .main import appify
+from .main import appify, resolve_output_format
 
 
 class DocsGroup(typer.core.TyperGroup):
@@ -53,7 +53,9 @@ app.add_typer(docs_app, name="docs")
 
 
 def _docs_context(ctx: typer.Context) -> DocsContext:
-    cc: DocsContext = ctx.obj
+    cc = ctx.find_object(DocsContext)
+    if cc is None:  # pragma: no cover - every docs command runs below docs_app
+        raise RuntimeError("DocsContext not found in the Click context chain")
     return cc
 
 
@@ -244,7 +246,7 @@ def search(
         payload = response.json()
     except ValueError as e:
         raise WgtlError(f"Search returned a non-JSON response from {url}") from e
-    if json_output:
+    if resolve_output_format(ctx, "json" if json_output else None) == "json":
         typer.echo(docs.search_payload_to_json(payload))
         return
     typer.echo(docs.format_search_results(payload))

@@ -102,9 +102,25 @@ def main(
     )
 
 
+def get_cli_context(ctx: typer.Context) -> CliContext:
+    """Return the root CLI context from a nested command context."""
+    cc = ctx.find_object(CliContext)
+    if cc is None:  # pragma: no cover - every command runs below the root app
+        raise RuntimeError("CliContext not found in the Click context chain")
+    return cc
+
+
+def resolve_output_format(
+    ctx: typer.Context,
+    local_format: str | None = None,
+) -> str | None:
+    """Resolve a local format before falling back to global CLI options."""
+    return local_format if local_format is not None else get_cli_context(ctx).fmt
+
+
 def get_client(ctx: typer.Context) -> WgtlClient:
     """Build a configured WgtlClient from global options + config cascade."""
-    cc: CliContext = ctx.obj
+    cc = get_cli_context(ctx)
     cfg = load_config(cli_url=cc.url, cli_token=cc.token)
     if not cfg.is_configured:
         raise UsageError(
@@ -121,8 +137,7 @@ def get_client(ctx: typer.Context) -> WgtlClient:
 
 def emit(ctx: typer.Context, data: Any) -> None:
     """Render data (or a dry-run request preview) to stdout."""
-    cc: CliContext = ctx.obj
-    fmt = cc.fmt
+    fmt = resolve_output_format(ctx)
     if isinstance(data, DryRunRequest):
         if fmt == "json":
             typer.echo(json.dumps(asdict(data), separators=(",", ":"), default=str))
