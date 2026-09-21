@@ -34,9 +34,16 @@ def test_whoami_auth_error_exit_4(monkeypatch):
     assert "Unauthorized" in result.output
 
 
-def test_whoami_unconfigured_exit_2(monkeypatch):
+def test_whoami_unconfigured_exit_2(monkeypatch, tmp_path):
     monkeypatch.delenv("WAGTAIL_CLI_BASE_URL", raising=False)
     monkeypatch.delenv("WAGTAIL_CLI_TOKEN", raising=False)
+    # Isolate from any real ~/.wagtail-cli.toml or project dotfile on this machine.
+    monkeypatch.setattr(
+        "wagtail_cli.config._user_dotfile", lambda: tmp_path / ".wagtail-cli.toml"
+    )
+    monkeypatch.setattr(
+        "wagtail_cli.config._project_dotfile", lambda: tmp_path / ".wagtail-cli.toml"
+    )
     result = runner.invoke(app, ["--url", BASE, "api", "whoami"])  # url but no token
     assert result.exit_code == 2
     assert "wt api init" in result.output
