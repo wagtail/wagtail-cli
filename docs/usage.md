@@ -22,9 +22,23 @@ Available on `wt api` invocations (placed before `api` on the command line):
 | `--human` | Force human-readable output. |
 | `-v` / `--verbose` | Print HTTP request/response details to stderr. |
 | `--dry-run` | Print the request that would be sent, without sending it. |
+| `--select FIELD,...` | Return only selected response fields; dot paths and repeated flags are supported. |
 
 `--json` and `--human` are mutually exclusive (the CLI exits with a usage
 error if both are given).
+
+For agent and scripting workflows, `--select` projects the response locally
+after the API request. It is especially useful for large page responses:
+
+```bash
+wt --json --select id,title,meta.html_url api pages list --child-of 4
+wt --json --select id,meta.html_url api pages get /blog/
+```
+
+Collection responses retain `count` and `items`; the selected fields are
+applied to each item. JSON-mode errors are written to stderr as one compact
+`{"error": ...}` object containing the exit code, HTTP status when present,
+and the original problem body.
 
 Top-level `--version` and `--help` are handled by `wt` itself:
 
@@ -223,7 +237,7 @@ wt api pages list [--type T]* [--child-of REF] [--descendant-of REF]
                 [--search Q] [--search-operator and|or] [--order F]
                 [--limit N] [--offset N]
 wt api pages find [--id N] [--path /blog/] [--site N]
-wt api pages get <ID> [--version draft|live] [--html]
+wt api pages get <ID|PATH> [--version draft|live] [--html]
 wt api pages create <TYPE> --parent REF --title T
                 [--slug S] [--field K:V]... [--publish]
 wt api pages update <ID> [--title T] [--slug S] [--field K:V]... [--publish] [--yes]
@@ -245,6 +259,9 @@ wt api pages revisions get <ID> <REVISION_ID>
 find endpoint. `--field` values that start with `[` or `{` are parsed as JSON;
 `@file` reads a value from a file (`@-` = stdin). Multi-line rich-text bodies
 read from a `.md` file are sent with `format: db_markdown`.
+
+`pages get` also accepts a page URL path directly, so an agent can fetch a
+page in one CLI invocation with `wt api pages get /blog/`.
 
 ## `wt api images`
 

@@ -36,6 +36,9 @@ project, `wt api_tokens create --user=<name>` mints one.
 - Put global flags before `api`: `wt --json --dry-run api pages create …`.
   Use `--json` and `jq`; pass `--limit` on lists (server cap is 20 by
   default, above it is a 400; page with `--offset`).
+- Use `--select id,title,meta.html_url` when you only need identifiers or
+  URLs. It keeps the response compact without a second `jq` command; selectors
+  are applied locally because the v3 API does not support `fields=` projection.
 - Check a type's write schema once, then trust it:
   `wt --json api schema show blog.BlogPage | jq '.create.required, (.create.properties | keys)'`.
 - `--dry-run` shows the request without sending it. On `update`, dry-run
@@ -72,9 +75,10 @@ project, `wt api_tokens create --user=<name>` mints one.
    Authenticated `list`/`get` include drafts and expose no `live` flag, so
    use `find --path` or the public URL to tell. There is no anonymous mode;
    an unauthenticated `curl "$WAGTAIL_CLI_BASE_URL/pages/?child_of=4"` lists live pages only.
-5. **`pages get` returns the live version.** `--version draft` gives the
-   latest revision (the help text says the opposite). `--html` renders rich
-   text as display HTML.
+5. **`pages get` returns the live version.** It accepts either an ID or a URL
+   path such as `/blog/`; path lookup is resolved inside the same CLI
+   invocation. `--version draft` gives the latest revision (the help text says
+   the opposite). `--html` renders rich text as display HTML.
 6. **Create is a draft unless `--publish`.** `update --publish` PATCHes then
    publishes. A 422 on `slug` is a sibling collision; pass a unique `--slug`.
 7. **StreamField and child relations are replaced whole on update.** Read,

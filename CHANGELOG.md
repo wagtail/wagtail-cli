@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Add `--select` response projections for compact agent and scripting output,
+  structured JSON errors when `--json` is selected, and path-based
+  `pages get` to combine page lookup and retrieval in one CLI invocation.
 - Support both global and command-local `--json` options for `wt docs search`.
 - Split the `wagtail-cli` agent skill into `wagtail-api` and `wagtail-docs`. `wagtail-api` is rewritten from evaluated runs against the demo site: a short `SKILL.md` focused on configuration, gotchas and a reporting default, with `references/commands.md` and `references/writing-content.md` for the full command surface and content payloads. `wagtail-docs` is a few lines on `wt docs` so agents stop fetching docs.wagtail.org pages by hand. The docs build now publishes each skill directory, not just `SKILL.md`, and the skills are bundled in the wheel and sdist under `wagtail_cli/.agents/skills/`.
 - Demo site: declare the blog and person API fields as writable so the v3 API accepts content writes.

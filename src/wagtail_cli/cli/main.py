@@ -55,6 +55,7 @@ class CliContext:
     fmt: str | None = None  # "json" | "human" | None (auto)
     verbose: bool = False
     dry_run: bool = False
+    select: tuple[str, ...] = ()
 
 
 @app.callback()
@@ -85,6 +86,14 @@ def main(
         "--dry-run",
         help="Print the HTTP request that would be sent without sending it.",
     ),
+    select: list[str] | None = typer.Option(  # noqa: B008
+        None,
+        "--select",
+        help=(
+            "Return only these response fields (comma-separated or repeatable; "
+            "supports dot paths)."
+        ),
+    ),
     ctx: typer.Context = typer.Context,
 ) -> None:
     """CLI client for the Wagtail v3 API."""
@@ -104,6 +113,7 @@ def main(
         fmt=fmt,
         verbose=verbose,
         dry_run=dry_run,
+        select=tuple(select or ()),
     )
 
 
@@ -156,7 +166,42 @@ def emit(ctx: typer.Context, data: Any) -> None:
             lines.append(f"File: {data.file}")
         typer.echo("\n".join(lines))
         return
-    typer.echo(output.render(data, fmt))
+    typer.echo(output.render(data, fmt, select=get_cli_context(ctx).select))
+
+
+def _context_from_call(
+    args: tuple[Any, ...], kwargs: dict[str, Any]
+) -> typer.Context | None:
+    context = kwargs.get("ctx")
+    if context is not None and hasattr(context, "find_object"):
+        return context
+    return next(
+        (arg for arg in args if hasattr(arg, "find_object")),
+        None,
+    )
+
+
+def _emit_error(ctx: typer.Context | None, error: WgtlError) -> None:
+    """Emit errors in the same machine-readable mode as successful output."""
+    if ctx is not None and resolve_output_format(ctx) == "json":
+        body: dict[str, Any] = {
+            "message": str(error),
+            "code": error.exit_code,
+        }
+        if error.status_code is not None:
+            body["status"] = error.status_code
+        if error.problem is not None:
+            body["problem"] = error.problem
+        typer.echo(output.render({"error": body}, "json"), err=True)
+        return
+    typer.echo(f"Error ({error.status_code or error.exit_code}): {error}", err=True)
+    if error.problem is not None:
+        body = (
+            json.dumps(error.problem, indent=2, default=str)
+            if isinstance(error.problem, (dict, list))
+            else str(error.problem)
+        )
+        typer.echo(body, err=True)
 
 
 def appify(fn: Callable[..., Any]) -> Callable[..., Any]:
@@ -167,14 +212,7 @@ def appify(fn: Callable[..., Any]) -> Callable[..., Any]:
         try:
             return fn(*args, **kwargs)
         except WgtlError as e:
-            typer.echo(f"Error ({e.status_code or e.exit_code}): {e}", err=True)
-            if e.problem is not None:
-                body = (
-                    json.dumps(e.problem, indent=2, default=str)
-                    if isinstance(e.problem, (dict, list))
-                    else str(e.problem)
-                )
-                typer.echo(body, err=True)
+            _emit_error(_context_from_call(args, kwargs), e)
             raise typer.Exit(code=e.exit_code) from e
 
     return wrapper

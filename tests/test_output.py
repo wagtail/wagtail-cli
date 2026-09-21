@@ -1,6 +1,6 @@
 import json
 
-from wagtail_cli.output import render
+from wagtail_cli.output import project, render
 
 
 def test_json_compact():
@@ -34,3 +34,27 @@ def test_none_fmt_piped_detection(monkeypatch):
     monkeypatch.setattr("wagtail_cli.output._stdout_is_tty", lambda: True)
     out = render({"items": [{"id": 1}]}, fmt=None)
     assert not out.startswith("{}")  # human mode chosen
+
+
+def test_project_nested_fields_keeps_collection_count():
+    data = {
+        "count": 2,
+        "items": [
+            {"id": 1, "title": "Home", "meta": {"html_url": "/home/"}},
+            {"id": 2, "title": "About", "meta": {"html_url": "/about/"}},
+        ],
+    }
+    assert project(data, ["id,meta.html_url"]) == {
+        "count": 2,
+        "items": [
+            {"id": 1, "meta": {"html_url": "/home/"}},
+            {"id": 2, "meta": {"html_url": "/about/"}},
+        ],
+    }
+
+
+def test_project_missing_field_is_explicitly_null():
+    assert project({"id": 1}, ["id", "meta.html_url"]) == {
+        "id": 1,
+        "meta": {"html_url": None},
+    }

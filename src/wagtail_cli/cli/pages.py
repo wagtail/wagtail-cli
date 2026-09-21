@@ -104,14 +104,15 @@ def find_page(
 @appify
 def get_page(
     ctx: typer.Context,
-    page_id: int = typer.Argument(help="Page ID."),
+    page_ref: str = typer.Argument(help="Page ID or URL path, e.g. /blog/."),
     version: str | None = typer.Option(
         None, "--version", help="'draft' (default) or 'live'."
     ),
     html: bool = typer.Option(False, "--html", help="Return rich text fields as HTML."),
 ) -> None:
-    """Fetch a single page by ID."""
+    """Fetch a single page by ID or URL path."""
     client = get_client(ctx)
+    page_id = _resolve_ref(ctx, page_ref)
     rich_text_format = "html" if html else None
     result = pages_resources.get_page(
         client, page_id, version=version, rich_text_format=rich_text_format

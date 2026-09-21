@@ -67,6 +67,21 @@ def test_pages_get_with_version_and_html(monkeypatch):
 
 
 @respx.mock
+def test_pages_get_resolves_path(monkeypatch):
+    _env(monkeypatch)
+    respx.get(f"{BASE}/pages/find/", params={"html_path": "/blog/"}).respond(
+        302, headers={"location": "/api/v3/pages/61/?pid=1"}
+    )
+    respx.get(f"{BASE}/pages/61/").respond(200, json={"id": 61, "title": "Blog"})
+    result = runner.invoke(app, ["api", "pages", "get", "/blog/"])
+    assert result.exit_code == 0
+    assert [call.request.url.path for call in respx.calls] == [
+        "/api/v3/pages/find/",
+        "/api/v3/pages/61/",
+    ]
+
+
+@respx.mock
 def test_pages_find_returns_location(monkeypatch):
     _env(monkeypatch)
     respx.get(f"{BASE}/pages/find/", params={"html_path": "/blog/"}).respond(
@@ -357,3 +372,68 @@ def test_pages_422_exit_7_with_problem_on_stderr(monkeypatch):
     assert result.exit_code == 7
     assert "422" in result.stderr
     assert "Unprocessable Entity" in result.stderr
+
+
+@respx.mock
+def test_pages_422_json_error_is_one_machine_readable_object(monkeypatch):
+    _env(monkeypatch)
+    problem = {"title": "Unprocessable Entity", "status": 422, "detail": "Bad"}
+    respx.post(f"{BASE}/pages/").respond(422, json=problem)
+    result = runner.invoke(
+        app,
+        [
+            "--json",
+            "api",
+            "pages",
+            "create",
+            "blog.BlogPage",
+            "--parent",
+            "3",
+            "--title",
+            "Bad",
+        ],
+    )
+    assert result.exit_code == 7
+    assert json.loads(result.stderr) == {
+        "error": {
+            "message": "Unprocessable Entity: Bad",
+            "code": 7,
+            "status": 422,
+            "problem": problem,
+        }
+    }
+
+
+@respx.mock
+def test_select_projects_json_response(monkeypatch):
+    _env(monkeypatch)
+    respx.get(f"{BASE}/pages/").respond(
+        200,
+        json={
+            "count": 1,
+            "items": [
+                {
+                    "id": 9,
+                    "title": "Hello",
+                    "body": "large body",
+                    "meta": {"html_url": "/hello/", "type": "blog.BlogPage"},
+                }
+            ],
+        },
+    )
+    result = runner.invoke(
+        app,
+        [
+            "--json",
+            "--select",
+            "id,meta.html_url",
+            "api",
+            "pages",
+            "list",
+        ],
+    )
+    assert result.exit_code == 0
+    assert json.loads(result.output) == {
+        "count": 1,
+        "items": [{"id": 9, "meta": {"html_url": "/hello/"}}],
+    }
