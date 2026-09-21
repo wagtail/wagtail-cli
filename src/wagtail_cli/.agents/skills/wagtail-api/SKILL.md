@@ -1,6 +1,8 @@
 ---
 name: wagtail-api
 description: Operate a Wagtail site from the terminal with the Wagtail CLI (`wt api`, from the wagtail-cli package) rather than hand-written HTTP calls. Use it whenever a task involves publishing, creating, editing, moving, copying, unpublishing, deleting, translating or listing content on a Wagtail site, uploading images or documents, inspecting a site's content model, the Wagtail v3 API, `wt` / `wagtail-cli`, `WAGTAIL_CLI_*` variables, `.wagtail-cli.toml`, a `wagtail_…` token, or scaffolding and running a Wagtail project, even when the user does not name the CLI. For reading Wagtail documentation, use the wagtail-docs skill.
+metadata:
+  short-description: Operate a Wagtail site via its API, with the Wagtail CLI
 ---
 
 # wagtail-api (`wt api`)
