@@ -49,7 +49,7 @@ just test              # Run tests with pytest.
 
 There is a simple test app in `tests/`. Write your test modules there alongside the existing files.
 
-The [agent skills](agent-skills.md) have their own eval suite, run with promptfoo — see [Skill evals](prompts/README.md).
+The [agent skills](agent-skills.md) have their own eval suite, run with promptfoo — see [Skill evals](evals/README.md).
 
 ## Continuous integration
 

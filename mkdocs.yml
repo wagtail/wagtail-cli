@@ -50,11 +50,8 @@ plugins:
         Reference:
           - reference/api.md
           - reference/configuration.md
-        Contributing:
-          # CONTRIBUTING.md, ROADMAP.md, and CHANGELOG.md are on the site but
-          # omitted from the LLM digest.
-          - contributing/development.md
-          - contributing/design-principles.md
+        # We do not publish contributing docs in the llms.txt sitemap.
+        # Contributing:
   - mkdocstrings:
       handlers:
         python:
@@ -68,10 +65,7 @@ plugins:
         on_post_build: 'docs.hooks:on_post_build'
 
 # Excluded from the site: not part of the published docs.
-# Patterns are relative to the docs directory; only the root README.md is a
-# repo-only file — docs/prompts/README.md (skill evals) is published.
 exclude_docs: |
-  /README.md
   SECURITY.md
 
 nav:
@@ -83,7 +77,7 @@ nav:
       - Configuration: reference/configuration.md
   - Agent skills:
       - Overview: agent-skills.md
-      - Skill evals: prompts/README.md
+      - Skill evals: evals/README.md
   - Contributing:
       - Contributing guidelines: CONTRIBUTING.md
       - Design principles: contributing/design-principles.md

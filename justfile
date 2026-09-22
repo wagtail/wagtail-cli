@@ -77,17 +77,17 @@ test-integration:
 eval-init:
     npm install -g promptfoo@latest @opencode-ai/sdk
 
-# Run the agent-skill evals (see docs/prompts/README.md).
+# Run the agent-skill evals
 eval *args="":
     #!/usr/bin/env bash
     set -euo pipefail
-    configs="docs/prompts/wagtail_api_skill.yaml docs/prompts/wagtail_docs_skill.yaml"
+    configs="docs/evals/wagtail_api_skill.yaml docs/evals/wagtail_docs_skill.yaml"
     if [ $# -gt 0 ] && [[ "${1}" == *.yaml ]]; then
         configs="${1}"
         shift
     fi
     for config in ${configs}; do
-        OPENCODE_CONFIG="$PWD/docs/prompts/opencode.json" promptfoo eval -c "${config}" --no-cache "$@"
+        OPENCODE_CONFIG="$PWD/docs/evals/opencode.json" promptfoo eval -c "${config}" --no-cache "$@"
     done
 
 # Open the promptfoo viewer for the most recent eval results.

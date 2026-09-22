@@ -23,4 +23,4 @@ Machine-readable index that also covers options other than skills: [`ai-catalog.
 
 ## Evaluating the skills
 
-We run [skills evaluations](prompts/README.md) to improve how the skills work across a wide range of models. Consider whether the skills will be relevant for your usage depending on results observed with those tested models.
+We run [skills evaluations](evals/README.md) to improve how the skills work across a wide range of models. Consider whether the skills will be relevant for your usage depending on results observed with those tested models.

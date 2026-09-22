@@ -26,7 +26,7 @@ Caveats: dry-run grading proves the CLI accepts the commands and builds the righ
 
 ```sh
 just eval                                       # both suites
-just eval docs/prompts/wagtail_api_skill.yaml   # one suite
+just eval docs/evals/wagtail_api_skill.yaml   # one suite
 just eval --repeat 3                            # agent runs are noisy; repeat before trusting a delta
 just eval-view                                  # dashboard for the latest run
 ```
