@@ -14,10 +14,10 @@ indent_style = tab
 [*.py]
 max_line_length = 88
 
-[*.{html,rst,md}]
+[*.{html,rst,md,toml}]
 indent_size = 4
 
-[*.{mjs,js,ts,tsx,json,jsonc,yml,yaml,toml,css,scss}]
+[*.{mjs,js,ts,tsx,json,jsonc,yml,yaml,css,scss}]
 indent_size = 2
 
 [*.md]
