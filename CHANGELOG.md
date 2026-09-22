@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-09-22
+
 - New [documentation website](https://wagtail.github.io/wagtail-cli/)
 - New [agent skills for CLI features](https://wagtail.github.io/wagtail-cli/agent-skills/)
 - Add `--select` response projections for more compact output.
