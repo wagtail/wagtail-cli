@@ -19,11 +19,13 @@ install: clean-pyc
 lint:
     uv run ruff format --check .
     uv run ruff check .
+    npm run lint
 
 # Format the server code with uv.
 format:
     uv run ruff check . --fix
     uv run ruff format .
+    npm run format
 
 # Run tests with pytest.
 test:
