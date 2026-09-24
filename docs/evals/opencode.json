@@ -3,21 +3,30 @@
   "provider": {
     "tensorx": {
       "models": {
-        "z-ai/glm-5.3-flash": {
-          "name": "GLM 5.3 Flash"
-        },
-        "qwen/qwen3.8-27b": {
-          "name": "Qwen 3.8 27B"
-        },
-        "qwen/qwen3.5-9b": {
-          "name": "Qwen 3.5 9B"
-        }
+        "z-ai/glm-5.3-flash": { "name": "GLM 5.3 Flash" },
+        "qwen/qwen3.8-27b": { "name": "Qwen 3.8 27B" },
+        "qwen/qwen3.5-9b": { "name": "Qwen 3.5 9B" }
       },
       "name": "TensorX",
       "npm": "@ai-sdk/openai-compatible",
       "options": {
         "apiKey": "{env:TENSORX_API_KEY}",
         "baseURL": "https://api.tensorx.ai/v1"
+      }
+    },
+    "neuralwatt": {
+      "name": "Neuralwatt",
+      "npm": "@ai-sdk/openai-compatible",
+      "options": {
+        "apiKey": "{env:NEURALWATT_API_KEY}",
+        "baseURL": "https://api.neuralwatt.com/v1"
+      },
+
+      "models": {
+        "deepseek-v4.1-flash": { "name": "Deepseek V4.1 Flash" },
+        "glm-5.3-flash": { "name": "GLM 5.3 Flash" },
+        "glm-5.3": { "name": "GLM 5.3" },
+        "qwen-3.8-27b": { "name": "Qwen 3.8 27B" }
       }
     }
   },

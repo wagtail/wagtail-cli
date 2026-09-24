@@ -21,9 +21,8 @@ providers:
   - id: opencode:sdk
     label: baseline
     config: &opencode
-      provider_id: tensorx
-      model: '{{ env.WT_EVAL_MODEL | default("z-ai/glm-5.3-flash", true) }}'
-      apiKey: '{{ env.TENSORX_API_KEY }}'
+      provider_id: '{{ env.EVAL_PROVIDER | default("tensorx", true) }}'
+      model: '{{ env.EVAL_MODEL | default("z-ai/glm-5.3-flash", true) }}'
       working_dir: ../..
       tools:
         '*': false

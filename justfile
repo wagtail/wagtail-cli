@@ -87,7 +87,7 @@ eval *args="":
         shift
     fi
     for config in ${configs}; do
-        OPENCODE_CONFIG="$PWD/docs/evals/opencode.json" promptfoo eval -c "${config}" --no-cache "$@"
+        OPENCODE_CONFIG="$PWD/docs/evals/opencode.json" promptfoo eval -c "${config}" "$@"
     done
 
 # Open the promptfoo viewer for the most recent eval results.
