@@ -3,6 +3,8 @@
 
   "extends": ["config:recommended", "helpers:pinGitHubActionDigests"],
 
+  "dependencyDashboard": false,
+
   // Run about bi-weekly.
   "schedule": ["* * 3,22 * *"],
   "timezone": "Etc/UTC",
