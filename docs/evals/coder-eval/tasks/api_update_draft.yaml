@@ -1,0 +1,63 @@
+# Coder Eval task: update a draft without publishing it.
+#
+# Ported from the Promptfoo `wagtail-api` suite, row "Update a draft without
+# publishing it". The `forbid_methods: [POST]` guard is shared with Promptfoo.
+
+task_id: 'update_draft_no_publish'
+description: 'Update a draft page without publishing it via the Wagtail CLI'
+
+initial_prompt: |-
+  On our Wagtail site, blog post 5 needs its title changed to "Rye bread guide"
+  and its search description to "How to bake with rye flour." Save it as a
+  draft — do not publish it.
+
+tags: [wagtail-api, skill-ab, cli]
+
+run_limits:
+  max_turns: 25
+  task_timeout: 300
+  expected_turns: 6
+
+sandbox:
+  driver: 'tempdir'
+  template_sources:
+    - type: 'template_dir'
+      path: '../fixtures/wt-site'
+  mock_path_dirs: ['bin']
+
+pre_run:
+  - command: 'rm -f wt_calls.jsonl'
+
+success_criteria:
+  - type: 'command_executed'
+    tool_name: 'Bash'
+    command_pattern: "wt\\b.*\\bapi\\b.*\\bpages\\b.*\\bupdate\\b"
+    min_count: 1
+    require_success: true
+    description: 'Agent updated the page with `wt api pages update`'
+
+  - type: 'command_executed'
+    tool_name: 'Bash'
+    command_pattern: "wt\\b.*\\bapi\\b.*\\bpages\\b.*\\b(5|\\$\\{?[A-Za-z_]|rye|update)"
+    min_count: 0
+    weight: 0
+    description: 'Agent targeted post 5 (or resolved it first)'
+
+  - type: 'skill_triggered'
+    skill_name: 'wagtail-api'
+    expected_skill: 'wagtail-api'
+    description: 'The wagtail-api skill was engaged'
+
+  - type: 'commands_efficiency'
+    expected_commands: 6
+    weight: 0
+    description: 'Completed within ~6 tool calls'
+
+  # The draft must NOT be published: no POST to a publishing action.
+  - type: 'run_command'
+    command: >-
+      EXPECT_REQUESTS='[{"method":"PATCH","url_suffix":"/pages/5/","body":{"title":"Rye bread guide","search_description":"How to bake with rye flour."}}]'
+      FORBID_METHODS='["POST"]'
+      python "$TASK_DIR/graders/check_api.py"
+    timeout: 30
+    description: 'A PATCH to /pages/5/ with the new title was sent, and no POST'

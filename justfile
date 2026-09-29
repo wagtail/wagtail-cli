@@ -73,11 +73,14 @@ generate-client:
 test-integration:
     WAGTAIL_CLI_TEST_BASE_URL=$${WAGTAIL_CLI_TEST_BASE_URL:-http://127.0.0.1:9001/api/v3} uv run pytest -m integration
 
-# Eval tooling; also needs the OpenCode CLI (https://opencode.ai/docs/).
+# Eval tooling. Both harnesses need the OpenCode CLI (https://opencode.ai/docs/).
 eval-init:
     npm install -g promptfoo@latest @opencode-ai/sdk
+    # Coder Eval drives the OpenCode CLI; the litellm extra routes its rubric
+    # judge to TensorX. Both harnesses cover the same tasks.
+    uv tool install coder-eval --with litellm
 
-# Run the agent-skill evals
+# Run the agent-skill evals with Promptfoo.
 eval *args="":
     #!/usr/bin/env bash
     set -euo pipefail
@@ -93,3 +96,23 @@ eval *args="":
 # Open the promptfoo viewer for the most recent eval results.
 eval-view:
     promptfoo view -y
+
+# Run the agent-skill evals with Coder Eval, which also reports the trajectory.
+# See docs/evals/README.md. Needs the OpenCode CLI, TENSORX_API_KEY, and
+# `just eval-init` for the coder-eval tool.
+eval-coder *args="":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    command -v coder-eval >/dev/null || { echo "coder-eval not found — run 'just eval-init'." >&2; exit 1; }
+    : "${TENSORX_API_KEY:?set TENSORX_API_KEY (the model under test and the judge both run on TensorX)}"
+    cd docs/evals/coder-eval
+    export SKILLS_PATH="$PWD/../../../src/wagtail_cli/.agents"
+    [ -d "$SKILLS_PATH/skills" ] || { echo "no skills at $SKILLS_PATH — the with-skill arm would run bare." >&2; exit 1; }
+    coder-eval run -e experiments/wagtail_skills_ab.yaml tasks/*.yaml "$@"
+
+# Open the Coder Eval report for the most recent run (or pass a run directory).
+eval-coder-report *args="":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    cd docs/evals/coder-eval
+    coder-eval report "runs/latest" "$@"

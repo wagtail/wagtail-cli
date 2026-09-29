@@ -1,0 +1,55 @@
+# Coder Eval task: take a page offline without deleting it.
+#
+# Ported from the Promptfoo `wagtail-api` suite, row "Take a page offline
+# without deleting it". The `forbid_methods: [DELETE]` guard is shared.
+
+task_id: 'unpublish_not_delete'
+description: 'Unpublish a page without deleting it via the Wagtail CLI'
+
+initial_prompt: |-
+  Take the blog post with id 7 off our Wagtail site for now, but keep it around
+  so we can put it back later.
+
+tags: [wagtail-api, skill-ab, cli]
+
+run_limits:
+  max_turns: 20
+  task_timeout: 300
+  expected_turns: 5
+
+sandbox:
+  driver: 'tempdir'
+  template_sources:
+    - type: 'template_dir'
+      path: '../fixtures/wt-site'
+  mock_path_dirs: ['bin']
+
+pre_run:
+  - command: 'rm -f wt_calls.jsonl'
+
+success_criteria:
+  - type: 'command_executed'
+    tool_name: 'Bash'
+    command_pattern: "wt\\b.*\\bapi\\b.*\\bpages\\b.*\\bunpublish\\b"
+    min_count: 1
+    require_success: true
+    description: 'Agent unpublished the page with `wt api pages unpublish`'
+
+  - type: 'skill_triggered'
+    skill_name: 'wagtail-api'
+    expected_skill: 'wagtail-api'
+    description: 'The wagtail-api skill was engaged'
+
+  - type: 'commands_efficiency'
+    expected_commands: 5
+    weight: 0
+    description: 'Completed within ~5 tool calls'
+
+  # Unpublish, never delete (delete is permanent and takes descendants).
+  - type: 'run_command'
+    command: >-
+      EXPECT_REQUESTS='[{"method":"POST","url_suffix":"/pages/7/actions/unpublish/"}]'
+      FORBID_METHODS='["DELETE"]'
+      python "$TASK_DIR/graders/check_api.py"
+    timeout: 30
+    description: 'A POST to /pages/7/actions/unpublish/ was sent, and no DELETE'

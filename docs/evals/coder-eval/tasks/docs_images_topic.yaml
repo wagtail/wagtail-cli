@@ -1,0 +1,80 @@
+# Coder Eval task: read the images topic.
+#
+# Ported from the Promptfoo `wagtail-docs` suite, row "Read the images topic".
+
+task_id: 'docs_images_topic'
+description: 'Read the Wagtail documentation topic about using images in templates'
+
+initial_prompt: |-
+  Pull up the Wagtail documentation topic about working with images in
+  templates, and summarise how to use an image in a template.
+
+tags: [wagtail-docs, skill-ab, cli]
+
+run_limits:
+  max_turns: 15
+  task_timeout: 180
+  expected_turns: 4
+
+sandbox:
+  driver: 'tempdir'
+  template_sources:
+    - type: 'template_dir'
+      path: '../fixtures/wt-site'
+  mock_path_dirs: ['bin']
+
+pre_run:
+  - command: 'rm -f wt_calls.jsonl'
+
+checker_context:
+  api_route:
+    route: 'litellm'
+    model: 'openai/qwen/qwen3.8-flash-next'
+    params:
+      api_base: 'https://api.tensorx.ai/v1'
+    env_params:
+      api_key: 'TENSORX_API_KEY'
+
+success_criteria:
+  - type: 'command_executed'
+    tool_name: 'Bash'
+    command_pattern: "wt\\b.*\\bdocs\\b"
+    min_count: 1
+    require_success: true
+    description: 'Agent used `wt docs` to read the documentation'
+
+  - type: 'command_executed'
+    tool_name: 'Bash'
+    command_pattern: "curl\\b.*docs\\.wagtail\\.org"
+    min_count: 0
+    max_count: 0
+    description: 'Agent did NOT curl docs.wagtail.org'
+
+  - type: 'skill_triggered'
+    skill_name: 'wagtail-docs'
+    expected_skill: 'wagtail-docs'
+    description: 'The wagtail-docs skill was engaged'
+
+  - type: 'commands_efficiency'
+    expected_commands: 4
+    weight: 0
+    description: 'Completed within ~4 tool calls'
+
+  - type: 'run_command'
+    command: >-
+      EXPECT_CONTAINS='["How to use images in templates"]'
+      python "$TASK_DIR/graders/check_docs.py"
+    timeout: 60
+    description: 'The images-in-templates docs topic was retrieved'
+
+  - type: 'llm_judge'
+    description: 'The answer explains using images in Wagtail templates'
+    include_agent_output: true
+    prompt: |-
+      The agent was asked to read the Wagtail docs topic on working with images
+      in templates, and summarise it. Judge the final answer.
+
+      Pass if the answer explains that a template loads the image tag library
+      and renders an image with the `{% image %}` tag (with a rendition spec,
+      e.g. width or fill, producing a resized rendition). Fail if the answer is
+      generic, invents an API, or does not describe template usage.

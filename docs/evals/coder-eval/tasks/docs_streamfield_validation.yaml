@@ -1,0 +1,83 @@
+# Coder Eval task: find and read the docs page on StreamField validation.
+#
+# Ported from the Promptfoo `wagtail-docs` suite, row "Find and read the page on
+# StreamField validation". `expect_contains` is asserted by replaying the
+# recorded `wt docs` commands, the same content check Promptfoo makes.
+
+task_id: 'docs_streamfield_validation'
+description: 'Find and read the documentation page on StreamField validation'
+
+initial_prompt: |-
+  I need to understand how StreamField block validation works in Wagtail. Find
+  the documentation page about it and read it; then summarise how it works.
+
+tags: [wagtail-docs, skill-ab, cli]
+
+run_limits:
+  max_turns: 15
+  task_timeout: 180
+  expected_turns: 4
+
+sandbox:
+  driver: 'tempdir'
+  template_sources:
+    - type: 'template_dir'
+      path: '../fixtures/wt-site'
+  mock_path_dirs: ['bin']
+
+pre_run:
+  - command: 'rm -f wt_calls.jsonl'
+
+checker_context:
+  api_route:
+    route: 'litellm'
+    model: 'openai/qwen/qwen3.8-flash-next'
+    params:
+      api_base: 'https://api.tensorx.ai/v1'
+    env_params:
+      api_key: 'TENSORX_API_KEY'
+
+success_criteria:
+  - type: 'command_executed'
+    tool_name: 'Bash'
+    command_pattern: "wt\\b.*\\bdocs\\b"
+    min_count: 1
+    require_success: true
+    description: 'Agent used `wt docs` to read the documentation'
+
+  # The whole point of the skill: no curl/WebFetch against docs.wagtail.org.
+  - type: 'command_executed'
+    tool_name: 'Bash'
+    command_pattern: "curl\\b.*docs\\.wagtail\\.org"
+    min_count: 0
+    max_count: 0
+    description: 'Agent did NOT curl docs.wagtail.org'
+
+  - type: 'skill_triggered'
+    skill_name: 'wagtail-docs'
+    expected_skill: 'wagtail-docs'
+    description: 'The wagtail-docs skill was engaged'
+
+  - type: 'commands_efficiency'
+    expected_commands: 4
+    weight: 0
+    description: 'Completed within ~4 tool calls'
+
+  - type: 'run_command'
+    command: >-
+      EXPECT_CONTAINS='["StreamField validation", "clean()"]'
+      python "$TASK_DIR/graders/check_docs.py"
+    timeout: 60
+    description: 'The StreamField validation docs page was retrieved'
+
+  - type: 'llm_judge'
+    description: 'The summary explains StreamField block validation'
+    include_agent_output: true
+    prompt: |-
+      The agent was asked to find and read the Wagtail docs page about
+      StreamField block validation, then summarise it. Judge the final answer.
+
+      Pass if the answer explains that each block implements a clean() method
+      which takes a block value and returns a cleaned version or raises a
+      ValidationError. Fail if the answer is generic, invents an API, or does
+      not describe validation at all.

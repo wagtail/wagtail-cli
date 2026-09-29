@@ -8,13 +8,28 @@ Warning: this executes model-generated shell code; only run it against models
 you trust.
 """
 
+import importlib.util
 import json
 import os
 import re
 import subprocess
 import tempfile
 
+from pathlib import Path
 from typing import Any
+
+
+# The match rules live in a shared module so the Coder Eval grader asserts
+# exactly the same thing; see its docstring. Loaded by path because Promptfoo
+# loads this file itself (via `file://`), so a plain relative import would not
+# resolve against a package.
+_spec = importlib.util.spec_from_file_location(
+    "_request_matching", Path(__file__).resolve().parent / "_request_matching.py"
+)
+_request_matching = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(_request_matching)
+describe_all = _request_matching.describe_all
+match_expectations = _request_matching.match_expectations
 
 
 CODE_BLOCK = re.compile(r"```(?:bash|sh|shell|console)?\s*\n(.*?)```", re.DOTALL)
@@ -174,57 +189,6 @@ def _add_dry_run(script: str) -> str:
     return "\n".join(result)
 
 
-def _subset(expected: Any, observed: Any) -> bool:
-    """Recursive subset match; lists match positionally."""
-    if isinstance(expected, dict):
-        if "$lte" in expected:
-            try:
-                return float(observed) <= float(expected["$lte"])
-            except (TypeError, ValueError):
-                return False
-        if "$exists" in expected:
-            # Presence itself is enforced by the parent key check; reaching
-            # this point means the key was there.
-            return True
-        if not isinstance(observed, dict):
-            return False
-        for key, value in expected.items():
-            if key not in observed or not _subset(value, observed[key]):
-                return False
-        return True
-    if isinstance(expected, list):
-        return (
-            isinstance(observed, list)
-            and len(expected) <= len(observed)
-            and all(_subset(e, o) for e, o in zip(expected, observed, strict=False))
-        )
-    if expected == "$list":
-        return isinstance(observed, list)
-    return expected == observed
-
-
-def _request_matches(expected: dict[str, Any], observed: dict[str, Any]) -> bool:
-    if "method" in expected and expected["method"] != observed.get("method"):
-        return False
-    if "url_suffix" in expected and not str(observed.get("url", "")).endswith(
-        expected["url_suffix"]
-    ):
-        return False
-    if "params" in expected and not _subset(expected["params"], observed.get("params")):
-        return False
-    if "body" in expected and not _subset(expected["body"], observed.get("body")):
-        return False
-    if expected.get("file_required") and not observed.get("file"):
-        return False
-    return True
-
-
-def _describe(request: dict[str, Any]) -> str:
-    params = json.dumps(request.get("params"), sort_keys=True)
-    body = json.dumps(request.get("body"), sort_keys=True)
-    return f"{request.get('method')} {request.get('url')} params={params} body={body}"
-
-
 def get_assert(output: str, context: dict[str, Any]) -> dict[str, Any]:
     """Grade one model answer by dry-running the commands it contains."""
     script = _extract_script(output)
@@ -275,7 +239,7 @@ def get_assert(output: str, context: dict[str, Any]) -> dict[str, Any]:
         if isinstance(parsed, dict) and "method" in parsed and "url" in parsed:
             requests.append(parsed)
 
-    described = "\n".join(f"  - {_describe(request)}" for request in requests)
+    described = describe_all(requests)
 
     if not requests:
         detail = run.stderr.strip().splitlines()
@@ -285,36 +249,18 @@ def get_assert(output: str, context: dict[str, Any]) -> dict[str, Any]:
             f"failed. Last error: {last_error}"
         )
 
-    forbidden = [
-        method
-        for method in variables.get("forbid_methods", [])
-        if any(request.get("method") == method for request in requests)
-    ]
-    if forbidden:
-        return _fail(
-            f"Command used {forbidden}, which the task rules out. Requests:\n{described}"
-        )
+    ok, reason = match_expectations(
+        variables.get("expect_requests", []),
+        requests,
+        variables.get("forbid_methods", []),
+    )
+    if not ok:
+        return _fail(f"{reason} Observed:\n{described}")
 
-    expectations = variables.get("expect_requests", [])
-    cursor = 0
-    for expected in expectations:
-        matched = next(
-            (
-                index
-                for index in range(cursor, len(requests))
-                if _request_matches(expected, requests[index])
-            ),
-            None,
-        )
-        if matched is None:
-            return _fail(
-                "Expected request not found (in order): "
-                f"{json.dumps(expected, sort_keys=True)}. Observed:\n{described}"
-            )
-        cursor = matched + 1
-
-    reason = f"{len(expectations) or 'All'} expected request(s) matched."
     if run.returncode != 0:
         detail = run.stderr.strip().splitlines()
-        reason += f" (a command exited {run.returncode}: {detail[-1] if detail else 'no stderr'})"
+        reason += (
+            f" (a command exited {run.returncode}: "
+            f"{detail[-1] if detail else 'no stderr'})"
+        )
     return {"pass": True, "score": 1, "reason": reason}

@@ -28,3 +28,6 @@ wagtail
 
 # Local CLI credential dotfile (contains an API token)
 /.wagtail-cli.toml
+
+# Coder Eval run artifacts (large; regenerated locally)
+/docs/evals/coder-eval/runs/

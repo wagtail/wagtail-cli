@@ -1,0 +1,46 @@
+# A/B experiment: does loading the wagtail-cli skills change how an agent works?
+#
+# The two arms differ ONLY in `agent.plugins` — the same tasks, the same model,
+# the same limits. That is the Promptfoo baseline-vs-skill split, re-expressed
+# as a Coder Eval experiment, with the added benefit that Coder Eval reports the
+# trajectory (turns, tokens, duration, tool calls) per arm, not just pass/fail.
+#
+# Run:
+#   just eval-coder
+#   coder-eval report runs/latest
+#
+# The plugins path is a PLUGIN ROOT holding `skills/`, per the OpenCode agent
+# docs: coder-eval maps it into OpenCode's `skills.paths` via
+# OPENCODE_CONFIG_CONTENT. Verify what the agent will see with:
+#   opencode debug skill --pure
+
+experiment_id: wagtail-skills-ab
+description: 'Do the wagtail-api / wagtail-docs skills improve agent outcomes and efficiency?'
+
+defaults:
+  agent:
+    type: 'opencode'
+    # TensorX is registered in ~/.config/opencode/opencode.json and reads
+    # TENSORX_API_KEY from the environment.
+    model: 'tensorx/deepseek/deepseek-v4.1-flash'
+    permission_mode: 'acceptEdits'
+  # Agents are noisy — every (task, variant) pair runs this many times. The
+  # report aggregates per replicate and adds a paired mean-difference test.
+  repeats: 5
+
+variants:
+  - variant_id: baseline
+    description: 'No skills loaded — the bare model'
+    agent:
+      plugins: []
+
+  - variant_id: with-skill
+    description: 'wagtail-api + wagtail-docs skills loaded'
+    agent:
+      plugins:
+        # A plugin ROOT: the directory that holds the skill directories.
+        # `$SKILLS_PATH` is exported by the `just eval-coder` recipe and points
+        # at src/wagtail_cli/.agents. If it is unset the with-skill arm runs
+        # without skills and silently measures a second baseline.
+        - type: 'local'
+          path: '${SKILLS_PATH}'

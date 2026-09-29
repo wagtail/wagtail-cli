@@ -1,0 +1,17 @@
+# Default experiment for single-arm runs (no `-e` flag), matching Coder Eval's
+# convention. Keeps the OpenCode + TensorX wiring in one place so `coder-eval run
+# tasks/foo.yaml` works without an explicit experiment.
+
+experiment_id: wagtail-default
+description: 'Single-arm default: no skills, TensorX DeepSeek, for task authoring and smoke checks'
+
+defaults:
+  agent:
+    type: 'opencode'
+    model: 'tensorx/deepseek/deepseek-v4.1-flash'
+    permission_mode: 'acceptEdits'
+    plugins: []
+
+variants:
+  - variant_id: default
+    description: 'Default experiment - bare agent, no skills'

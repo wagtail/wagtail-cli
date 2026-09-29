@@ -1,0 +1,55 @@
+# Coder Eval task: upload an image with a title.
+#
+# Ported from the Promptfoo `wagtail-api` suite, row "Upload an image with a
+# title". The fixture ships a placeholder `hero.png`; the dry-run never reads
+# its bytes, so the `file_required` assertion only checks that a file was
+# attached — the same as Promptfoo's placeholder.
+
+task_id: 'upload_image'
+description: 'Upload an image with a title via the Wagtail CLI'
+
+initial_prompt: |-
+  Upload the image hero.png from the current directory to our Wagtail site with
+  the title "Hero loaf".
+
+tags: [wagtail-api, skill-ab, cli]
+
+run_limits:
+  max_turns: 20
+  task_timeout: 300
+  expected_turns: 4
+
+sandbox:
+  driver: 'tempdir'
+  template_sources:
+    - type: 'template_dir'
+      path: '../fixtures/wt-site'
+  mock_path_dirs: ['bin']
+
+pre_run:
+  - command: 'rm -f wt_calls.jsonl'
+
+success_criteria:
+  - type: 'command_executed'
+    tool_name: 'Bash'
+    command_pattern: "wt\\b.*\\bapi\\b.*\\bimages\\b.*\\bcreate\\b"
+    min_count: 1
+    require_success: true
+    description: 'Agent uploaded the image with `wt api images create`'
+
+  - type: 'skill_triggered'
+    skill_name: 'wagtail-api'
+    expected_skill: 'wagtail-api'
+    description: 'The wagtail-api skill was engaged'
+
+  - type: 'commands_efficiency'
+    expected_commands: 4
+    weight: 0
+    description: 'Completed within ~4 tool calls'
+
+  - type: 'run_command'
+    command: >-
+      EXPECT_REQUESTS='[{"method":"POST","url_suffix":"/images/","body":{"title":"Hero loaf"},"file_required":true}]'
+      python "$TASK_DIR/graders/check_api.py"
+    timeout: 30
+    description: 'A POST /images/ with the title and a file was sent'

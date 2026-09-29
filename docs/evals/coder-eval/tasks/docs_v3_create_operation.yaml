@@ -1,0 +1,82 @@
+# Coder Eval task: pull up the v3 API operation that creates a page.
+#
+# Ported from the Promptfoo `wagtail-docs` suite, row "Pull up the v3 API
+# operation that creates a page".
+
+task_id: 'docs_v3_create_operation'
+description: 'Look up the Wagtail v3 API operation that creates a page'
+
+initial_prompt: |-
+  I want to check the exact query parameters and request payload of the Wagtail
+  v3 API operation that creates a page. Find and read its reference, then list
+  the parameters and payload fields.
+
+tags: [wagtail-docs, skill-ab, cli]
+
+run_limits:
+  max_turns: 15
+  task_timeout: 180
+  expected_turns: 4
+
+sandbox:
+  driver: 'tempdir'
+  template_sources:
+    - type: 'template_dir'
+      path: '../fixtures/wt-site'
+  mock_path_dirs: ['bin']
+
+pre_run:
+  - command: 'rm -f wt_calls.jsonl'
+
+checker_context:
+  api_route:
+    route: 'litellm'
+    model: 'openai/qwen/qwen3.8-flash-next'
+    params:
+      api_base: 'https://api.tensorx.ai/v1'
+    env_params:
+      api_key: 'TENSORX_API_KEY'
+
+success_criteria:
+  - type: 'command_executed'
+    tool_name: 'Bash'
+    command_pattern: "wt\\b.*\\bdocs\\b"
+    min_count: 1
+    require_success: true
+    description: 'Agent used `wt docs` to read the documentation'
+
+  - type: 'command_executed'
+    tool_name: 'Bash'
+    command_pattern: "curl\\b.*docs\\.wagtail\\.org"
+    min_count: 0
+    max_count: 0
+    description: 'Agent did NOT curl docs.wagtail.org'
+
+  - type: 'skill_triggered'
+    skill_name: 'wagtail-docs'
+    expected_skill: 'wagtail-docs'
+    description: 'The wagtail-docs skill was engaged'
+
+  - type: 'commands_efficiency'
+    expected_commands: 4
+    weight: 0
+    description: 'Completed within ~4 tool calls'
+
+  - type: 'run_command'
+    command: >-
+      EXPECT_CONTAINS='["Create page", "POST /api/v3/pages/"]'
+      python "$TASK_DIR/graders/check_docs.py"
+    timeout: 60
+    description: 'The v3 create-page operation reference was retrieved'
+
+  - type: 'llm_judge'
+    description: "The answer lists the create-page operation's parameters"
+    include_agent_output: true
+    prompt: |-
+      The agent was asked to pull up the Wagtail v3 API reference for the
+      operation that creates a page, and list its parameters and payload
+      fields. Judge the final answer.
+
+      Pass if the answer names the `POST /api/v3/pages/` operation and lists
+      at least some of its actual query parameters or body fields. Fail if the
+      answer is generic, invents an API, or does not reference the operation.

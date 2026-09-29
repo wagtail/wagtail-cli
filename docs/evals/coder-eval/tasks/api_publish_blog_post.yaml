@@ -1,0 +1,63 @@
+# Coder Eval task: publish a blog post with heading, paragraph and author.
+#
+# Ported from the Promptfoo `wagtail-api` suite (../../../wagtail_api_skill.yaml),
+# row "Publish a blog post with heading, paragraph and author". The expectations
+# are identical; the shared `_request_matching` module guarantees that.
+
+task_id: 'publish_blog_post'
+description: 'Publish a blog post with heading, paragraph and author via the Wagtail CLI'
+
+initial_prompt: |-
+  On our Wagtail site, publish a new blog post in the blog section (the blog
+  index lives at /blog/) titled "Baking with rye". The body must start with a
+  heading reading "Why bake with rye" followed by a paragraph reading "Rye
+  flour gives a denser crumb.", and the post is credited to author 1.
+
+tags: [wagtail-api, skill-ab, cli]
+
+run_limits:
+  max_turns: 25
+  task_timeout: 300
+  expected_turns: 6
+
+sandbox:
+  driver: 'tempdir'
+  template_sources:
+    - type: 'template_dir'
+      path: '../fixtures/wt-site'
+  mock_path_dirs: ['bin']
+
+pre_run:
+  - command: 'rm -f wt_calls.jsonl'
+
+success_criteria:
+  - type: 'command_executed'
+    tool_name: 'Bash'
+    command_pattern: "wt\\b.*\\bapi\\b.*\\bpages\\b.*\\bcreate\\b"
+    min_count: 1
+    require_success: true
+    description: 'Agent created the page with `wt api pages create`'
+
+  - type: 'command_executed'
+    tool_name: 'Bash'
+    command_pattern: "wt\\b.*\\bapi\\b.*\\bwhoami\\b"
+    min_count: 0
+    weight: 0
+    description: 'Agent ran `wt api whoami` before acting (skill guidance)'
+
+  - type: 'skill_triggered'
+    skill_name: 'wagtail-api'
+    expected_skill: 'wagtail-api'
+    description: 'The wagtail-api skill was engaged'
+
+  - type: 'commands_efficiency'
+    expected_commands: 6
+    weight: 0
+    description: 'Completed within ~6 tool calls'
+
+  - type: 'run_command'
+    command: >-
+      EXPECT_REQUESTS='[{"method":"POST","url_suffix":"/pages/","body":{"meta":{"type":"blog.BlogPage","parent_id":"/blog/","action":"publish"},"title":"Baking with rye","body":[{"type":"heading_block","value":{"heading_text":"Why bake with rye"}},{"type":"paragraph_block","value":"<p>Rye flour gives a denser crumb.</p>"}],"blog_person_relationship":[{"person_id":1}]}}]'
+      python "$TASK_DIR/graders/check_api.py"
+    timeout: 30
+    description: 'A blog.BlogPage publish request with the expected body was sent'

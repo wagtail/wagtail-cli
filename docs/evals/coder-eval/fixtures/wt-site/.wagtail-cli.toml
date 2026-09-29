@@ -1,0 +1,6 @@
+# The site configuration `wt` picks up from the working directory.
+# Points at the recorded-request mock so every `wt api …` command is dry-run
+# by the bin/wt shim and never touches the network.
+[wagtail]
+base_url = "https://wt-evals.invalid/api/v3/"
+token = "wt-evals-dummy-token"

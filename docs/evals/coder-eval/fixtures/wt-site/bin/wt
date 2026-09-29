@@ -1,0 +1,99 @@
+#!/usr/bin/env python3
+"""A `wt` shim for Coder Eval sandboxes.
+
+Two jobs:
+
+1. Record every `wt …` invocation as one JSON line in ``wt_calls.jsonl`` at the
+   sandbox root, in the shape Coder Eval's ``cli_called`` criterion reads
+   (``{"ts", "tool", "argv", "exit"}``).
+2. Behave like the real CLI for the agent, without a live Wagtail site: force
+   ``--dry-run --json`` on ``wt api …`` calls so the agent sees the JSON body
+   ``wt`` *would* have sent, and answer ``whoami`` as a healthy connection.
+
+It delegates to the real CLI found on PATH, skipping its own directory, so the
+dry-run output is always the genuine one — the ``--dry-run --json`` document is
+exactly the ``{"method","url","params","body","file"}`` shape the grader (and the
+Promptfoo grader it mirrors) consumes.
+
+The sandbox is wired by ``sandbox.mock_path_dirs: ["bin"]`` in the task YAML,
+which PATH-prepends this directory so `wt` resolves here.
+"""
+
+from __future__ import annotations
+
+import json
+import os
+import subprocess
+import sys
+import time
+
+from pathlib import Path
+
+
+HERE = Path(__file__).resolve().parent
+# The agent's working directory is the sandbox root; the log lives at its top
+# level so a run_command criterion can read it without knowing about bin/.
+SANDBOX_ROOT = HERE.parent
+LOG_PATH = SANDBOX_ROOT / "wt_calls.jsonl"
+
+DUMMY_BASE_URL = "https://wt-evals.invalid/api/v3/"
+DUMMY_TOKEN = "wt-evals-dummy-token"  # noqa: S105 - placeholder, matches nothing
+
+
+def _log(argv: list[str], exit_code: int) -> None:
+    record = {"ts": time.time(), "tool": "wt", "argv": argv, "exit": exit_code}
+    with LOG_PATH.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(record) + "\n")
+
+
+def _find_real_wt() -> str | None:
+    """Resolve the real `wt`, skipping this shim's own directory."""
+    here = HERE.resolve()
+    for directory in os.environ.get("PATH", "").split(os.pathsep):
+        if not directory:
+            continue
+        if Path(directory).resolve() == here:
+            continue
+        candidate = Path(directory) / "wt"
+        if candidate.is_file() and os.access(candidate, os.X_OK):
+            return str(candidate)
+    return None
+
+
+def _delegate(argv: list[str]) -> int:
+    real = _find_real_wt()
+    if real is None:
+        sys.stderr.write(
+            "wt: no real `wt` found on PATH (the shim only records and delegates).\n"
+        )
+        return 127
+
+    env = dict(os.environ)
+    env["WAGTAIL_CLI_BASE_URL"] = DUMMY_BASE_URL
+    env["WAGTAIL_CLI_TOKEN"] = DUMMY_TOKEN
+
+    if "api" in argv and "whoami" in argv:
+        sys.stdout.write(json.dumps({"url": DUMMY_BASE_URL, "user": "wt-eval"}) + "\n")
+        return 0
+
+    if "api" in argv:
+        # Global flags go before the `api` subcommand, which is where `wt` wants them.
+        argv = [argv[0], "--json", "--dry-run", *argv[1:]]
+
+    completed = subprocess.run(  # noqa: S603 - the shim only replays the CLI's own argv
+        [real, *argv[1:]], env=env, capture_output=True, text=True, check=False
+    )
+    sys.stdout.write(completed.stdout)
+    sys.stderr.write(completed.stderr)
+    return completed.returncode
+
+
+def main() -> int:
+    argv = [Path(sys.argv[0]).name, *sys.argv[1:]]
+    exit_code = _delegate(argv)
+    _log(argv, exit_code)
+    return exit_code
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -1,0 +1,53 @@
+# Coder Eval task: list blog posts under a section within the page cap.
+#
+# Ported from the Promptfoo `wagtail-api` suite, row "List blog posts under a
+# section within the page cap". The `$lte` operator is shared.
+
+task_id: 'list_blog_posts'
+description: 'List the first 20 blog posts under a section via the Wagtail CLI'
+
+initial_prompt: |-
+  List the first 20 blog posts under the section with page id 4 on our Wagtail
+  site — the posts are blog.BlogPage pages.
+
+tags: [wagtail-api, skill-ab, cli]
+
+run_limits:
+  max_turns: 20
+  task_timeout: 300
+  expected_turns: 4
+
+sandbox:
+  driver: 'tempdir'
+  template_sources:
+    - type: 'template_dir'
+      path: '../fixtures/wt-site'
+  mock_path_dirs: ['bin']
+
+pre_run:
+  - command: 'rm -f wt_calls.jsonl'
+
+success_criteria:
+  - type: 'command_executed'
+    tool_name: 'Bash'
+    command_pattern: "wt\\b.*\\bapi\\b.*\\bpages\\b.*\\blist\\b"
+    min_count: 1
+    require_success: true
+    description: 'Agent listed pages with `wt api pages list`'
+
+  - type: 'skill_triggered'
+    skill_name: 'wagtail-api'
+    expected_skill: 'wagtail-api'
+    description: 'The wagtail-api skill was engaged'
+
+  - type: 'commands_efficiency'
+    expected_commands: 4
+    weight: 0
+    description: 'Completed within ~4 tool calls'
+
+  - type: 'run_command'
+    command: >-
+      EXPECT_REQUESTS='[{"method":"GET","url_suffix":"/pages/","params":{"child_of":"4","limit":{"$lte":20}}}]'
+      python "$TASK_DIR/graders/check_api.py"
+    timeout: 30
+    description: 'A GET /pages/ filtered to child_of=4 with limit <= 20 was sent'

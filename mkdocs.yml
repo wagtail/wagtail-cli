@@ -67,6 +67,11 @@ plugins:
 # Excluded from the site: not part of the published docs.
 exclude_docs: |
   SECURITY.md
+  # Coder Eval run artifacts (reports, transcripts, sandbox copies) — generated
+  # locally, large, and not documentation.
+  evals/coder-eval/runs/
+  # Sandbox fixture copied into each Coder Eval run; a page for the agent, not docs.
+  evals/coder-eval/fixtures/
 
 nav:
   - Home: index.md
@@ -78,6 +83,7 @@ nav:
   - Agent skills:
       - Overview: agent-skills.md
       - Skill evals: evals/README.md
+      - Eval task suite: evals/coder-eval/README.md
   - Contributing:
       - Contributing guidelines: CONTRIBUTING.md
       - Design principles: contributing/design-principles.md
