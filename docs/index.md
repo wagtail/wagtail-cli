@@ -51,7 +51,8 @@ wt api pages create blog.BlogPage --parent /blog/ \
   machine-readable skill published with these docs.
 - **Contributing?** Read the
   [contribution guidelines](CONTRIBUTING.md)
-  and the [development guide](contributing/development.md).
+  and the [development guide](contributing/development.md), and follow the
+  [documentation style guide](contributing/style-guide.md) when writing docs.
 
 ## License
 

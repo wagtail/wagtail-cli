@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- New [documentation style guide](contributing/style-guide.md) for contributor and user-facing docs.
+
 ## [0.3.0] - 2026-09-22
 
 - New [documentation website](https://wagtail.github.io/wagtail-cli/)

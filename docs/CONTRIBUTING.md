@@ -45,6 +45,10 @@ just shell             # Open a shell to the demo application.
 just test              # Run tests with pytest.
 ```
 
+## Writing documentation
+
+Documentation lives in `docs/` and is published to [wagtail.github.io/wagtail-cli](https://wagtail.github.io/wagtail-cli/) with MkDocs. When you add or change docs, follow the [documentation style guide](contributing/style-guide.md), then build the site with `just docs-build` (strict mode) to catch broken links and anchors before opening a pull request.
+
 ## Writing tests
 
 There is a simple test app in `tests/`. Write your test modules there alongside the existing files.

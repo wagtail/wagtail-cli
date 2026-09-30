@@ -88,5 +88,6 @@ nav:
       - Contributing guidelines: CONTRIBUTING.md
       - Design principles: contributing/design-principles.md
       - Development guide: contributing/development.md
+      - Documentation style guide: contributing/style-guide.md
   - Roadmap: ROADMAP.md
   - Changelog: CHANGELOG.md
