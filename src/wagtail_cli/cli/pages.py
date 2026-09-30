@@ -8,9 +8,19 @@ from wagtail_cli import parsing
 from wagtail_cli.errors import UsageError
 from wagtail_cli.resources import pages as pages_resources
 
+from ._shared import LOCAL_DRY_RUN_OPTION as _LOCAL_DRY_RUN_OPTION
+from ._shared import LOCAL_HUMAN_OPTION as _LOCAL_HUMAN_OPTION
+from ._shared import LOCAL_JSON_OPTION as _LOCAL_JSON_OPTION
+from ._shared import SELECT_OPTION as _SELECT_OPTION
 from ._shared import is_tty as _is_tty  # noqa: F401
 from ._shared import require_yes as _require_yes
-from .main import api_app, appify, emit, get_cli_context, get_client
+from .main import (
+    api_app,
+    appify,
+    emit,
+    get_client,
+    is_dry_run,
+)
 
 
 pages_app = typer.Typer(
@@ -28,7 +38,7 @@ def _resolve_ref(ctx: typer.Context, raw: str) -> Any:
     """
     if raw.isdigit():
         return int(raw)
-    if get_cli_context(ctx).dry_run:
+    if is_dry_run(ctx):
         return raw
     return parsing.resolve_page_ref(get_client(ctx), raw)
 
@@ -63,6 +73,10 @@ def list_pages(
     ),
     limit: int | None = typer.Option(None, "--limit", help="Maximum items per page."),
     offset: int | None = typer.Option(None, "--offset", help="Pagination offset."),
+    select: list[str] | None = _SELECT_OPTION,
+    json: bool = _LOCAL_JSON_OPTION,
+    human: bool = _LOCAL_HUMAN_OPTION,
+    dry_run: bool = _LOCAL_DRY_RUN_OPTION,
 ) -> None:
     """List pages with optional filters, ordering, and pagination."""
     client = get_client(ctx)
@@ -81,7 +95,7 @@ def list_pages(
         limit=limit,
         offset=offset,
     )
-    emit(ctx, result)
+    emit(ctx, result, select=select)
 
 
 @pages_app.command("find")
@@ -91,13 +105,17 @@ def find_page(
     id: str | None = typer.Option(None, "--id", help="Find by page ID."),
     path: str | None = typer.Option(None, "--path", help="Find by URL path."),
     site: str | None = typer.Option(None, "--site", help="Find within a site."),
+    select: list[str] | None = _SELECT_OPTION,
+    json: bool = _LOCAL_JSON_OPTION,
+    human: bool = _LOCAL_HUMAN_OPTION,
+    dry_run: bool = _LOCAL_DRY_RUN_OPTION,
 ) -> None:
     """Locate a page by ID or URL path, returning its API location."""
     if id is None and path is None:
         raise UsageError("Provide one of --id or --path to find a page.")
     client = get_client(ctx)
     result = pages_resources.find_page(client, id=id, html_path=path, site=site)
-    emit(ctx, result)
+    emit(ctx, result, select=select)
 
 
 @pages_app.command("get")
@@ -109,6 +127,10 @@ def get_page(
         None, "--version", help="'draft' (default) or 'live'."
     ),
     html: bool = typer.Option(False, "--html", help="Return rich text fields as HTML."),
+    select: list[str] | None = _SELECT_OPTION,
+    json: bool = _LOCAL_JSON_OPTION,
+    human: bool = _LOCAL_HUMAN_OPTION,
+    dry_run: bool = _LOCAL_DRY_RUN_OPTION,
 ) -> None:
     """Fetch a single page by ID or URL path."""
     client = get_client(ctx)
@@ -117,7 +139,7 @@ def get_page(
     result = pages_resources.get_page(
         client, page_id, version=version, rich_text_format=rich_text_format
     )
-    emit(ctx, result)
+    emit(ctx, result, select=select)
 
 
 @pages_app.command("create")
@@ -132,6 +154,10 @@ def create_page(
         None, "--field", help="Set a field KEY:VALUE (repeatable)."
     ),
     publish: bool = typer.Option(False, "--publish", help="Publish the new page."),
+    select: list[str] | None = _SELECT_OPTION,
+    json: bool = _LOCAL_JSON_OPTION,
+    human: bool = _LOCAL_HUMAN_OPTION,
+    dry_run: bool = _LOCAL_DRY_RUN_OPTION,
 ) -> None:
     """Create a page as a draft (or publish it with --publish)."""
     client = get_client(ctx)
@@ -145,7 +171,7 @@ def create_page(
         publish=publish,
     )
     result = pages_resources.create_page(client, payload)
-    emit(ctx, result)
+    emit(ctx, result, select=select)
 
 
 @pages_app.command("update")
@@ -160,6 +186,10 @@ def update_page(
     ),
     publish: bool = typer.Option(False, "--publish", help="Publish after updating."),
     yes: bool = typer.Option(False, "--yes", help="Skip confirmation."),
+    select: list[str] | None = _SELECT_OPTION,
+    json: bool = _LOCAL_JSON_OPTION,
+    human: bool = _LOCAL_HUMAN_OPTION,
+    dry_run: bool = _LOCAL_DRY_RUN_OPTION,
 ) -> None:
     """Update (PATCH) a page. Sends only provided fields by default."""
     if not _require_yes(ctx, yes, f"update page {page_id}"):
@@ -174,7 +204,7 @@ def update_page(
     result = pages_resources.update_page(client, page_id, payload)
     if publish:
         result = pages_resources.publish_page(client, page_id)
-    emit(ctx, result)
+    emit(ctx, result, select=select)
 
 
 @pages_app.command("delete")
@@ -183,13 +213,17 @@ def delete_page(
     ctx: typer.Context,
     page_id: int = typer.Argument(help="Page ID."),
     yes: bool = typer.Option(False, "--yes", help="Skip confirmation."),
+    select: list[str] | None = _SELECT_OPTION,
+    json: bool = _LOCAL_JSON_OPTION,
+    human: bool = _LOCAL_HUMAN_OPTION,
+    dry_run: bool = _LOCAL_DRY_RUN_OPTION,
 ) -> None:
     """Delete a page (confirmation required unless --yes)."""
     if not _require_yes(ctx, yes, f"delete page {page_id}"):
         return
     client = get_client(ctx)
     result = pages_resources.delete_page(client, page_id)
-    emit(ctx, result)
+    emit(ctx, result, select=select)
 
 
 @pages_app.command("publish")
@@ -197,10 +231,14 @@ def delete_page(
 def publish(
     ctx: typer.Context,
     page_id: int = typer.Argument(help="Page ID."),
+    select: list[str] | None = _SELECT_OPTION,
+    json: bool = _LOCAL_JSON_OPTION,
+    human: bool = _LOCAL_HUMAN_OPTION,
+    dry_run: bool = _LOCAL_DRY_RUN_OPTION,
 ) -> None:
     """Publish a page's latest revision."""
     client = get_client(ctx)
-    emit(ctx, pages_resources.publish_page(client, page_id))
+    emit(ctx, pages_resources.publish_page(client, page_id), select=select)
 
 
 @pages_app.command("unpublish")
@@ -208,10 +246,14 @@ def publish(
 def unpublish(
     ctx: typer.Context,
     page_id: int = typer.Argument(help="Page ID."),
+    select: list[str] | None = _SELECT_OPTION,
+    json: bool = _LOCAL_JSON_OPTION,
+    human: bool = _LOCAL_HUMAN_OPTION,
+    dry_run: bool = _LOCAL_DRY_RUN_OPTION,
 ) -> None:
     """Unpublish a page, moving it back to draft."""
     client = get_client(ctx)
-    emit(ctx, pages_resources.unpublish_page(client, page_id))
+    emit(ctx, pages_resources.unpublish_page(client, page_id), select=select)
 
 
 @pages_app.command("copy")
@@ -234,6 +276,10 @@ def copy(
         "--keep-live/--no-keep-live",
         help="Keep copied pages live.",
     ),
+    select: list[str] | None = _SELECT_OPTION,
+    json: bool = _LOCAL_JSON_OPTION,
+    human: bool = _LOCAL_HUMAN_OPTION,
+    dry_run: bool = _LOCAL_DRY_RUN_OPTION,
 ) -> None:
     """Copy a page to a new location."""
     client = get_client(ctx)
@@ -247,7 +293,7 @@ def copy(
         recursive=recursive,
         keep_live=keep_live,
     )
-    emit(ctx, result)
+    emit(ctx, result, select=select)
 
 
 @pages_app.command("move")
@@ -258,6 +304,10 @@ def move(
     destination: str = typer.Option(
         ..., "--destination", help="Destination parent REF."
     ),
+    select: list[str] | None = _SELECT_OPTION,
+    json: bool = _LOCAL_JSON_OPTION,
+    human: bool = _LOCAL_HUMAN_OPTION,
+    dry_run: bool = _LOCAL_DRY_RUN_OPTION,
 ) -> None:
     """Move a page to a new parent."""
     client = get_client(ctx)
@@ -265,6 +315,7 @@ def move(
     emit(
         ctx,
         pages_resources.move_page(client, page_id, destination_id=destination_id),
+        select=select,
     )
 
 
@@ -274,12 +325,17 @@ def revert(
     ctx: typer.Context,
     page_id: int = typer.Argument(help="Page ID."),
     revision: int = typer.Option(..., "--revision", help="Revision ID."),
+    select: list[str] | None = _SELECT_OPTION,
+    json: bool = _LOCAL_JSON_OPTION,
+    human: bool = _LOCAL_HUMAN_OPTION,
+    dry_run: bool = _LOCAL_DRY_RUN_OPTION,
 ) -> None:
     """Revert a page to a previous revision."""
     client = get_client(ctx)
     emit(
         ctx,
         pages_resources.revert_page(client, page_id, revision_id=revision),
+        select=select,
     )
 
 
@@ -291,6 +347,10 @@ def create_alias(
     destination: str = typer.Option(
         ..., "--destination", help="Destination parent REF."
     ),
+    select: list[str] | None = _SELECT_OPTION,
+    json: bool = _LOCAL_JSON_OPTION,
+    human: bool = _LOCAL_HUMAN_OPTION,
+    dry_run: bool = _LOCAL_DRY_RUN_OPTION,
 ) -> None:
     """Create an alias of a page."""
     client = get_client(ctx)
@@ -298,6 +358,7 @@ def create_alias(
     emit(
         ctx,
         pages_resources.create_alias(client, page_id, destination_id=destination_id),
+        select=select,
     )
 
 
@@ -306,10 +367,14 @@ def create_alias(
 def convert_alias(
     ctx: typer.Context,
     page_id: int = typer.Argument(help="Alias page ID."),
+    select: list[str] | None = _SELECT_OPTION,
+    json: bool = _LOCAL_JSON_OPTION,
+    human: bool = _LOCAL_HUMAN_OPTION,
+    dry_run: bool = _LOCAL_DRY_RUN_OPTION,
 ) -> None:
     """Convert an alias into an ordinary page."""
     client = get_client(ctx)
-    emit(ctx, pages_resources.convert_alias(client, page_id))
+    emit(ctx, pages_resources.convert_alias(client, page_id), select=select)
 
 
 @pages_app.command("copy-for-translation")
@@ -318,10 +383,18 @@ def copy_for_translation(
     ctx: typer.Context,
     page_id: int = typer.Argument(help="Page ID."),
     locale: str = typer.Option(..., "--locale", help="Target locale code."),
+    select: list[str] | None = _SELECT_OPTION,
+    json: bool = _LOCAL_JSON_OPTION,
+    human: bool = _LOCAL_HUMAN_OPTION,
+    dry_run: bool = _LOCAL_DRY_RUN_OPTION,
 ) -> None:
     """Copy a page for translation into a locale."""
     client = get_client(ctx)
-    emit(ctx, pages_resources.copy_for_translation(client, page_id, locale=locale))
+    emit(
+        ctx,
+        pages_resources.copy_for_translation(client, page_id, locale=locale),
+        select=select,
+    )
 
 
 revisions_app = typer.Typer(
@@ -336,12 +409,17 @@ def revisions_list(
     page_id: int = typer.Argument(help="Page ID."),
     limit: int | None = typer.Option(None, "--limit", help="Max items."),
     offset: int | None = typer.Option(None, "--offset", help="Pagination offset."),
+    select: list[str] | None = _SELECT_OPTION,
+    json: bool = _LOCAL_JSON_OPTION,
+    human: bool = _LOCAL_HUMAN_OPTION,
+    dry_run: bool = _LOCAL_DRY_RUN_OPTION,
 ) -> None:
     """List the revisions of a page."""
     client = get_client(ctx)
     emit(
         ctx,
         pages_resources.list_revisions(client, page_id, limit=limit, offset=offset),
+        select=select,
     )
 
 
@@ -351,10 +429,18 @@ def revisions_get(
     ctx: typer.Context,
     page_id: int = typer.Argument(help="Page ID."),
     revision_id: int = typer.Argument(help="Revision ID."),
+    select: list[str] | None = _SELECT_OPTION,
+    json: bool = _LOCAL_JSON_OPTION,
+    human: bool = _LOCAL_HUMAN_OPTION,
+    dry_run: bool = _LOCAL_DRY_RUN_OPTION,
 ) -> None:
     """Fetch a single revision of a page."""
     client = get_client(ctx)
-    emit(ctx, pages_resources.get_revision(client, page_id, revision_id))
+    emit(
+        ctx,
+        pages_resources.get_revision(client, page_id, revision_id),
+        select=select,
+    )
 
 
 pages_app.add_typer(revisions_app, name="revisions")

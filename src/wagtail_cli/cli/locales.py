@@ -5,8 +5,17 @@ import typer
 from wagtail_cli import parsing
 from wagtail_cli.resources import locales as locales_resources
 
+from ._shared import LOCAL_DRY_RUN_OPTION as _LOCAL_DRY_RUN_OPTION
+from ._shared import LOCAL_HUMAN_OPTION as _LOCAL_HUMAN_OPTION
+from ._shared import LOCAL_JSON_OPTION as _LOCAL_JSON_OPTION
+from ._shared import SELECT_OPTION as _SELECT_OPTION
 from ._shared import require_yes as _require_yes
-from .main import api_app, appify, emit, get_client
+from .main import (
+    api_app,
+    appify,
+    emit,
+    get_client,
+)
 
 
 locales_app = typer.Typer(
@@ -22,12 +31,17 @@ def list_locales(
     ctx: typer.Context,
     limit: int | None = typer.Option(None, "--limit", help="Maximum items per page."),
     offset: int | None = typer.Option(None, "--offset", help="Pagination offset."),
+    select: list[str] | None = _SELECT_OPTION,
+    json: bool = _LOCAL_JSON_OPTION,
+    human: bool = _LOCAL_HUMAN_OPTION,
+    dry_run: bool = _LOCAL_DRY_RUN_OPTION,
 ) -> None:
     """List locales."""
     client = get_client(ctx)
     emit(
         ctx,
         locales_resources.list_locales(client, limit=limit, offset=offset),
+        select=select,
     )
 
 
@@ -36,10 +50,14 @@ def list_locales(
 def get_locale(
     ctx: typer.Context,
     locale_id: int = typer.Argument(help="Locale ID."),
+    select: list[str] | None = _SELECT_OPTION,
+    json: bool = _LOCAL_JSON_OPTION,
+    human: bool = _LOCAL_HUMAN_OPTION,
+    dry_run: bool = _LOCAL_DRY_RUN_OPTION,
 ) -> None:
     """Fetch a single locale by ID."""
     client = get_client(ctx)
-    emit(ctx, locales_resources.get_locale(client, locale_id))
+    emit(ctx, locales_resources.get_locale(client, locale_id), select=select)
 
 
 @locales_app.command("create")
@@ -49,11 +67,15 @@ def create_locale(
     field: list[str] = typer.Option(  # noqa: B008
         ..., "--field", help="Set a field KEY:VALUE (repeatable)."
     ),
+    select: list[str] | None = _SELECT_OPTION,
+    json: bool = _LOCAL_JSON_OPTION,
+    human: bool = _LOCAL_HUMAN_OPTION,
+    dry_run: bool = _LOCAL_DRY_RUN_OPTION,
 ) -> None:
     """Create a locale. Required field: language_code."""
     client = get_client(ctx)
     result = locales_resources.create_locale(client, parsing.parse_fields(field))
-    emit(ctx, result)
+    emit(ctx, result, select=select)
 
 
 @locales_app.command("update")
@@ -65,6 +87,10 @@ def update_locale(
         None, "--field", help="Set a field KEY:VALUE (repeatable)."
     ),
     yes: bool = typer.Option(False, "--yes", help="Skip confirmation."),
+    select: list[str] | None = _SELECT_OPTION,
+    json: bool = _LOCAL_JSON_OPTION,
+    human: bool = _LOCAL_HUMAN_OPTION,
+    dry_run: bool = _LOCAL_DRY_RUN_OPTION,
 ) -> None:
     """Update a locale (PUT — language_code required)."""
     if not _require_yes(ctx, yes, f"update locale {locale_id}"):
@@ -75,6 +101,7 @@ def update_locale(
         locales_resources.update_locale(
             client, locale_id, parsing.parse_fields(field or [])
         ),
+        select=select,
     )
 
 
@@ -84,12 +111,16 @@ def delete_locale(
     ctx: typer.Context,
     locale_id: int = typer.Argument(help="Locale ID."),
     yes: bool = typer.Option(False, "--yes", help="Skip confirmation."),
+    select: list[str] | None = _SELECT_OPTION,
+    json: bool = _LOCAL_JSON_OPTION,
+    human: bool = _LOCAL_HUMAN_OPTION,
+    dry_run: bool = _LOCAL_DRY_RUN_OPTION,
 ) -> None:
     """Delete a locale (confirmation required unless --yes)."""
     if not _require_yes(ctx, yes, f"delete locale {locale_id}"):
         return
     client = get_client(ctx)
-    emit(ctx, locales_resources.delete_locale(client, locale_id))
+    emit(ctx, locales_resources.delete_locale(client, locale_id), select=select)
 
 
 api_app.add_typer(locales_app, name="locales")

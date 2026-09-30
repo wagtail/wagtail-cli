@@ -1,3 +1,5 @@
+import json
+
 import respx
 
 from typer.testing import CliRunner
@@ -36,3 +38,22 @@ def test_schema_show_returns_json_even_when_tty(monkeypatch):
     assert "BlogPage" in result.output
     # must be JSON (machine-readable), not the human table shape
     assert '"read":{"title":"BlogPage"}' in result.output
+
+
+@respx.mock
+def test_schema_show_local_select(monkeypatch):
+    _env(monkeypatch)
+    respx.get(f"{BASE}/schema/blog.BlogPage/").respond(
+        200,
+        json={
+            "read": {"title": "BlogPage"},
+            "create": {"title": "BlogPage"},
+            "patch": {"title": "BlogPage"},
+        },
+    )
+    result = runner.invoke(
+        app,
+        ["api", "schema", "show", "blog.BlogPage", "--select", "read"],
+    )
+    assert result.exit_code == 0
+    assert json.loads(result.output) == {"read": {"title": "BlogPage"}}

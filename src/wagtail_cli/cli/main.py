@@ -56,6 +56,9 @@ class CliContext:
     verbose: bool = False
     dry_run: bool = False
     select: tuple[str, ...] = ()
+    # Command-local overrides of the global --json/--human/--dry-run flags.
+    local_fmt: str | None = None
+    local_dry_run: bool | None = None
 
 
 @app.callback()
@@ -130,7 +133,10 @@ def resolve_output_format(
     local_format: str | None = None,
 ) -> str | None:
     """Resolve a local format before falling back to global CLI options."""
-    return local_format if local_format is not None else get_cli_context(ctx).fmt
+    if local_format is not None:
+        return local_format
+    cc = get_cli_context(ctx)
+    return cc.local_fmt if cc.local_fmt is not None else cc.fmt
 
 
 def get_client(ctx: typer.Context) -> WgtlClient:
@@ -142,15 +148,39 @@ def get_client(ctx: typer.Context) -> WgtlClient:
             "Not configured. Run `wt api init` or set WAGTAIL_CLI_BASE_URL / "
             "WAGTAIL_CLI_TOKEN."
         )
+    dry_run = cc.local_dry_run if cc.local_dry_run is not None else cc.dry_run
     return WgtlClient(
         cfg.base_url,
         cfg.token,
-        dry_run=cc.dry_run,
+        dry_run=dry_run,
         verbose=cc.verbose,
     )
 
 
-def emit(ctx: typer.Context, data: Any) -> None:
+def is_dry_run(ctx: typer.Context) -> bool:
+    """Whether the invocation is a dry run (local overrides global)."""
+    cc = get_cli_context(ctx)
+    return cc.local_dry_run if cc.local_dry_run is not None else cc.dry_run
+
+
+def resolve_select(
+    ctx: typer.Context,
+    local: list[str] | tuple[str, ...] | None = None,
+) -> tuple[str, ...]:
+    """Merge a command-local --select with the global one.
+
+    Both forms are accepted so an agent can write either
+    ``wt --select id api sites list`` or ``wt api sites list --select id``.
+    Command-local selectors come first, then any global ones.
+    """
+    return tuple(local or ()) + get_cli_context(ctx).select
+
+
+def emit(
+    ctx: typer.Context,
+    data: Any,
+    select: list[str] | tuple[str, ...] | None = None,
+) -> None:
     """Render data (or a dry-run request preview) to stdout."""
     fmt = resolve_output_format(ctx)
     if isinstance(data, DryRunRequest):
@@ -166,7 +196,7 @@ def emit(ctx: typer.Context, data: Any) -> None:
             lines.append(f"File: {data.file}")
         typer.echo("\n".join(lines))
         return
-    typer.echo(output.render(data, fmt, select=get_cli_context(ctx).select))
+    typer.echo(output.render(data, fmt, select=resolve_select(ctx, select)))
 
 
 def _context_from_call(

@@ -437,3 +437,45 @@ def test_select_projects_json_response(monkeypatch):
         "count": 1,
         "items": [{"id": 9, "meta": {"html_url": "/hello/"}}],
     }
+
+
+@respx.mock
+def test_select_projects_command_local(monkeypatch):
+    """--select also works after the subcommand, as agents tend to write it."""
+    _env(monkeypatch)
+    respx.get(f"{BASE}/pages/").respond(
+        200,
+        json={
+            "count": 1,
+            "items": [
+                {
+                    "id": 9,
+                    "title": "Hello",
+                    "body": "large body",
+                    "meta": {"html_url": "/hello/", "type": "blog.BlogPage"},
+                }
+            ],
+        },
+    )
+    result = runner.invoke(
+        app,
+        ["--json", "api", "pages", "list", "--select", "id,title"],
+    )
+    assert result.exit_code == 0
+    assert json.loads(result.output) == {
+        "count": 1,
+        "items": [{"id": 9, "title": "Hello"}],
+    }
+
+
+@respx.mock
+def test_pages_get_local_dry_run_leaves_path_unresolved(monkeypatch):
+    """A command-local --dry-run must also skip the path-to-id lookup."""
+    _env(monkeypatch)
+    find_route = respx.get(f"{BASE}/pages/find/").respond(
+        302, headers={"location": f"{BASE}/pages/9/?"}
+    )
+    result = runner.invoke(app, ["api", "pages", "get", "/blog/", "--dry-run"])
+    assert result.exit_code == 0
+    assert "GET" in result.output
+    assert not find_route.called

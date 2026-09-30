@@ -34,6 +34,33 @@ def test_whoami_auth_error_exit_4(monkeypatch):
     assert "Unauthorized" in result.output
 
 
+@respx.mock
+def test_whoami_local_json_and_select(monkeypatch):
+    _env(monkeypatch)
+    respx.get(f"{BASE}/whoami/").respond(
+        200, json={"user": {"username": "admin", "email": "a@example.com"}}
+    )
+    result = runner.invoke(
+        app, ["api", "whoami", "--json", "--select", "user.username"]
+    )
+    assert result.exit_code == 0
+    assert result.output.strip() == '{"user":{"username":"admin"}}'
+
+
+@respx.mock
+def test_init_local_dry_run_writes_nothing(monkeypatch, tmp_path):
+    """--dry-run after the subcommand is honoured too."""
+    monkeypatch.setattr(
+        "wagtail_cli.config._user_dotfile", lambda: tmp_path / ".wagtail-cli.toml"
+    )
+    result = runner.invoke(
+        app, ["--url", BASE, "--token", "tok123", "api", "init", "--dry-run"]
+    )
+    assert result.exit_code == 0
+    assert not (tmp_path / ".wagtail-cli.toml").exists()
+    assert "dry-run: would write" in result.output
+
+
 def test_whoami_unconfigured_exit_2(monkeypatch, tmp_path):
     monkeypatch.delenv("WAGTAIL_CLI_BASE_URL", raising=False)
     monkeypatch.delenv("WAGTAIL_CLI_TOKEN", raising=False)

@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `--select` is now accepted on every `api` command, not just globally, so
+  `wt api sites list --select id,hostname` works. Global and command-local
+  selectors are merged.
+- `--json`, `--human`, and `--dry-run` are now accepted on every `api`
+  command as well as globally, so `wt api pages list --json` and
+  `wt api pages delete 42 --dry-run` work. A command-local flag overrides the
+  global one.
+- `wt api schema show` renders human-readable output with `--human` (JSON
+  remains the default).
 - New [documentation style guide](contributing/style-guide.md) for contributor and user-facing docs.
 
 ## [0.3.0] - 2026-09-22

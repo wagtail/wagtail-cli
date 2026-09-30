@@ -1,5 +1,8 @@
 import json
 
+import typer
+
+from wagtail_cli.cli.main import CliContext, resolve_select
 from wagtail_cli.output import project, render
 
 
@@ -58,3 +61,27 @@ def test_project_missing_field_is_explicitly_null():
         "id": 1,
         "meta": {"html_url": None},
     }
+
+
+def _context_with_select(select: tuple[str, ...]) -> typer.Context:
+    import click
+
+    ctx = typer.Context(click.Command("wt"))
+    ctx.obj = CliContext(select=select)
+    return ctx
+
+
+def test_resolve_select_local_then_global():
+    ctx = _context_with_select(("meta.html_url",))
+    assert resolve_select(ctx, ["id", "title"]) == (
+        "id",
+        "title",
+        "meta.html_url",
+    )
+    assert resolve_select(ctx, None) == ("meta.html_url",)
+
+
+def test_resolve_select_local_only():
+    ctx = _context_with_select(())
+    assert resolve_select(ctx, ("id",)) == ("id",)
+    assert resolve_select(ctx, None) == ()
