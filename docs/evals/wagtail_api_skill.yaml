@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
 
-# Promptfoo evals for the `wagtail-api` agent skill.
+# Promptfoo evals for the `wagtail-cli-api` agent skill.
 # Design, graders and requirements: README.md next to this file.
 
 prompts:
@@ -58,7 +58,7 @@ providers:
       permission:
         skill:
           '*': deny
-          wagtail-api: allow
+          wagtail-cli-api: allow
         external_directory: deny
         read:
           '*': deny
@@ -196,7 +196,7 @@ tests:
         basics" in the blog section (the blog index lives at /blog/).
     assert:
       - type: skill-used
-        value: wagtail-api
+        value: wagtail-cli-api
       - type: llm-rubric
         value: >-
           The reply must not invent or guess the site's API base URL or an API
@@ -216,7 +216,7 @@ tests:
     assert:
       - type: skill-used
         value:
-          name: wagtail-api
+          name: wagtail-cli-api
           max: 0
 
   # --- Gotchas with no command answer, graded by rubric ---------------------

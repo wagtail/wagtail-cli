@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
 
-# Promptfoo evals for the `wagtail-docs` agent skill.
+# Promptfoo evals for the `wagtail-cli-docs` agent skill.
 # Design, graders and requirements: README.md next to this file.
 
 prompts:
@@ -58,7 +58,7 @@ providers:
       permission:
         skill:
           '*': deny
-          wagtail-docs: allow
+          wagtail-cli-docs: allow
         external_directory: deny
         read:
           '*': deny
@@ -138,7 +138,7 @@ tests:
         documentation.
     assert:
       - type: skill-used
-        value: wagtail-docs
+        value: wagtail-cli-docs
 
   - description: Does not activate on an unrelated task
     providers:
@@ -150,7 +150,7 @@ tests:
     assert:
       - type: skill-used
         value:
-          name: wagtail-docs
+          name: wagtail-cli-docs
           max: 0
 
   # --- Gotcha with no command answer, graded by rubric ----------------------

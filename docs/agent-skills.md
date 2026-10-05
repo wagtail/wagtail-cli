@@ -4,8 +4,8 @@ Wagtail CLI includes [agent skills](https://agentskills.io/) that help agents ge
 
 ## Available skills
 
-- [wagtail-api](https://wagtail.github.io/wagtail-cli/.well-known/agent-skills/wagtail-api/SKILL.md): Operate a Wagtail site via its API, with the Wagtail CLI.
-- [wagtail-docs](https://wagtail.github.io/wagtail-cli/.well-known/agent-skills/wagtail-docs/SKILL.md): Read and search the Wagtail documentation from the terminal.
+- [wagtail-cli-api](https://wagtail.github.io/wagtail-cli/.well-known/agent-skills/wagtail-cli-api/SKILL.md): Operate a Wagtail site via its API, with the Wagtail CLI.
+- [wagtail-cli-docs](https://wagtail.github.io/wagtail-cli/.well-known/agent-skills/wagtail-cli-docs/SKILL.md): Read and search the Wagtail documentation from the terminal.
 
 We make the skills available in multiple formats, for compatibility with a wide range of tools.
 

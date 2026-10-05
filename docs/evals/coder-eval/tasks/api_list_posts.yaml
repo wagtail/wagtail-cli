@@ -1,6 +1,6 @@
 # Coder Eval task: list blog posts under a section within the page cap.
 #
-# Ported from the Promptfoo `wagtail-api` suite, row "List blog posts under a
+# Ported from the Promptfoo `wagtail-cli-api` suite, row "List blog posts under a
 # section within the page cap". The `$lte` operator is shared.
 
 task_id: 'list_blog_posts'
@@ -10,7 +10,7 @@ initial_prompt: |-
   List the first 20 blog posts under the section with page id 4 on our Wagtail
   site — the posts are blog.BlogPage pages.
 
-tags: [wagtail-api, skill-ab, cli]
+tags: [wagtail-cli-api, skill-ab, cli]
 
 run_limits:
   max_turns: 20
@@ -36,9 +36,9 @@ success_criteria:
     description: 'Agent listed pages with `wt api pages list`'
 
   - type: 'skill_triggered'
-    skill_name: 'wagtail-api'
-    expected_skill: 'wagtail-api'
-    description: 'The wagtail-api skill was engaged'
+    skill_name: 'wagtail-cli-api'
+    expected_skill: 'wagtail-cli-api'
+    description: 'The wagtail-cli-api skill was engaged'
 
   - type: 'commands_efficiency'
     expected_commands: 4

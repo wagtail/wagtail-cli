@@ -1,6 +1,6 @@
 # Coder Eval task: read the images topic.
 #
-# Ported from the Promptfoo `wagtail-docs` suite, row "Read the images topic".
+# Ported from the Promptfoo `wagtail-cli-docs` suite, row "Read the images topic".
 
 task_id: 'docs_images_topic'
 description: 'Read the Wagtail documentation topic about using images in templates'
@@ -9,7 +9,7 @@ initial_prompt: |-
   Pull up the Wagtail documentation topic about working with images in
   templates, and summarise how to use an image in a template.
 
-tags: [wagtail-docs, skill-ab, cli]
+tags: [wagtail-cli-docs, skill-ab, cli]
 
 run_limits:
   max_turns: 15
@@ -51,9 +51,9 @@ success_criteria:
     description: 'Agent did NOT curl docs.wagtail.org'
 
   - type: 'skill_triggered'
-    skill_name: 'wagtail-docs'
-    expected_skill: 'wagtail-docs'
-    description: 'The wagtail-docs skill was engaged'
+    skill_name: 'wagtail-cli-docs'
+    expected_skill: 'wagtail-cli-docs'
+    description: 'The wagtail-cli-docs skill was engaged'
 
   - type: 'commands_efficiency'
     expected_commands: 4

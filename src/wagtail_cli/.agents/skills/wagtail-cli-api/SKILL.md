@@ -1,6 +1,6 @@
 ---
-name: wagtail-api
-description: Operate a Wagtail site from the terminal with the Wagtail CLI (`wt api`, from the wagtail-cli package) rather than hand-written HTTP calls. Use it whenever a task involves publishing, creating, editing, moving, copying, unpublishing, deleting, translating or listing content on a Wagtail site, uploading images or documents, inspecting a site's content model, the Wagtail v3 API, `wt` / `wagtail-cli`, `WAGTAIL_CLI_*` variables, `.wagtail-cli.toml`, a `wagtail_…` token, or scaffolding and running a Wagtail project, even when the user does not name the CLI. For reading Wagtail documentation, use the wagtail-docs skill.
+name: wagtail-cli-api
+description: Operate a Wagtail site from the terminal with the Wagtail CLI (`wt api`, from the wagtail-cli package) rather than hand-written HTTP calls. Use it whenever a task involves publishing, creating, editing, moving, copying, unpublishing, deleting, translating or listing content on a Wagtail site, uploading images or documents, inspecting a site's content model, the Wagtail v3 API, `wt` / `wagtail-cli`, `WAGTAIL_CLI_*` variables, `.wagtail-cli.toml`, a `wagtail_…` token, or scaffolding and running a Wagtail project, even when the user does not name the CLI. For reading Wagtail documentation, use the wagtail-cli-docs skill.
 metadata:
   short-description: Operate a Wagtail site via its API, with the Wagtail CLI
 ---
@@ -39,7 +39,7 @@ Tokens carry the permissions of the user they belong to. In a Wagtail project wi
 - Check a type's write schema once, then trust it unless you are actively modifying it: `wt --json api schema show blog.BlogPage | jq '.create.required, (.create.properties | keys)'`.
 - `--dry-run` shows the request without sending it. On `update`, dry-run without `--publish` or you only see the publish call.
 - Skip `--help` for things covered here.
-- For an operation's exact generated API reference, `wt docs api "POST /pages/"` (see the wagtail-docs skill).
+- For an operation's exact generated API reference, `wt docs api "POST /pages/"` (see the wagtail-cli-docs skill).
 
 ## Command map
 

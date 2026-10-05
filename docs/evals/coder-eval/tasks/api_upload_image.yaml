@@ -1,6 +1,6 @@
 # Coder Eval task: upload an image with a title.
 #
-# Ported from the Promptfoo `wagtail-api` suite, row "Upload an image with a
+# Ported from the Promptfoo `wagtail-cli-api` suite, row "Upload an image with a
 # title". The fixture ships a placeholder `hero.png`; the dry-run never reads
 # its bytes, so the `file_required` assertion only checks that a file was
 # attached — the same as Promptfoo's placeholder.
@@ -12,7 +12,7 @@ initial_prompt: |-
   Upload the image hero.png from the current directory to our Wagtail site with
   the title "Hero loaf".
 
-tags: [wagtail-api, skill-ab, cli]
+tags: [wagtail-cli-api, skill-ab, cli]
 
 run_limits:
   max_turns: 20
@@ -38,9 +38,9 @@ success_criteria:
     description: 'Agent uploaded the image with `wt api images create`'
 
   - type: 'skill_triggered'
-    skill_name: 'wagtail-api'
-    expected_skill: 'wagtail-api'
-    description: 'The wagtail-api skill was engaged'
+    skill_name: 'wagtail-cli-api'
+    expected_skill: 'wagtail-cli-api'
+    description: 'The wagtail-cli-api skill was engaged'
 
   - type: 'commands_efficiency'
     expected_commands: 4

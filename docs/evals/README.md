@@ -66,7 +66,7 @@ Things a future maintainer will run into, and what to do about them:
 - **Coder Eval's with-skill arm needs `$SKILLS_PATH`.** `just eval-coder` exports
   it and fails fast if it is unset; if you invoke `coder-eval` directly, export
   it yourself or the arm silently measures the bare model.
-- **`wt docs` has no `--outline` flag.** The `wagtail-docs` skill's SKILL.md
+- **`wt docs` has no `--outline` flag.** The `wagtail-cli-docs` skill's SKILL.md
   suggests one that the CLI does not implement. Agents that follow the example
   produce a failed command; a `command_executed` criterion with
   `require_success: true` catches that, but the skill text should be fixed.
@@ -85,7 +85,7 @@ Things a future maintainer will run into, and what to do about them:
 
 Promptfoo numbers, post-leak-fix (see caveats): `--no-cache`, promptfoo 0.123.1, baseline with all filesystem tools disabled, skill arm with `read` scoped to the skills directory. Single runs — confirm deltas with `--repeat 3` before acting. The pre-fix snapshot (2026-09-19) measured all three models with the baseline able to read the repo, so those numbers are not comparable and were dropped. "Activation" is the two skill-arm rows asserting the skill loads (or does not).
 
-### wagtail-api (8 graded rows + 2 activation)
+### wagtail-cli-api (8 graded rows + 2 activation)
 
 | Model | baseline | skill | activation |
 | --- | --- | --- | --- |
@@ -98,7 +98,7 @@ Promptfoo numbers, post-leak-fix (see caveats): `--no-cache`, promptfoo 0.123.1,
 - glm's other miss (list) is new this run and passed in earlier runs of the same config (eval-6go-2026-09-21T15:51:39, 9/10) — noise; treat one-run deltas as indicative. The intermediate all-read-disabled config (eval-ChC-2026-09-21T15:06:49) also failed update-draft and image-upload because the command syntax in `references/commands.md` was unreachable; the scoped read restores those.
 - qwen3.8-27b's other miss (unpublish) was an empty response — provider error, not an answer (its baseline hit one on the same row). qwen3.5-9b is the local-model test case: activation works, but without reliable command syntax it fails five rows (`--dry-run` rewrites, schema checks and `references/` lookups notwithstanding).
 
-### wagtail-docs (4 graded rows + 2 activation), z-ai/glm-5.3-flash, eval-Y0n-2026-09-21T15:06:49
+### wagtail-cli-docs (4 graded rows + 2 activation), z-ai/glm-5.3-flash, eval-Y0n-2026-09-21T15:06:49
 
 | Model | baseline | skill | activation |
 | --- | --- | --- | --- |

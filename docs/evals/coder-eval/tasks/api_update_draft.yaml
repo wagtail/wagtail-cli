@@ -1,6 +1,6 @@
 # Coder Eval task: update a draft without publishing it.
 #
-# Ported from the Promptfoo `wagtail-api` suite, row "Update a draft without
+# Ported from the Promptfoo `wagtail-cli-api` suite, row "Update a draft without
 # publishing it". The `forbid_methods: [POST]` guard is shared with Promptfoo.
 
 task_id: 'update_draft_no_publish'
@@ -11,7 +11,7 @@ initial_prompt: |-
   and its search description to "How to bake with rye flour." Save it as a
   draft — do not publish it.
 
-tags: [wagtail-api, skill-ab, cli]
+tags: [wagtail-cli-api, skill-ab, cli]
 
 run_limits:
   max_turns: 25
@@ -44,9 +44,9 @@ success_criteria:
     description: 'Agent targeted post 5 (or resolved it first)'
 
   - type: 'skill_triggered'
-    skill_name: 'wagtail-api'
-    expected_skill: 'wagtail-api'
-    description: 'The wagtail-api skill was engaged'
+    skill_name: 'wagtail-cli-api'
+    expected_skill: 'wagtail-cli-api'
+    description: 'The wagtail-cli-api skill was engaged'
 
   - type: 'commands_efficiency'
     expected_commands: 6

@@ -1,6 +1,6 @@
 # Coder Eval task: find and read the docs page on StreamField validation.
 #
-# Ported from the Promptfoo `wagtail-docs` suite, row "Find and read the page on
+# Ported from the Promptfoo `wagtail-cli-docs` suite, row "Find and read the page on
 # StreamField validation". `expect_contains` is asserted by replaying the
 # recorded `wt docs` commands, the same content check Promptfoo makes.
 
@@ -11,7 +11,7 @@ initial_prompt: |-
   I need to understand how StreamField block validation works in Wagtail. Find
   the documentation page about it and read it; then summarise how it works.
 
-tags: [wagtail-docs, skill-ab, cli]
+tags: [wagtail-cli-docs, skill-ab, cli]
 
 run_limits:
   max_turns: 15
@@ -54,9 +54,9 @@ success_criteria:
     description: 'Agent did NOT curl docs.wagtail.org'
 
   - type: 'skill_triggered'
-    skill_name: 'wagtail-docs'
-    expected_skill: 'wagtail-docs'
-    description: 'The wagtail-docs skill was engaged'
+    skill_name: 'wagtail-cli-docs'
+    expected_skill: 'wagtail-cli-docs'
+    description: 'The wagtail-cli-docs skill was engaged'
 
   - type: 'commands_efficiency'
     expected_commands: 4

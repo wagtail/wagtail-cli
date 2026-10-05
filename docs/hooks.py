@@ -43,8 +43,8 @@ SKILL_MIME = "application/agent-skills+md"
 SKILL_VERSION = "1.0.0"
 # Human-readable catalog titles keyed by skill directory name.
 SKILL_DISPLAY_NAMES = {
-    "wagtail-api": "Wagtail API via the wagtail-cli",
-    "wagtail-docs": "Wagtail documentation via the wagtail-cli",
+    "wagtail-cli-api": "Wagtail API via the wagtail-cli",
+    "wagtail-cli-docs": "Wagtail documentation via the wagtail-cli",
 }
 # Skill subdirectories that are development-only and must not be published.
 SKILL_IGNORE = shutil.ignore_patterns("evals", "__pycache__", ".*")
