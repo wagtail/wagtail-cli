@@ -56,3 +56,17 @@ token = "wagtail_abc123def456"
 > Do not commit production tokens. The project dotfile is intended for shared
 > URLs or dev-only tokens; use environment variables or the user dotfile for
 > real credentials.
+
+## Editor validation
+
+The dotfiles have a published [JSON Schema](https://wagtail.github.io/wagtail-cli/schema/wagtail-cli.json).
+Add a `#:schema` hint to validate and complete keys in TOML-aware editors:
+
+```toml
+#:schema https://wagtail.github.io/wagtail-cli/schema/wagtail-cli.json
+
+url = "https://cms.example.com/api/v3/"
+token = "wagtail_abc123def456"
+```
+
+`wt api init` adds this hint for you.

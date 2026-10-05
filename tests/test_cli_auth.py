@@ -94,6 +94,7 @@ def test_init_writes_dotfile(monkeypatch, tmp_path):
     assert result.exit_code == 0
     data = (tmp_path / ".wagtail-cli.toml").read_text()
     assert 'url = "https://x.test/api/v3"' in data and 'token = "tok123"' in data
+    assert data.startswith("#:schema https://wagtail.github.io/wagtail-cli/schema/")
 
 
 @respx.mock

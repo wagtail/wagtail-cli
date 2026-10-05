@@ -1,6 +1,6 @@
 import tomllib
 
-from wagtail_cli.config import Config, load_config, save_user_config
+from wagtail_cli.config import SCHEMA_URL, Config, load_config, save_user_config
 
 
 def _isolate(monkeypatch, tmp_path):
@@ -54,6 +54,14 @@ def test_save_user_config_round_trip(tmp_path):
     out = save_user_config(Config(base_url="https://x", token="t"), path=path)
     data = tomllib.loads(out.read_text())
     assert data == {"url": "https://x", "token": "t"}
+
+
+def test_save_user_config_writes_schema_hint(tmp_path):
+    path = tmp_path / "sub" / ".wagtail-cli.toml"
+    out = save_user_config(Config(base_url="https://x", token="t"), path=path)
+    first_line = out.read_text().splitlines()[0]
+    assert first_line.startswith("#:schema ")
+    assert first_line.removeprefix("#:schema ") == SCHEMA_URL
 
 
 def test_save_user_config_restricts_permissions(tmp_path):

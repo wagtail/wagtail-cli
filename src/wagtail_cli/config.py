@@ -9,6 +9,9 @@ from pathlib import Path
 
 USER_DOTFILE_NAME = ".wagtail-cli.toml"
 
+SCHEMA_URL = "https://wagtail.github.io/wagtail-cli/schema/wagtail-cli.json"
+"""Published JSON Schema for the dotfiles, used for editor validation."""
+
 
 def _user_dotfile() -> Path:
     return Path.home() / USER_DOTFILE_NAME
@@ -53,6 +56,11 @@ def load_config(cli_url: str | None = None, cli_token: str | None = None) -> Con
 def save_user_config(config: Config, path: Path | None = None) -> Path:
     path = path or _user_dotfile()
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(f'url = "{config.base_url}"\ntoken = "{config.token or ""}"\n')
+    # The leading `#:schema` hint lets TOML-aware editors (Taplo, Even Better
+    # TOML, JetBrains) validate and complete the keys in this file.
+    path.write_text(
+        f"#:schema {SCHEMA_URL}\n"
+        f'url = "{config.base_url}"\ntoken = "{config.token or ""}"\n'
+    )
     os.chmod(path, 0o600)
     return path

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://wagtail.github.io/wagtail-cli/schema/wagtail-cli.json",
+  "title": "wagtail-cli configuration",
+  "description": "JSON Schema for the wagtail-cli dotfiles (.wagtail-cli.toml and ~/.wagtail-cli.toml).",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "url": {
+      "type": "string",
+      "format": "uri",
+      "title": "API base URL",
+      "description": "Base URL of the Wagtail v3 API, for example https://cms.example.com/api/v3/.",
+      "examples": ["https://cms.example.com/api/v3/"]
+    },
+    "token": {
+      "type": "string",
+      "title": "API token",
+      "description": "Wagtail API token, prefixed with `wagtail_`. Prefer environment variables or the user dotfile for real credentials.",
+      "examples": ["wagtail_abc123def456"]
+    }
+  }
+}
