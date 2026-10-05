@@ -1,4 +1,5 @@
 import json
+import re
 
 import respx
 
@@ -9,6 +10,13 @@ from wagtail_cli.cli.main import app
 
 BASE = "https://x.test/api/v3"
 runner = CliRunner()
+
+_ANSI_ESCAPE = re.compile(r"\x1b\[[0-9;]*m")
+
+
+def _cli_text(result) -> str:
+    """CLI stdout/stderr with ANSI escapes removed (Click/Rich styling on CI)."""
+    return _ANSI_ESCAPE.sub("", result.output + result.stderr)
 
 
 def _env(monkeypatch):
@@ -136,7 +144,10 @@ def test_sites_list_local_human_overrides_global_json(monkeypatch):
 def test_sites_list_local_json_human_conflict(monkeypatch):
     result = runner.invoke(app, ["api", "sites", "list", "--json", "--human"])
     assert result.exit_code == 2
-    assert "Cannot combine --json and --human" in result.output + result.stderr
+    text = _cli_text(result)
+    # Typer may style flag names (e.g. "-json" with ANSI) rather than plain "--json".
+    assert "Cannot combine" in text
+    assert "json" in text and "human" in text
 
 
 @respx.mock
