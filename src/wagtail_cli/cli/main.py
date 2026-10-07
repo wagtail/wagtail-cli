@@ -283,7 +283,7 @@ def cli() -> None:
     raise SystemExit(subprocess.call(target))  # noqa: S603  # argv is user-authored CLI args forwarded verbatim to the Django runner
 
 
-_KNOWN_GROUPS = {"api", "docs", "start"}
+_KNOWN_GROUPS = {"api", "docs", "skills", "start"}
 
 
 def resolve_delegate(args: list[str]) -> list[str] | None:

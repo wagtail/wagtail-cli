@@ -84,7 +84,7 @@ eval-init:
 eval *args="":
     #!/usr/bin/env bash
     set -euo pipefail
-    configs="docs/evals/wagtail_api_skill.yaml docs/evals/wagtail_docs_skill.yaml"
+    configs="docs/evals/wagtail_api_skill.yaml docs/evals/wagtail_docs_skill.yaml docs/evals/wagtail_skill.yaml docs/evals/wagtail_trigger_skill.yaml"
     if [ $# -gt 0 ] && [[ "${1}" == *.yaml ]]; then
         configs="${1}"
         shift

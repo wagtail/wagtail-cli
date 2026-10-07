@@ -1,11 +1,11 @@
 # Command reference
 
-`wt` is organized as a Typer app with two nested command groups, `api` (all
-Wagtail v3 API operations, including the setup commands `whoami` and `init`)
-and `docs` (read docs.wagtail.org from the terminal), a `start` command that
-scaffolds a new Django/Wagtail project, and a delegation rule: any command
-`wt` doesn't know is forwarded to the current project's Django management
-runner.
+`wt` is organized as a Typer app with three nested command groups, `api` (all
+Wagtail v3 API operations, including the setup commands `whoami` and `init`),
+`docs` (read docs.wagtail.org from the terminal), and `skills` (load the agent
+skills bundled with the CLI), a `start` command that scaffolds a new
+Django/Wagtail project, and a delegation rule: any command `wt` doesn't know
+is forwarded to the current project's Django management runner.
 
 New to the CLI? Follow [Getting started](getting-started.md) for an
 end-to-end walkthrough first.
@@ -56,8 +56,8 @@ wt --help      # CLI help, plus ./manage.py --help when present
 
 ## Delegation
 
-Any `wt <command>` that is not `api`, `docs`, `start`, `--version`, or
-`--help` is delegated to the current project's Django management command
+Any `wt <command>` that is not `api`, `docs`, `skills`, `start`, `--version`,
+or `--help` is delegated to the current project's Django management command
 runner, in this order:
 
 1. `./manage.py` if that file exists in the current directory;
@@ -186,6 +186,40 @@ wt docs search --json picture            # equivalent local form
 Results are scoped to the resolved docs version (`project:wagtail/<version>`);
 when a non-stable version yields no results, a note suggests
 `--version stable`.
+
+---
+
+## `wt skills`
+
+Read the [agent skills](agent-skills.md) bundled with this CLI. Agents load a
+skill to get instructions that match the installed version, rather than a
+snapshot downloaded earlier.
+
+```
+wt skills                       # list available skills
+wt skills list
+wt skills get NAME [NAME...] [--all] [--full]
+wt skills path [NAME]
+```
+
+| Command | Description |
+|---|---|
+| `wt skills` / `wt skills list` | List the visible skills with their descriptions. |
+| `wt skills get NAME` | Print a skill's `SKILL.md`. Accepts the full name (`cli-api`) or its short alias (`api`). |
+| `wt skills get --all` | Print every visible skill. The hidden `wagtail` discovery stub is excluded. |
+| `wt skills get NAME --full` | Also print the skill's `references/` and `templates/` files. |
+| `wt skills path [NAME]` | Print the skills directory, or a single skill's directory. |
+
+```bash
+wt skills get api                     # short alias for cli-api
+wt skills get cli-api --full  # plus references/commands.md etc.
+wt skills get cli-docs
+```
+
+Skill content is printed as-is (Markdown) by default; pass `--json` (globally
+or on the command) for machine-readable output, including JSON errors. Set
+`WAGTAIL_CLI_SKILLS_DIR` to serve skills from a different directory, for
+development.
 
 ---
 

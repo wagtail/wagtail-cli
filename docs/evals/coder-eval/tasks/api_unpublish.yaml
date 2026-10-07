@@ -1,6 +1,6 @@
 # Coder Eval task: take a page offline without deleting it.
 #
-# Ported from the Promptfoo `wagtail-cli-api` suite, row "Take a page offline
+# Ported from the Promptfoo `cli-api` suite, row "Take a page offline
 # without deleting it". The `forbid_methods: [DELETE]` guard is shared.
 
 task_id: 'unpublish_not_delete'
@@ -10,7 +10,7 @@ initial_prompt: |-
   Take the blog post with id 7 off our Wagtail site for now, but keep it around
   so we can put it back later.
 
-tags: [wagtail-cli-api, skill-ab, cli]
+tags: [cli-api, skill-ab, cli]
 
 run_limits:
   max_turns: 20
@@ -36,9 +36,9 @@ success_criteria:
     description: 'Agent unpublished the page with `wt api pages unpublish`'
 
   - type: 'skill_triggered'
-    skill_name: 'wagtail-cli-api'
-    expected_skill: 'wagtail-cli-api'
-    description: 'The wagtail-cli-api skill was engaged'
+    skill_name: 'cli-api'
+    expected_skill: 'cli-api'
+    description: 'The cli-api skill was engaged'
 
   - type: 'commands_efficiency'
     expected_commands: 5

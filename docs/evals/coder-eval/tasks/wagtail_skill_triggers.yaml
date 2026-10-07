@@ -1,0 +1,209 @@
+# Coder Eval task: trigger behaviour of the `wagtail` agent skill.
+#
+# Prompts are copied verbatim from the Wagtail ai-evals atomic task corpus
+# (`ai-evals/tasks/atomic/<name>/instruction.md`). Every development task is
+# expected to activate the `wagtail` skill; `hello-world` is the corpus control
+# and must not. The `api-v3-recipe-editing` holdout is excluded: the corpus
+# keeps holdouts out of prompt/agent calibration.
+#
+# `skill_triggered` is a classification criterion: `expected_skill` is the row's
+# true skill ('' for the negative), so the suite reports a confusion matrix.
+
+task_id: 'wagtail_skill_triggers'
+description: 'Does the wagtail skill activate on Wagtail tasks, and stay off control tasks?'
+
+initial_prompt: '${row.prompt}'
+
+tags: [wagtail, skill-trigger]
+
+run_limits:
+  max_turns: 8
+  task_timeout: 240
+  expected_turns: 3
+
+sandbox:
+  driver: 'tempdir'
+
+dataset:
+  rows:
+    - id: 'accessibility-contextual-image-alt'
+      expected_skill: 'wagtail'
+      prompt: |-
+        # Respect each image's context-specific text alternative
+
+        Captioned images always announce the media library title, ignoring the editor's text alternative and decorative choice. Render the contextual alternative for each use of an image, and an empty alt attribute for a decorative use. Using the same image twice with different alternatives must not change its library title or description. Keep historical image-chooser values renderable, using Wagtail's normal default alternative when no contextual value was stored.
+
+        Keep the responsive picture formats, loading behavior, captions and attribution. Alternatives and captions must remain safely escaped, including quotes and HTML. The starting block definition and migrations already support these choices; this is a rendering repair, with no content rewrite needed. Keep tests passing.
+    - id: 'admin-userbar-items'
+      expected_skill: 'wagtail'
+      prompt: |-
+        # Preserve the other userbar controls
+
+        Our custom accessibility checker has replaced every item in the Wagtail userbar. Replace only the built-in content checker, leaving all other item objects in their original order. Modify the supplied list in place. The custom checker should continue running all checks; repeated hook calls must not add duplicate controls.
+
+        Keep the existing application tests passing. Do not change tests or test settings.
+    - id: 'contrib-sitemap-route'
+      expected_skill: 'wagtail'
+      prompt: |-
+        # Restore the XML sitemap
+
+        Search engines get a 404 for /sitemap.xml. Restore a sitemap for the current Wagtail site. Include live public pages using absolute URLs with the request’s scheme and host (including a host alias that resolves to the default site); exclude drafts and pages protected directly or by an ancestor. Normal page routing and the existing admin/API URLs must continue working.
+
+        Keep the existing application tests passing. Do not change tests or test settings.
+    - id: 'forms-field-errors'
+      expected_skill: 'wagtail'
+      prompt: |-
+        # Make contact form errors understandable and accessible
+
+        An invalid contact submission gives visitors no useful field feedback. Render each field's errors beside its input and connect that feedback to the input with aria-describedby; mark invalid inputs with aria-invalid="true". Keep labels associated with inputs and include help text in the same description association. Render non-field errors above the fields. Escape error messages and retain submitted values, including punctuation and non-ASCII text.
+
+        Use the real contact form flow: retain CSRF protection and the successful submission/confirmation/email behavior. Errors must appear for every affected field, not just a field called subject. Keep existing application tests passing.
+    - id: 'forms-submission-history'
+      expected_skill: 'wagtail'
+      prompt: |-
+        # Repair historical contact submissions after field renaming
+
+        The contact form's email_address and your_message fields were renamed to email and message. Old submissions now export empty cells. Complete the supplied normalize_contact_submissions --page-id ID command to migrate stored submissions for that FormPage only. Copy an old value when the new value is absent, null or empty; otherwise retain the nonempty new value. Remove the old keys after the merge. Preserve all unrelated keys, record IDs and submission timestamps.
+
+        The command must safely run twice, cope with old-only/new-only/mixed submissions, and leave other forms untouched. New form submissions and the existing CSV export must work under the new names. No schema changes or external services are needed. Keep existing application tests passing.
+    - id: 'i18n-page-language'
+      expected_skill: 'wagtail'
+      prompt: |-
+        # Give readers and search engines the right translated page
+
+        Use the page locale for HTML lang, retaining regional subtags. Without a page, use the active Django language. Also add alternate hreflang links in the head and a language navigation labelled "Languages" linking to the current page and its live public translations. Each link must use that translation's locale code and actual page URL, not the locale homepage. Do not expose draft translations, restricted translations (including inherited restrictions), or unrelated pages. No page context means no translation links. Use absolute URLs for alternate links; the navigation may use relative URLs. Keep the rest of the layout intact.
+
+        Keep the existing application tests passing. Use the existing test settings.
+    - id: 'images-preserve-aspect-ratio'
+      expected_skill: 'wagtail'
+      prompt: |-
+        # Stop cropping captioned images
+
+        Portrait and panoramic images in CaptionedImageBlock are being cropped. Keep the responsive AVIF/WebP/JPEG picture output and lazy loading, but preserve the whole image at the existing 400px and 600px width candidates. Do not upscale smaller uploads. Retain escaped caption and attribution text.
+
+        Keep the existing application tests passing. Do not change tests or test settings.
+    - id: 'pages-recipe-parent-rules'
+      expected_skill: 'wagtail'
+      prompt: |-
+        # Restore recipe placement rules
+
+        Editors can currently add recipe detail pages in arbitrary sections and nest pages under recipes. A RecipePage must only be creatable below RecipeIndexPage, and must not have children. RecipeIndexPage must only offer RecipePage as a child type. Keep recipe editing and existing content intact.
+
+        Keep the existing application tests passing. Do not change tests or test settings.
+    - id: 'performance-blog-authors'
+      expected_skill: 'wagtail'
+      prompt: |-
+        # Stop blog index queries growing with every post
+
+        The blog index is slow as its list grows. Make rendering the index and tagged archives load author and tag relationships in a bounded number of database queries, rather than a query per post or author. On a cold template cache, going from one to twenty posts (each with authors and tags, without images) must add no more than four queries. Keep all posts and their links, editorial author order, tag filters and published-author visibility. Draft people must not appear. The detail page's authors() must still return Person objects in editorial order.
+
+        This is about reducing unnecessary database work; don't hide content, cap the list, or satisfy the bound by caching an incomplete response. Keep the existing application tests passing. Use the existing test settings.
+    - id: 'permissions-private-search'
+      expected_skill: 'wagtail'
+      prompt: |-
+        # Keep search results within the visitor's public site and language
+
+        Public search mixes results from the other bakery site and other languages, and exposes restricted pages. For the configured database search backend, return only matching live public pages inside the request's Wagtail site root (including a searchable root), in the active Django language. Exclude direct and inherited password/group/login restrictions even for a signed-in visitor: this is a public search endpoint, not an editor search.
+
+        Apply all boundaries before paginating: ten results per page, accurate counts, no missing results or empty holes caused by hidden matches. Preserve the query in next/previous links. Invalid page text uses page one and out-of-range page numbers use the last page, as before. Empty queries return no results. Do not substitute promoted results when no pages match. Keep title/body/introduction indexing and normal page routing working.
+
+        Keep existing application tests passing. Use the existing test settings.
+    - id: 'personalization-preview-segments'
+      expected_skill: 'wagtail'
+      prompt: |-
+        # Render audience content and let editors preview both audiences
+
+        The seeded audience_content block does not reliably receive request context, and treats a public ?audience=members parameter as membership. In StandardPage content, show "all" blocks to everyone, "members" only to authenticated users, and "visitors" only to anonymous users. Hidden content must be absent from HTML, not merely hidden with CSS. With no request, use the anonymous audience.
+
+        The existing Visitors and Members editor preview modes must show the chosen audience, even when the editor is signed in. Only the server-side preview flow may override audience selection; ordinary query parameters cannot. Preserve rich-text links and normal blocks. Consecutive requests or previews must not leak one audience into another. No external personalization service is needed. Keep application tests passing; the block schema is already migrated.
+    - id: 'routing-blog-tag-scope'
+      expected_skill: 'wagtail'
+      prompt: |-
+        # Make blog tag archives scoped, shareable and paginated
+
+        A tag archive leaks posts from other blog sections and unpublished posts. Match the existing slug-based tag route, listing only live public BlogPages below the current BlogIndexPage. A tag shared by two sections must work in each independently. Paginate the normal index and tag archives at ten posts per page, with newest date first and descending page ID for ties. Next/previous links must retain the current archive path/tag. An unknown tag keeps the existing redirect-to-index behavior. Invalid page text uses page one and out-of-range page numbers use the last page. Keep get_posts() returning the complete scoped queryset for existing callers; paginate only the displayed list.
+
+        Keep the existing application tests passing. Use the existing test settings.
+    - id: 'search-recipe-introduction'
+      expected_skill: 'wagtail'
+      prompt: |-
+        # Find recipes by their introduction
+
+        A recipe cannot be found through the site's search when the search term occurs only in its introduction. Make recipe introductions searchable using the configured Wagtail search backend.
+
+        Keep matching recipe titles and body content, and keep unpublished recipes out of the public results. The fix must work after rebuilding the search index; do not special-case a particular query or bypass Wagtail search with substring matching.
+
+        Work in /app. Use the existing test settings when running Django commands.
+    - id: 'seo-description-fallback'
+      expected_skill: 'wagtail'
+      prompt: |-
+        # Consolidate social descriptions without losing editorial copy
+
+        StandardPage has an old social_text field alongside search_description. Make search_description the single editor-facing description: retain its nonempty value, otherwise backfill it from social_text. Apply that policy to existing StandardPage rows and all their saved revisions, so opening or publishing an older draft does not lose the description. Preserve unrelated data. The legacy database column may remain, but remove it from the editor panels.
+
+        Both the HTML meta description and Open Graph description must use the canonical value, then introduction as a rendering-only fallback, then empty text. Emit one of each tag and escape quotes/HTML safely. Do not persist introduction as the canonical description or alter the title behavior. Include a forward data migration and keep existing application tests passing.
+    - id: 'snippets-published-footer'
+      expected_skill: 'wagtail'
+      prompt: |-
+        # Keep a newer footer draft out of public responses
+
+        A published footer can have a newer saved draft. Public pages must keep showing the published revision until that draft is published, and show an empty footer after unpublishing or when no published footer exists. Legacy live snippets without a live revision should still render their saved body.
+
+        An explicit footer_text in preview context must win, including an empty string. Preserve rich text and internal links. Previewing must never change subsequent public output. Keep existing application tests passing.
+    - id: 'streamfield-step-label'
+      expected_skill: 'wagtail'
+      prompt: |-
+        # Show readable recipe step difficulty
+
+        Recipe steps currently show the stored difficulty codes S, M, and L on the website. Readers should see Small, Medium, and Large instead, using the labels configured for the editor's difficulty choices.
+
+        Keep the stored values and editor choices compatible with existing recipes. Keep the step's rich text and links working. The fix must work when steps are rendered inside a recipe body's steps_list as well as individually.
+
+        Work in /app. Use the existing test settings when running Django commands.
+    - id: 'streamfield-step-migration'
+      expected_skill: 'wagtail'
+      prompt: |-
+        # Rename recipe step text without losing saved content
+
+        Rename RecipeStepBlock's text child to instruction, including its editor field and rendering. The steps live inside RecipePage.body's steps_list. Migrate existing stored page content and all saved recipe revisions, including older and unpublished revisions, from text to instruction. Preserve the rich text, links, difficulty values, stream/list item IDs, ordering and unrelated blocks.
+
+        Include migration state matching the new block definition. After migrating, old revisions must still render and be publishable, and new steps must save and reload with instruction. This is a forward migration; reversing the data rename is not required. Keep existing application tests passing.
+    - id: 'template-recipe-headline'
+      expected_skill: 'wagtail'
+      prompt: |-
+        # Recipe headline links do not work
+
+        Editors can format recipe headlines and link them to another page, but the recipe section's accessible label displays escaped markup and its internal links do not resolve.
+
+        Fix the recipe headline rendering so supported formatting and internal page links render as HTML. Preserve the section's accessible label association and the plain “Recipe” label when the headline is blank. Do not treat arbitrary plain-text page fields as HTML.
+
+        Work in /app. Use the existing test settings when running Django commands.
+    - id: 'workflow-first-publication'
+      expected_skill: 'wagtail'
+      prompt: |-
+        # Announce a blog post only after its first publication commits
+
+        Our seeded blog notification receiver sends on every publish, even when the surrounding transaction later rolls back. Use the existing local delivery hook to announce exactly once on a post's first-ever successful publication, only after its surrounding transaction commits. Draft saves, previews, later edits, and unpublish/republish must not announce again. Two different posts each get one announcement; a rolled-back first publication can announce when retried successfully. Nested transactions must preserve the same behavior.
+
+        Keep the delivery hook interface and the local delivered list for testing. Do not add a network service or distributed delivery queue. Keep existing application tests passing. Use the existing test settings.
+    - id: 'workflow-inactive-approver'
+      expected_skill: 'wagtail'
+      prompt: |-
+        # Disable moderation access immediately when the approver is disabled
+
+        Our UserApprovalTask must stop granting editor access, actions and moderatable task states when its assigned account is disabled, including a workflow already in progress. Direct calls to on_action by an inactive or unassigned user must raise PermissionDenied and leave the task/workflow unchanged. Unassigned superusers are not approvers. Re-enabling the assigned account restores access to the existing pending state and normal approve/reject/cancel behavior.
+
+        Use real workflow state, not only whether buttons are visible. Keep the existing application tests passing. Use the existing test settings.
+    - id: 'hello-world'
+      expected_skill: ''
+      prompt: |-
+        # Hello, world
+
+        Change `/app/hello_world.md` to contain exactly `Hello, world` followed by a newline. Do not change anything else.
+
+        Keep the existing application tests passing. Do not change tests or test settings.
+success_criteria:
+  - type: 'skill_triggered'
+    skill_name: 'wagtail'
+    expected_skill: '${row.expected_skill}'
+    description: 'The wagtail skill engaged iff expected for this row'

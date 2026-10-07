@@ -1,0 +1,153 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+
+# Promptfoo evals for the `wagtail` discovery stub skill.
+# Design, graders and requirements: README.md next to this file.
+
+prompts:
+  - '{{prompt}}'
+
+providers:
+  - id: opencode:sdk
+    label: baseline
+    config: &opencode
+      provider_id: '{{ env.EVAL_PROVIDER | default("tensorx", true) }}'
+      model: '{{ env.EVAL_MODEL | default("z-ai/glm-5.3-flash", true) }}'
+      working_dir: ../..
+      # The arms differ in the `skill` tool and permission. With `working_dir`
+      # set, the promptfoo opencode:sdk provider turns on the read-only
+      # filesystem tools even when `'*': false`, so they are disabled
+      # explicitly; the skill arm gets `read` back, scoped to the skills
+      # directory so it can follow the stub's pointer into SKILL.md.
+      tools:
+        '*': false
+        read: false
+        grep: false
+        glob: false
+        list: false
+      permission:
+        external_directory: deny
+      custom_agent:
+        description: Wagtail task routing
+        temperature: 0
+        steps: 20
+        prompt: >-
+          You are helping a developer work with a Wagtail site from the
+          terminal. Answer directly and concisely, using what you know plus
+          whatever tools and reference material you have — if you have neither,
+          answer from memory rather than asking for file access. When the
+          question asks how to do something, reply with the exact terminal
+          commands to run, as one complete bash code block.
+
+  - id: opencode:sdk
+    label: skill
+    config:
+      <<: *opencode
+      tools:
+        '*': false
+        read: true
+        grep: false
+        glob: false
+        list: false
+        skill: true
+      permission:
+        skill:
+          '*': deny
+          wagtail: allow
+        external_directory: deny
+        read:
+          '*': deny
+          'src/wagtail_cli/.agents/skills/**': allow
+
+evaluateOptions:
+  maxConcurrency: 2
+
+defaultTest:
+  options:
+    disableVarExpansion: true
+    # Rubric grader: different model family from the one under test.
+    provider:
+      id: openai:chat:deepseek/deepseek-v4.1-flash
+      config:
+        apiBaseUrl: 'https://api.tensorx.ai/v1'
+        apiKey: '{{ env.TENSORX_API_KEY }}'
+        temperature: 0
+        max_tokens: 4096
+        response_format:
+          type: json_object
+  # A provider error surfaces as empty output; name it so it cannot be
+  # mistaken for a bad answer.
+  assert:
+    - type: javascript
+      value: |
+        return (output || '').trim().length > 0
+          ? { pass: true, score: 1, reason: 'Provider returned output' }
+          : { pass: false, score: 0, reason: 'EMPTY RESPONSE — provider error, not a model failure. Re-run this row.' };
+
+tests:
+  # --- Task completion ------------------------------------------------------
+
+  - description: Routes to the API skill before building a payload
+    vars:
+      prompt: >-
+        You have the Wagtail skill loaded for a task that publishes a page
+        through the v3 API. Which command do you run to load the detailed API
+        instructions?
+    assert:
+      - type: contains
+        value: 'wt skills get cli-api'
+
+  # --- Skill activation, on the skill arm only ------------------------------
+
+  - description: Activates on a site-operations task
+    providers:
+      - skill
+    vars:
+      prompt: >-
+        Publish a new blog post on our Wagtail site with a Markdown body and a
+        hero image. Give me the exact terminal commands.
+    assert:
+      - type: skill-used
+        value: wagtail
+
+  - description: Activates on a documentation question
+    providers:
+      - skill
+    vars:
+      prompt: >-
+        Where is the Wagtail documentation page on StreamField validation?
+        Point me at it.
+    assert:
+      - type: skill-used
+        value: wagtail
+
+  - description: Does not activate on an unrelated task
+    providers:
+      - skill
+    vars:
+      prompt: >-
+        In Python, what is the difference between a list and a tuple? Answer
+        in one paragraph.
+    assert:
+      - type: skill-used
+        value:
+          name: wagtail
+          max: 0
+
+  # --- Gotcha with no command answer, graded by rubric ----------------------
+
+  - description: Prefer the bundled skills over guessing at the API
+    vars:
+      prompt: >-
+        An agent on our team keeps getting Wagtail API requests wrong because
+        it guesses at the endpoints and field shapes. Is there a way for it to
+        load accurate instructions for the task at hand?
+    assert:
+      - type: llm-rubric
+        value: >-
+          The answer points the agent at the Wagtail CLI's bundled skills: it
+          recommends loading one with `wt skills get` (for example
+          `wt skills get cli-api`, optionally with `--full`) or listing
+          them with `wt skills list`, so the instructions match the installed
+          CLI version. Suggesting only generic documentation reading, a
+          different HTTP client, or hand-written requests without mentioning
+          `wt skills`, fails.

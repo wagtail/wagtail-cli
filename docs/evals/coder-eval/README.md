@@ -2,9 +2,10 @@
 
 A [Coder Eval](https://coder-eval.com/) suite covering the same tasks as the
 [Promptfoo skill evals](../README.md), run alongside them. It answers the same
-question — does loading the `wagtail-cli-api` / `wagtail-cli-docs` skills change agent
-behaviour? — and adds the **trajectory**: turns, tokens, tool calls and
-duration per arm, which Promptfoo's answer-grading harness cannot report.
+question — does loading the `wagtail` / `cli-api` / `cli-docs`
+skills change agent behaviour? — and adds the **trajectory**: turns, tokens,
+tool calls and duration per arm, which Promptfoo's answer-grading harness cannot
+report.
 
 Promptfoo remains the primary harness; this suite runs alongside it. Neither
 replaces the other today (see [Trade-offs](#trade-offs)).
@@ -32,14 +33,22 @@ One Coder Eval task per row of the Promptfoo suites.
 
 | Coder Eval task | Promptfoo row | Suite |
 | --- | --- | --- |
-| `api_publish_blog_post` | Publish a blog post with heading, paragraph and author | wagtail-cli-api |
-| `api_update_draft` | Update a draft without publishing it | wagtail-cli-api |
-| `api_unpublish` | Take a page offline without deleting it | wagtail-cli-api |
-| `api_list_posts` | List blog posts under a section within the page cap | wagtail-cli-api |
-| `api_upload_image` | Upload an image with a title | wagtail-cli-api |
-| `docs_streamfield_validation` | Find and read the page on StreamField validation | wagtail-cli-docs |
-| `docs_v3_create_operation` | Pull up the v3 API operation that creates a page | wagtail-cli-docs |
-| `docs_images_topic` | Read the images topic | wagtail-cli-docs |
+| `api_publish_blog_post` | Publish a blog post with heading, paragraph and author | cli-api |
+| `api_update_draft` | Update a draft without publishing it | cli-api |
+| `api_unpublish` | Take a page offline without deleting it | cli-api |
+| `api_list_posts` | List blog posts under a section within the page cap | cli-api |
+| `api_upload_image` | Upload an image with a title | cli-api |
+| `docs_streamfield_validation` | Find and read the page on StreamField validation | cli-docs |
+| `docs_v3_create_operation` | Pull up the v3 API operation that creates a page | cli-docs |
+| `docs_images_topic` | Read the images topic | cli-docs |
+
+`wagtail_skill_triggers.yaml` is separate from the table above: a single dataset
+task whose 21 rows are the Wagtail ai-evals atomic task corpus prompts, copied
+verbatim (`ai-evals/tasks/atomic/<name>/instruction.md`). It measures trigger
+behaviour only — a stacked `skill_triggered` criterion reports a confusion matrix
+for the `wagtail` skill. Every development prompt is a positive; `hello-world` is
+the corpus control (negative); the `api-v3-recipe-editing` holdout is excluded.
+Its Promptfoo counterpart is `../../wagtail_trigger_skill.yaml`.
 
 ## Layout
 
@@ -55,8 +64,8 @@ docs/evals/coder-eval/
 │       ├── hero.png            # placeholder for the image-upload task
 │       └── SITE.md             # site context the agent needs
 └── tasks/
-    ├── api_*.yaml              # one per wagtail-cli-api row
-    ├── docs_*.yaml             # one per wagtail-cli-docs row
+    ├── api_*.yaml              # one per cli-api row
+    ├── docs_*.yaml             # one per cli-docs row
     └── graders/
         ├── check_api.py        # replays recorded argv, matches expect_requests
         └── check_docs.py       # replays recorded `wt docs`, checks expect_contains
@@ -143,10 +152,6 @@ is gitignored). `just eval-coder-report` renders it.
   The grader skips those lines (there is no request to match), but it means a
   recorded trajectory can contain entries that are not dry-run request
   documents. `check_api.py` filters to dicts for this reason.
-- **`wt docs` has no `--outline` flag.** The `wagtail-cli-docs` SKILL.md suggests
-  one the CLI does not implement. Agents that follow the example produce a
-  failed command; tasks use `require_success: true` so it is caught rather
-  than counted. The skill text should be fixed.
 - **OpenCode + Docker is unsupported** in Coder Eval (the CLI is not in its
   image and no credentials are passed through), so this runs under the default
   `tempdir` driver — a working directory, not a confinement boundary.

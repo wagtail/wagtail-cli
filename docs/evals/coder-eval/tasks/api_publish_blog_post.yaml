@@ -1,6 +1,6 @@
 # Coder Eval task: publish a blog post with heading, paragraph and author.
 #
-# Ported from the Promptfoo `wagtail-cli-api` suite (../../../wagtail_api_skill.yaml),
+# Ported from the Promptfoo `cli-api` suite (../../../wagtail_api_skill.yaml),
 # row "Publish a blog post with heading, paragraph and author". The expectations
 # are identical; the shared `_request_matching` module guarantees that.
 
@@ -13,7 +13,7 @@ initial_prompt: |-
   heading reading "Why bake with rye" followed by a paragraph reading "Rye
   flour gives a denser crumb.", and the post is credited to author 1.
 
-tags: [wagtail-cli-api, skill-ab, cli]
+tags: [cli-api, skill-ab, cli]
 
 run_limits:
   max_turns: 25
@@ -46,9 +46,9 @@ success_criteria:
     description: 'Agent ran `wt api whoami` before acting (skill guidance)'
 
   - type: 'skill_triggered'
-    skill_name: 'wagtail-cli-api'
-    expected_skill: 'wagtail-cli-api'
-    description: 'The wagtail-cli-api skill was engaged'
+    skill_name: 'cli-api'
+    expected_skill: 'cli-api'
+    description: 'The cli-api skill was engaged'
 
   - type: 'commands_efficiency'
     expected_commands: 6

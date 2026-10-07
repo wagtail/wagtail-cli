@@ -25,6 +25,10 @@ __pycache__/
 demo/media
 bakerydemo
 wagtail
+# The bundled agent skill directory is named `wagtail`, which the line above
+# would otherwise ignore.
+!src/wagtail_cli/.agents/skills/wagtail/
+!src/wagtail_cli/.agents/skills/wagtail/**
 
 # Local CLI credential dotfile (contains an API token)
 /.wagtail-cli.toml

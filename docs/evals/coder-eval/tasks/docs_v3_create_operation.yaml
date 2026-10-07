@@ -1,6 +1,6 @@
 # Coder Eval task: pull up the v3 API operation that creates a page.
 #
-# Ported from the Promptfoo `wagtail-cli-docs` suite, row "Pull up the v3 API
+# Ported from the Promptfoo `cli-docs` suite, row "Pull up the v3 API
 # operation that creates a page".
 
 task_id: 'docs_v3_create_operation'
@@ -11,7 +11,7 @@ initial_prompt: |-
   v3 API operation that creates a page. Find and read its reference, then list
   the parameters and payload fields.
 
-tags: [wagtail-cli-docs, skill-ab, cli]
+tags: [cli-docs, skill-ab, cli]
 
 run_limits:
   max_turns: 15
@@ -53,9 +53,9 @@ success_criteria:
     description: 'Agent did NOT curl docs.wagtail.org'
 
   - type: 'skill_triggered'
-    skill_name: 'wagtail-cli-docs'
-    expected_skill: 'wagtail-cli-docs'
-    description: 'The wagtail-cli-docs skill was engaged'
+    skill_name: 'cli-docs'
+    expected_skill: 'cli-docs'
+    description: 'The cli-docs skill was engaged'
 
   - type: 'commands_efficiency'
     expected_commands: 4

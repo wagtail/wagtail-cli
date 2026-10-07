@@ -15,7 +15,7 @@
 #   opencode debug skill --pure
 
 experiment_id: wagtail-skills-ab
-description: 'Do the wagtail-cli-api / wagtail-cli-docs skills improve agent outcomes and efficiency?'
+description: 'Do the wagtail / cli-api / cli-docs skills improve agent outcomes and efficiency?'
 
 defaults:
   agent:
@@ -35,7 +35,7 @@ variants:
       plugins: []
 
   - variant_id: with-skill
-    description: 'wagtail-cli-api + wagtail-cli-docs skills loaded'
+    description: 'wagtail + cli-api + cli-docs skills loaded'
     agent:
       plugins:
         # A plugin ROOT: the directory that holds the skill directories.

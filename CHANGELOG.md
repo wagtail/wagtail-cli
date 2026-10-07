@@ -7,19 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-07
+
 ### Added
 
-- `--select` is now accepted on every `api` command, not just globally, so
-  `wt api sites list --select id,hostname` works. Global and command-local
-  selectors are merged.
-- `--json`, `--human`, and `--dry-run` are now accepted on every `api`
-  command as well as globally, so `wt api pages list --json` and
-  `wt api pages delete 42 --dry-run` work. A command-local flag overrides the
-  global one.
-- `wt api schema show` renders human-readable output with `--human` (JSON
-  remains the default).
-- New [documentation style guide](contributing/style-guide.md) for contributor and user-facing docs.
-- Published a [JSON Schema for the dotfiles](https://wagtail.github.io/wagtail-cli/schema/wagtail-cli.json) (served from the docs site). Editors that understand the `#:schema` hint (Taplo, Even Better TOML, JetBrains) now complete and validate the keys in `.wagtail-cli.toml`. `wt api init` writes the hint automatically.
+- `wt skills` serves the agent skills bundled with the installed CLI, so
+  agents load instructions that match their version: `wt skills list`,
+  `wt skills get cli-api` (or the short alias `api`, plus `--full` for
+  reference files), and `wt skills path`.
+- `--json`, `--human`, `--select`, and `--dry-run` are now accepted on every `api`
+  command as well as globally.
+- `wt api schema show` renders human-readable output with `--human`.
+- New [JSON Schema for config files](https://wagtail.github.io/wagtail-cli/schema/wagtail-cli.json).
+
+### Changed
+
+- Replace separate skills with a single lightweight `wagtail` skill triggers the appropriate detailed skill (`cli-api`, `cli-docs`) served by the CLI.
 
 ## [0.3.0] - 2026-09-22
 
