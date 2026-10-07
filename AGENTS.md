@@ -46,3 +46,4 @@ docs/                      # MkDocs documentation site source (published to GitH
 - Follow [Semantic Versioning](https://semver.org/) for releases.
 - Use [Keep a Changelog](https://keepachangelog.com/) format for CHANGELOG.md.
 - Refer to [CONTRIBUTING.md](docs/CONTRIBUTING.md) for the full contribution workflow.
+- Keep docs concise and do not hard-wrap paragraphs or list items. Preserve code and table formatting, and check links after moves.

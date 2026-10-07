@@ -40,7 +40,14 @@ variants:
       plugins:
         # A plugin ROOT: the directory that holds the skill directories.
         # `$SKILLS_PATH` is exported by the `just eval-coder` recipe and points
-        # at src/wagtail_cli/.agents. If it is unset the with-skill arm runs
-        # without skills and silently measures a second baseline.
+        # at src/wagtail_cli/.agents (the published `wagtail` skill). If it is
+        # unset the with-skill arm runs without skills and silently measures a
+        # second baseline.
         - type: 'local'
           path: '${SKILLS_PATH}'
+        # CLI-served content is not an auto-loadable skill in production; the
+        # harness loads skill-data anyway to measure the content skills
+        # directly. `skill-data/` has no `skills/` subdir, so coder-eval uses it
+        # as a bare skills root. `$SKILL_DATA_PATH` is exported by the recipe.
+        - type: 'local'
+          path: '${SKILL_DATA_PATH}'

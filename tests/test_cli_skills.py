@@ -235,15 +235,45 @@ def test_skills_missing_directory(tmp_path, monkeypatch):
 # --- bundled skills ---
 
 
-def test_bundled_wagtail_stub_is_hidden(monkeypatch):
-    """The shipped `wagtail` stub exists, is loadable, and stays out of `list`."""
+def test_bundled_wagtail_stub_is_gettable_but_not_listed(monkeypatch):
+    """The `wagtail` stub is skipped by `list`/`--all` but still loadable by name."""
     monkeypatch.delenv("WAGTAIL_CLI_SKILLS_DIR", raising=False)
-    listed = runner.invoke(app, ["skills", "list"])
+    listed = runner.invoke(app, ["skills", "list", "--json"])
     assert listed.exit_code == 0
-    assert "cli-api" in listed.output
-    assert "cli-docs" in listed.output
+    names = [skill["name"] for skill in json.loads(listed.output)["skills"]]
+    assert "wagtail" not in names
+    assert {"cli-api", "cli-docs", "content-modeling", "upgrade-wagtail"} <= set(names)
+
+    all_skills = runner.invoke(app, ["skills", "get", "--all"])
+    assert all_skills.exit_code == 0
+    assert "name: wagtail\n" not in all_skills.output
 
     stub = runner.invoke(app, ["skills", "get", "wagtail"])
     assert stub.exit_code == 0
     assert "wt skills get cli-api" in stub.output
-    assert "discovery stub" in stub.output
+    assert "index of available skills" in stub.output
+
+
+def test_bundled_skill_data_is_outside_agents(monkeypatch):
+    """CLI-served content lives in skill-data/, not the auto-loaded skills dir."""
+    monkeypatch.delenv("WAGTAIL_CLI_SKILLS_DIR", raising=False)
+    result = runner.invoke(app, ["skills", "path"])
+    assert result.exit_code == 0
+    lines = result.output.strip().splitlines()
+    assert any(line.endswith(str(Path(".agents") / "skills")) for line in lines)
+    assert any(line.endswith("skill-data") for line in lines)
+
+    content = runner.invoke(app, ["skills", "path", "docs"])
+    assert content.exit_code == 0
+    assert content.output.strip().endswith(str(Path("skill-data") / "cli-docs"))
+
+
+def test_bundled_skill_names_match_directories(monkeypatch):
+    """Every bundled skill resolves by name, and its front-matter name is its directory."""
+    monkeypatch.delenv("WAGTAIL_CLI_SKILLS_DIR", raising=False)
+    listed = runner.invoke(app, ["skills", "list", "--json"])
+    assert listed.exit_code == 0
+    for skill in json.loads(listed.output)["skills"]:
+        path = runner.invoke(app, ["skills", "path", skill["name"]])
+        assert path.exit_code == 0, skill["name"]
+        assert Path(path.output.strip()).name == skill["name"]

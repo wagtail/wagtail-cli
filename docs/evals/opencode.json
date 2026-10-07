@@ -31,6 +31,6 @@
     }
   },
   "skills": {
-    "paths": ["src/wagtail_cli/.agents/skills"]
+    "paths": ["src/wagtail_cli/.agents/skills", "src/wagtail_cli/skill-data"]
   }
 }

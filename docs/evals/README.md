@@ -74,9 +74,17 @@ Things a future maintainer will run into, and what to do about them:
 - **Coder Eval's rubric judge needs the `litellm` extra.** `just eval-init`
   installs it (`uv tool install coder-eval --with litellm`). Without it the
   judge fails loudly rather than scoring 0 silently.
-- **Coder Eval's with-skill arm needs `$SKILLS_PATH`.** `just eval-coder` exports
-  it and fails fast if it is unset; if you invoke `coder-eval` directly, export
-  it yourself or the arm silently measures the bare model.
+- **Coder Eval's with-skill arm needs `$SKILLS_PATH` and `$SKILL_DATA_PATH`.**
+  `just eval-coder` exports both and fails fast if either is unset; if you invoke
+  `coder-eval` directly, export them yourself or the arm silently measures a
+  smaller set of skills (or none).
+- **The harness loads `skill-data` as skills; production does not.** The
+  CLI-served content skills (`core`, `cli-api`, `cli-docs`, and the project
+  skills) live in `src/wagtail_cli/skill-data/`, outside the auto-loaded
+  `.agents/skills/` directory. The Promptfoo config (`opencode.json`) and the
+  Coder Eval A/B arm add `skill-data` as a skills path so those suites can keep
+  measuring the content skills directly. Only `wagtail` is auto-loadable in a
+  real install.
 - **OpenCode + Docker is unsupported in Coder Eval** (the CLI is not in its
   image), so the sandbox is a tempdir — a working directory, not a confinement
   boundary. OpenCode also ignores `allowed_tools`/`system_prompt`; the baseline

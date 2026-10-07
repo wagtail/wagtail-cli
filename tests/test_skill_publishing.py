@@ -1,7 +1,8 @@
-"""Tests for the docs-site skill publication filter.
+"""Tests for the docs-site skill publication.
 
-Only the `wagtail` skill is published to the discovery index; `cli-api` and
-`cli-docs` are bundled for the CLI to serve on demand (`wt skills get`).
+Only `wagtail` lives in `.agents/skills/`, so it is the only skill published to
+the discovery index. Everything else lives in `skill-data/` and is bundled for
+the CLI to serve on demand (`wt skills get`).
 """
 
 import importlib.util
@@ -15,13 +16,6 @@ _spec = importlib.util.spec_from_file_location("docs_hooks", HOOKS_PATH)
 assert _spec and _spec.loader
 hooks = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(hooks)
-
-
-def test_is_published_defaults_to_true():
-    assert hooks._is_published({}) is True
-    assert hooks._is_published({"name": "wagtail"}) is True
-    assert hooks._is_published({"publish": True}) is True
-    assert hooks._is_published({"publish": False}) is False
 
 
 def test_only_wagtail_is_published(tmp_path):

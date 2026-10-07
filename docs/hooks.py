@@ -28,7 +28,8 @@ import yaml
 
 # --- Constants ---------------------------------------------------------------
 
-# Canonical skill source files under the package, bundled with the published docs.
+# Published agent skills, bundled with the package and copied into the docs
+# site. CLI-only content lives in `src/wagtail_cli/skill-data/` instead.
 SKILLS_DIR = Path(__file__).parent.parent / "src" / "wagtail_cli" / ".agents" / "skills"
 
 WELL_KNOWN_DIR = ".well-known/agent-skills"
@@ -44,9 +45,8 @@ SKILL_VERSION = "1.0.0"
 # Human-readable catalog titles keyed by skill directory name.
 SKILL_DISPLAY_NAMES = {
     "wagtail": "Wagtail from the terminal",
-    "cli-api": "Wagtail API via the wagtail-cli",
-    "cli-docs": "Wagtail documentation via the wagtail-cli",
 }
+
 # Skill subdirectories that are development-only and must not be published.
 SKILL_IGNORE = shutil.ignore_patterns("evals", "__pycache__", ".*")
 
@@ -95,15 +95,6 @@ def _discover_skills() -> list[Path]:
     return sorted(SKILLS_DIR.glob("*/SKILL.md"))
 
 
-def _is_published(frontmatter: dict[str, Any]) -> bool:
-    """Whether a skill belongs in the published discovery index.
-
-    Skills bundled only for the CLI to serve on demand carry ``publish: false``
-    and are shipped in the package but not the docs site.
-    """
-    return frontmatter.get("publish", True) is not False
-
-
 def _site_root(config: dict[str, Any]) -> str:
     """Return the site's root URL, with a trailing slash stripped."""
     return str(config.get("site_url", "")).rstrip("/")
@@ -149,13 +140,6 @@ def on_post_build(config: dict[str, Any], **kwargs: Any) -> None:
 
     for skill_path in _discover_skills():
         name = skill_path.parent.name
-
-        # Parse frontmatter first: a skill marked `publish: false` is bundled
-        # for the CLI to serve but must not appear in the discovery index.
-        frontmatter = _parse_frontmatter(skill_path.read_text(encoding="utf-8"))
-        if not _is_published(frontmatter):
-            continue
-
         target_dir = skills_out / name
         # Copy the whole skill directory: SKILL.md links to its references/
         # with relative paths, so they must be published alongside it.
@@ -163,6 +147,8 @@ def on_post_build(config: dict[str, Any], **kwargs: Any) -> None:
             skill_path.parent, target_dir, ignore=SKILL_IGNORE, dirs_exist_ok=True
         )
 
+        # Parse frontmatter for metadata.
+        frontmatter = _parse_frontmatter(skill_path.read_text(encoding="utf-8"))
         description = frontmatter.get("description", "")
         display_name = SKILL_DISPLAY_NAMES.get(name, name)
         digest = _sha256(skill_path)

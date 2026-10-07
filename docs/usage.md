@@ -195,6 +195,14 @@ Read the [agent skills](agent-skills.md) bundled with this CLI. Agents load a
 skill to get instructions that match the installed version, rather than a
 snapshot downloaded earlier.
 
+The published `wagtail` skill lives in `.agents/skills/`, so agent tooling can
+install and auto-load it. It is the entry point, so `wt skills list` and
+`wt skills get --all` skip it (fetch it explicitly with `wt skills get wagtail`).
+The CLI-only content lives in `skill-data/`, outside that directory, so it is
+never auto-loaded — only served by `wt skills get`: `core`, `cli-api`,
+`cli-docs`, and the Wagtail project skills `api`, `backend`,
+`content-modeling`, `frontend`, and `upgrade-wagtail`.
+
 ```
 wt skills                       # list available skills
 wt skills list
@@ -205,21 +213,21 @@ wt skills path [NAME]
 | Command | Description |
 |---|---|
 | `wt skills` / `wt skills list` | List the visible skills with their descriptions. |
-| `wt skills get NAME` | Print a skill's `SKILL.md`. Accepts the full name (`cli-api`) or its short alias (`api`). |
-| `wt skills get --all` | Print every visible skill. The hidden `wagtail` discovery stub is excluded. |
+| `wt skills get NAME` | Print a skill's `SKILL.md`. Accepts the full name (`cli-api`) or its short alias (`docs` for `cli-docs`). |
+| `wt skills get --all` | Print every visible skill. The `wagtail` stub and any hidden skill are skipped. |
 | `wt skills get NAME --full` | Also print the skill's `references/` and `templates/` files. |
-| `wt skills path [NAME]` | Print the skills directory, or a single skill's directory. |
+| `wt skills path [NAME]` | Print the skills directories, or a single skill's directory. |
 
 ```bash
-wt skills get api                     # short alias for cli-api
+wt skills get docs            # short alias for cli-docs
 wt skills get cli-api --full  # plus references/commands.md etc.
-wt skills get cli-docs
+wt skills get content-modeling
 ```
 
 Skill content is printed as-is (Markdown) by default; pass `--json` (globally
 or on the command) for machine-readable output, including JSON errors. Set
-`WAGTAIL_CLI_SKILLS_DIR` to serve skills from a different directory, for
-development.
+`WAGTAIL_CLI_SKILLS_DIR` to serve skills from a single alternative directory,
+for development and tests.
 
 ---
 

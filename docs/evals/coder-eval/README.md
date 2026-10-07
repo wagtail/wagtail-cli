@@ -122,11 +122,16 @@ skills:
 opencode debug skill --pure   # lists every skill the CLI can load
 ```
 
-The run log prints the resolved path on the with-skill arm:
+The run log prints the resolved paths on the with-skill arm — one for the
+published `wagtail` skill, one for the `skill-data/` content skills:
 
 ```
-opencode: injecting 1 skill path(s) via OPENCODE_CONFIG_CONTENT: ['…/.agents/skills']
+opencode: injecting 2 skill path(s) via OPENCODE_CONFIG_CONTENT: ['…/.agents/skills', '…/skill-data']
 ```
+
+`skill-data/` has no `skills/` subdir, so coder-eval treats it as a bare skills
+root (see `agents/_skills.py`). Only `wagtail` is auto-loadable in a real
+install; the harness loads `skill-data` to measure the content skills directly.
 
 If that line is absent, the arm is silently measuring the bare model.
 

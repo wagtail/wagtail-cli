@@ -108,6 +108,8 @@ eval-coder *args="":
     cd docs/evals/coder-eval
     export SKILLS_PATH="$PWD/../../../src/wagtail_cli/.agents"
     [ -d "$SKILLS_PATH/skills" ] || { echo "no skills at $SKILLS_PATH — the with-skill arm would run bare." >&2; exit 1; }
+    export SKILL_DATA_PATH="$PWD/../../../src/wagtail_cli/skill-data"
+    [ -d "$SKILL_DATA_PATH" ] || { echo "no skill-data at $SKILL_DATA_PATH — the with-skill arm would miss the content skills." >&2; exit 1; }
     coder-eval run -e experiments/wagtail_skills_ab.yaml tasks/*.yaml "$@"
 
 # Open the Coder Eval report for the most recent run (or pass a run directory).

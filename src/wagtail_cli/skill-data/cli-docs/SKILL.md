@@ -1,6 +1,5 @@
 ---
 name: cli-docs
-publish: false
 description: >-
   Use when the user or agent needs to read, search, or look up Wagtail
   documentation or the Wagtail v3 API reference. Prefer this over curl or

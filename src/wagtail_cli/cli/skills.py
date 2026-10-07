@@ -1,9 +1,17 @@
 """`wt skills`: serve the agent skills bundled with this CLI.
 
-The skills are the same files the documentation site publishes under
-``.well-known/agent-skills/``. Serving them here means an agent can load
-content that always matches the installed CLI version, rather than a snapshot
-it may have downloaded earlier.
+Skills live in two places:
+
+- ``.agents/skills/`` — published agent skills (the ``wagtail`` stub). These
+  are the files the documentation site serves under ``.well-known/agent-skills/``
+  and that external tools install, so they can be loaded automatically.
+- ``skill-data/`` — content the CLI serves on demand: ``core``, ``cli-api``,
+  ``cli-docs``, and the Wagtail project skills ``api``, ``backend``,
+  ``content-modeling``, ``frontend``, and ``upgrade-wagtail``. It is
+  deliberately outside ``.agents/`` so no skill loader picks it up.
+
+Serving both from the CLI means an agent can load content that always matches
+the installed CLI version, rather than a snapshot it may have downloaded earlier.
 """
 
 from __future__ import annotations
@@ -24,15 +32,21 @@ from ._shared import LOCAL_JSON_OPTION as _LOCAL_JSON_OPTION
 from .main import appify, resolve_output_format
 
 
-# Bundled with the package: `src/wagtail_cli/.agents/skills/` (see
-# `[tool.uv.build-backend]` in pyproject.toml, which keeps dot-directories).
-BUNDLED_SKILLS_DIR = Path(__file__).resolve().parent.parent / ".agents" / "skills"
+# Bundled with the package, relative to `src/wagtail_cli/`. `.agents/skills/`
+# holds auto-loadable agent skills (published by docs/hooks.py); `skill-data/`
+# holds CLI-served content that must not be auto-loaded.
+PACKAGE_DIR = Path(__file__).resolve().parent.parent
+SKILLS_DIRS = (PACKAGE_DIR / ".agents" / "skills", PACKAGE_DIR / "skill-data")
 
 SKILLS_DIR_ENV = "WAGTAIL_CLI_SKILLS_DIR"
-"""Override the skills directory, for development and tests."""
+"""Override the skills directories with a single directory, for tests."""
 
 PREFIX = "cli-"
 """Skill names carry this prefix; the suffix is also accepted as a short alias."""
+
+DISCOVERY_STUB = "wagtail"
+"""The discovery stub is the entry point, so it is never listed or loaded with
+`--all`. It can still be fetched by name (`wt skills get wagtail`)."""
 
 _REFERENCE_DIRS = ("references", "templates")
 
@@ -44,6 +58,11 @@ class Skill:
     dir: Path
     hidden: bool
     short_description: str = ""
+
+
+def _is_visible(skill: Skill) -> bool:
+    """Whether a skill appears in `wt skills list` or `wt skills get --all`."""
+    return not skill.hidden and skill.name != DISCOVERY_STUB
 
 
 def _parse_frontmatter(content: str) -> dict[str, Any]:
@@ -105,38 +124,44 @@ def _parse_frontmatter(content: str) -> dict[str, Any]:
     return meta
 
 
-def _skills_root() -> Path:
+def _skills_dirs() -> list[Path]:
+    """Return the directories to search for skills, env override first."""
     override = os.environ.get(SKILLS_DIR_ENV)
-    return Path(override) if override else BUNDLED_SKILLS_DIR
+    if override:
+        return [Path(override)]
+    return list(SKILLS_DIRS)
 
 
 def _load_skills() -> list[Skill]:
-    root = _skills_root()
-    if not root.is_dir():
+    roots = _skills_dirs()
+    if not any(root.is_dir() for root in roots):
         raise WgtlError(
-            f"Skills directory not found: {root}. "
+            f"Skills directory not found: {', '.join(str(root) for root in roots)}. "
             f"Set {SKILLS_DIR_ENV} or reinstall wagtail-cli."
         )
     skills = []
-    for entry in sorted(root.iterdir()):
-        skill_md = entry / "SKILL.md"
-        if not entry.is_dir() or not skill_md.is_file():
+    for root in roots:
+        if not root.is_dir():
             continue
-        meta = _parse_frontmatter(skill_md.read_text(encoding="utf-8"))
-        skills.append(
-            Skill(
-                name=meta["name"] or entry.name,
-                description=meta["description"],
-                dir=entry,
-                hidden=meta["hidden"],
-                short_description=meta["short_description"],
+        for entry in sorted(root.iterdir()):
+            skill_md = entry / "SKILL.md"
+            if not entry.is_dir() or not skill_md.is_file():
+                continue
+            meta = _parse_frontmatter(skill_md.read_text(encoding="utf-8"))
+            skills.append(
+                Skill(
+                    name=meta["name"] or entry.name,
+                    description=meta["description"],
+                    dir=entry,
+                    hidden=meta["hidden"],
+                    short_description=meta["short_description"],
+                )
             )
-        )
     return skills
 
 
 def _aliases(skills: list[Skill]) -> dict[str, str]:
-    """Map short names (`api`) to skill names (`cli-api`)."""
+    """Map short names (`docs`) to skill names (`cli-docs`)."""
     names = {skill.name for skill in skills}
     aliases = {}
     for skill in skills:
@@ -191,7 +216,7 @@ def _reference_files(skill_dir: Path) -> list[tuple[str, str]]:
 
 
 def _list_skills(ctx: typer.Context) -> None:
-    skills = [skill for skill in _load_skills() if not skill.hidden]
+    skills = [skill for skill in _load_skills() if _is_visible(skill)]
     if _wants_json(ctx):
         _emit(
             ctx,
@@ -220,7 +245,7 @@ def _list_skills(ctx: typer.Context) -> None:
 def _get_skills(ctx: typer.Context, names: list[str], all_skills: bool, full: bool):
     skills = _load_skills()
     if all_skills:
-        targets = [skill for skill in skills if not skill.hidden]
+        targets = [skill for skill in skills if _is_visible(skill)]
     else:
         if not names:
             raise UsageError("No skill name provided. Usage: wt skills get <name>")
@@ -262,9 +287,9 @@ def _get_skills(ctx: typer.Context, names: list[str], all_skills: bool, full: bo
 
 def _show_path(ctx: typer.Context, name: str | None) -> None:
     skills = _load_skills()
-    root = _skills_root()
     if name is None:
-        _emit(ctx, {"path": str(root)}, str(root))
+        roots = [str(root) for root in _skills_dirs()]
+        _emit(ctx, {"paths": roots}, "\n".join(roots))
         return
     skill = _resolve(skills, name)
     if skill is None:
@@ -275,7 +300,7 @@ def _show_path(ctx: typer.Context, name: str | None) -> None:
 ALL_OPTION = typer.Option(
     False,
     "--all",
-    help="Load every visible skill (excludes the hidden discovery stub).",
+    help="Load every visible skill (the `wagtail` stub and hidden skills are skipped).",
 )
 
 FULL_OPTION = typer.Option(
@@ -324,7 +349,8 @@ def list_skills(
 def get(
     ctx: typer.Context,
     names: list[str] = typer.Argument(  # noqa: B008
-        None, help="Skill names, e.g. `cli-api` or the short alias `api`."
+        None,
+        help="Skill names, e.g. `cli-api`, or the short alias `docs` for `cli-docs`.",
     ),
     all_skills: bool = ALL_OPTION,
     full: bool = FULL_OPTION,
@@ -340,7 +366,7 @@ def get(
 def path(
     ctx: typer.Context,
     name: str | None = typer.Argument(
-        None, help="Skill name; with no argument, print the skills directory."
+        None, help="Skill name; with no argument, print the skills directories."
     ),
     json: bool = _LOCAL_JSON_OPTION,
     human: bool = _LOCAL_HUMAN_OPTION,

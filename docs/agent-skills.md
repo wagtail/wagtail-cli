@@ -6,11 +6,14 @@ Wagtail CLI includes [agent skills](https://agentskills.io/) that help agents ge
 
 - [wagtail](https://wagtail.github.io/wagtail-cli/.well-known/agent-skills/wagtail/SKILL.md): triggers on any Wagtail task and routes the agent to the detailed workflow for the task at hand.
 
-`wagtail` is the only skill published here. The detailed content it loads is
-bundled with the CLI and served on demand by [`wt skills`](#loading-skills-from-the-cli),
-so it always matches the installed version. There are two of those skills today:
-`cli-api` (operate a site via the v3 API) and `cli-docs` (read and search the
-documentation).
+`wagtail` is the only skill published here, and the only one that lives in the
+package's `.agents/skills/` directory, so agent tooling can install and load it.
+The detailed content it loads is bundled for the CLI to serve on demand under
+`skill-data/` and is never auto-loaded. `wt skills list` lists them: `core`
+(orientation for work on Wagtail projects), `cli-api` (operate a site via the
+v3 API), `cli-docs` (read and search the documentation), and the specialized
+project skills `api`, `backend`, `content-modeling`, `frontend`, and
+`upgrade-wagtail`.
 
 We make the skill available in multiple formats, for compatibility with a wide range of tools.
 
@@ -22,7 +25,7 @@ downloaded earlier. The `wagtail` stub exists to tell agents to do this:
 
 ```bash
 wt skills list                 # skills available on the installed version
-wt skills get cli-api          # or the short alias `api`
+wt skills get cli-api          # or the short alias `docs` for cli-docs
 wt skills get cli-api --full   # include references/ and templates/
 wt skills get cli-docs         # read and search the documentation
 wt skills path cli-api         # where the skill's files live on disk
@@ -30,11 +33,17 @@ wt skills path cli-api         # where the skill's files live on disk
 
 `wt skills get` prints the skill's `SKILL.md`; `--full` appends its reference
 files, which is how the cli-api skill exposes its full command and
-content-writing references. Add `--json` for machine-readable output.
+content-writing references. `wt skills list` and `--all` skip the `wagtail`
+stub itself: it is the entry point, not one of the skills to load. Add `--json`
+for machine-readable output.
 
 ## In the installed package
 
-Skills are bundled with the installed package and can be found under `wagtail_cli/.agents/skills/` in site-packages. Only `wagtail` is published to the discovery index; the `cli-api` and `cli-docs` content is bundled for the CLI to serve. You can manually create symlinks, use the [Library Skills CLI](https://library-skills.io/) to manage them, or have agents load them with [`wt skills`](#loading-skills-from-the-cli).
+The `wagtail` skill is bundled under `wagtail_cli/.agents/skills/` in
+site-packages, and the CLI-served content under `wagtail_cli/skill-data/`. You
+can manually create symlinks, use the [Library Skills CLI](https://library-skills.io/)
+to manage the `wagtail` skill, or have agents load any of them with
+[`wt skills`](#loading-skills-from-the-cli).
 
 ## Well Known Discovery
 

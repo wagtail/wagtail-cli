@@ -63,6 +63,7 @@ providers:
         read:
           '*': deny
           'src/wagtail_cli/.agents/skills/**': allow
+          'src/wagtail_cli/skill-data/**': allow
 
 evaluateOptions:
   maxConcurrency: 2
