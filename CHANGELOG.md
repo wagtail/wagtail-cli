@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `wt skills` serves the agent skills bundled with the installed CLI.
+- `wt skills` serves the agent skills bundled with the installed CLI, including the Wagtail project skills `api`, `backend`, `content-modeling`, `frontend`, and `upgrade-wagtail`.
 - `--json`, `--human`, `--select`, and `--dry-run` are now accepted on every `api`
   command as well as globally.
 - `wt api schema show` renders human-readable output with `--human`.
@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Replace separate skills with a single lightweight `wagtail` skill that triggers the appropriate detailed skill (`cli-api`, `cli-docs`) served by the CLI.
+- Replace separate skills with a single lightweight `wagtail` skill that triggers the appropriate detailed skill served by th9e CLI.
 
 ## [0.3.0] - 2026-09-22
 
