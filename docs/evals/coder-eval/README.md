@@ -6,31 +6,31 @@ Promptfoo remains the primary harness; this suite runs alongside it. Neither rep
 
 ## Why run both
 
-| Metric | Promptfoo | Coder Eval |
-| --- | --- | --- |
-| Overall time spent | Not reported | `duration` per task, aggregated per variant |
-| Tokens needed | Not reported | `token_usage` per task, aggregated per variant |
-| Tool calls needed | Only if the answer text is parsed | `commands_efficiency` + `CommandTelemetry`, counted from real calls |
-| Skill activation | Custom provider config | `skill_triggered` criterion, first-class |
-| Outcome grading | Python grader over the answer | `run_command` / file criteria over the sandbox |
-| Statistics | Single run | `repeats` + bootstrap CIs + paired mean-difference test |
+| Metric             | Promptfoo                         | Coder Eval                                                          |
+| ------------------ | --------------------------------- | ------------------------------------------------------------------- |
+| Overall time spent | Not reported                      | `duration` per task, aggregated per variant                         |
+| Tokens needed      | Not reported                      | `token_usage` per task, aggregated per variant                      |
+| Tool calls needed  | Only if the answer text is parsed | `commands_efficiency` + `CommandTelemetry`, counted from real calls |
+| Skill activation   | Custom provider config            | `skill_triggered` criterion, first-class                            |
+| Outcome grading    | Python grader over the answer     | `run_command` / file criteria over the sandbox                      |
+| Statistics         | Single run                        | `repeats` + bootstrap CIs + paired mean-difference test             |
 
-Promptfoo has to *infer* what the agent did by re-parsing a markdown bash block from its reply. Coder Eval runs a real agent in a sandbox and records what it actually ran, so the efficiency metrics are first-class rather than inferred. The two suites agree on what "correct" means because they share their match rules (below).
+Promptfoo has to _infer_ what the agent did by re-parsing a markdown bash block from its reply. Coder Eval runs a real agent in a sandbox and records what it actually ran, so the efficiency metrics are first-class rather than inferred. The two suites agree on what "correct" means because they share their match rules (below).
 
 ## Tasks
 
 One Coder Eval task per row of the Promptfoo suites.
 
-| Coder Eval task | Promptfoo row | Suite |
-| --- | --- | --- |
-| `api_publish_blog_post` | Publish a blog post with heading, paragraph and author | cli-api |
-| `api_update_draft` | Update a draft without publishing it | cli-api |
-| `api_unpublish` | Take a page offline without deleting it | cli-api |
-| `api_list_posts` | List blog posts under a section within the page cap | cli-api |
-| `api_upload_image` | Upload an image with a title | cli-api |
-| `docs_streamfield_validation` | Find and read the page on StreamField validation | cli-docs |
-| `docs_v3_create_operation` | Pull up the v3 API operation that creates a page | cli-docs |
-| `docs_images_topic` | Read the images topic | cli-docs |
+| Coder Eval task               | Promptfoo row                                          | Suite    |
+| ----------------------------- | ------------------------------------------------------ | -------- |
+| `api_publish_blog_post`       | Publish a blog post with heading, paragraph and author | cli-api  |
+| `api_update_draft`            | Update a draft without publishing it                   | cli-api  |
+| `api_unpublish`               | Take a page offline without deleting it                | cli-api  |
+| `api_list_posts`              | List blog posts under a section within the page cap    | cli-api  |
+| `api_upload_image`            | Upload an image with a title                           | cli-api  |
+| `docs_streamfield_validation` | Find and read the page on StreamField validation       | cli-docs |
+| `docs_v3_create_operation`    | Pull up the v3 API operation that creates a page       | cli-docs |
+| `docs_images_topic`           | Read the images topic                                  | cli-docs |
 
 `wagtail_skill_triggers.yaml` is separate from the table above: a single dataset task whose 21 rows are the Wagtail ai-evals atomic task corpus prompts, copied verbatim (`ai-evals/tasks/atomic/<name>/instruction.md`). It measures trigger behaviour only — a stacked `skill_triggered` criterion reports a confusion matrix for the `wagtail` skill. Every development prompt is a positive; `hello-world` is the corpus control (negative); the `api-v3-recipe-editing` holdout is excluded. Its Promptfoo counterpart is `../../wagtail_trigger_skill.yaml`.
 

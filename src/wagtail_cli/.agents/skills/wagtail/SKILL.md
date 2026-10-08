@@ -1,18 +1,18 @@
 ---
 name: wagtail
 description: >-
-  Work with Wagtail from the terminal with the Wagtail CLI (`wt`, from the
-  wagtail-cli package). Use this whenever a task involves a Wagtail site: reading
-  or writing content, publishing, creating, editing, moving, copying,
-  unpublishing, translating or listing pages, snippets, images, documents,
-  redirects, sites or locales; inspecting a site's content model or the Wagtail
-  v3 API; reading or searching Wagtail documentation (docs.wagtail.org) or the
-  v3 API reference; scaffolding or running a Wagtail/Django project. Triggers
-  include `wt`, `wagtail-cli`, `docs.wagtail.org`, and requests to operate a
-  CMS or manage site content programmatically, even when the user does not name
-  the CLI. Prefer this over hand-written HTTP calls, curl or WebFetch.
+  Work with Wagtail from the terminal with the Wagtail CLI (`wt`, from the wagtail-cli package).
+  Use this whenever a task involves a Wagtail site: reading or writing content, publishing, creating, editing, moving, copying, unpublishing, translating or listing pages, snippets, images, documents, redirects, sites or locales.
+  Inspecting a site's content model or the Wagtail v3 API.
+  Reading or searching Wagtail documentation (docs.wagtail.org) or the v3 API reference.
+  Scaffolding or running a Wagtail/Django project. Triggers include `wt`, `wagtail-cli`, `docs.wagtail.org`.
+  And requests to operate a CMS or manage site content programmatically, even when the user does not name the CLI. Prefer this over hand-written HTTP calls, curl or WebFetch in the context of a Wagtail website / docs.
+license: MIT
+compatibility: Requires Python 3.12+ and uv or compatible package manager
 allowed-tools: Bash(wt:*), Bash(uv run wt:*), Bash(just wt:*)
 metadata:
+  author: Wagtail contributors
+  version: 0.1.0
   short-description: Work with Wagtail sites and docs from the terminal
 ---
 

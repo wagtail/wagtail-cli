@@ -12,10 +12,10 @@ For each skill, we run two suites: a baseline with nothing loaded, and one with 
 
 We run these suites with two tools, on the same tasks and the same model, so the results can be compared and either number trusted:
 
-| | what it grades | what it is good for |
-| --- | --- | --- |
-| [Promptfoo](https://promptfoo.dev/) | the agent's written **answer** | command correctness and rubric grading |
-| [Coder Eval](coder-eval/README.md) | the agent's **trajectory** in a sandbox | time, tokens and tool calls per arm |
+|                                     | what it grades                          | what it is good for                    |
+| ----------------------------------- | --------------------------------------- | -------------------------------------- |
+| [Promptfoo](https://promptfoo.dev/) | the agent's written **answer**          | command correctness and rubric grading |
+| [Coder Eval](coder-eval/README.md)  | the agent's **trajectory** in a sandbox | time, tokens and tool calls per arm    |
 
 Promptfoo is the primary harness. Coder Eval runs alongside it to add the efficiency metrics Promptfoo cannot report, and to check the two agree on what "correct" means. Neither replaces the other today; see [coder-eval/README.md](coder-eval/README.md) for the trade-offs.
 
@@ -67,11 +67,11 @@ Promptfoo numbers, post-leak-fix (see caveats): `--no-cache`, promptfoo 0.123.1,
 
 ### cli-api (8 graded rows + 2 activation)
 
-| Model | baseline | skill | activation |
-| --- | --- | --- | --- |
-| z-ai/glm-5.3-flash (eval-fIc-2026-09-21T16:09:08) | 1/8 | 8/10 | 2/2 |
-| qwen/qwen3.8-27b (eval-RNf-2026-09-21T16:14:24) | 1/8 | 8/10 | 2/2 |
-| qwen/qwen3.5-9b (eval-FZi-2026-09-21T16:32:38) | 1/8 | 5/10 | 2/2 |
+| Model                                             | baseline | skill | activation |
+| ------------------------------------------------- | -------- | ----- | ---------- |
+| z-ai/glm-5.3-flash (eval-fIc-2026-09-21T16:09:08) | 1/8      | 8/10  | 2/2        |
+| qwen/qwen3.8-27b (eval-RNf-2026-09-21T16:14:24)   | 1/8      | 8/10  | 2/2        |
+| qwen/qwen3.5-9b (eval-FZi-2026-09-21T16:32:38)    | 1/8      | 5/10  | 2/2        |
 
 - Every baseline passes exactly one row: the StreamField replace-whole rubric, answered from generic Wagtail knowledge. Every command row now fails honestly — the models suggest `git clone` of the Wagtail repo or generic curl against the API instead of `wt`.
 - Every skill arm misses the create row: the models follow the skill's schema-check strategy but still build partly generic payloads (`size: h2` on the heading, no `blog_person_relationship`) instead of the demo's shapes — the persistent hard row across configs and models.
@@ -80,9 +80,9 @@ Promptfoo numbers, post-leak-fix (see caveats): `--no-cache`, promptfoo 0.123.1,
 
 ### cli-docs (4 graded rows + 2 activation), z-ai/glm-5.3-flash, eval-Y0n-2026-09-21T15:06:49
 
-| Model | baseline | skill | activation |
-| --- | --- | --- | --- |
-| z-ai/glm-5.3-flash | 0/4 | 4/4 | 2/2 |
+| Model              | baseline | skill | activation |
+| ------------------ | -------- | ----- | ---------- |
+| z-ai/glm-5.3-flash | 0/4      | 4/4   | 2/2        |
 
 - Baseline fails every row from pure memory (clone-the-repo and curl advice, invented docs paths); the skill arm passes everything — the intended contrast. Numbers are from the intermediate all-read-disabled config; the scoped read only adds access the skill arm already used.
 
@@ -90,30 +90,30 @@ Promptfoo numbers, post-leak-fix (see caveats): `--no-cache`, promptfoo 0.123.1,
 
 `tensorx/deepseek/deepseek-v4.1-flash`, 5 replicates per (task, arm), 8 tasks × 2 arms, graded by `qwen/qwen3.8-flash-next` (a different family from the model under test). Run `2026-09-29_17-00-11`. Bold marks the better arm.
 
-| Metric | baseline | with-skill |
-| --- | --- | --- |
-| Mean score | 0.548 ± 0.172 | **0.925 ± 0.074** |
-| Tasks won | 0/8 | **8/8** |
-| Task pass rate | 0% | 37.5% |
-| Tool calls per run | 13.0 | **8.4** |
-| Assistant turns per run | 10.2 | **8.2** |
-| Tokens per run | 218,188 | **166,784** |
-| Duration per run | 72.5s | **54.2s** |
+| Metric                  | baseline      | with-skill        |
+| ----------------------- | ------------- | ----------------- |
+| Mean score              | 0.548 ± 0.172 | **0.925 ± 0.074** |
+| Tasks won               | 0/8           | **8/8**           |
+| Task pass rate          | 0%            | 37.5%             |
+| Tool calls per run      | 13.0          | **8.4**           |
+| Assistant turns per run | 10.2          | **8.2**           |
+| Tokens per run          | 218,188       | **166,784**       |
+| Duration per run        | 72.5s         | **54.2s**         |
 
 Paired mean difference (baseline − with-skill): **−0.378** (95% CI −0.505 to −0.251, Cohen's d = −2.49, p < 0.001). The skill arm wins every task, uses ~24% fewer tokens, ~35% fewer tool calls, and ~25% less wall-clock time.
 
 Per-task scores (baseline → with-skill):
 
-| Task | baseline | with-skill |
-| --- | --- | --- |
-| `unpublish_not_delete` | 0.667 | 1.000 |
-| `list_blog_posts` | 0.600 | 1.000 |
-| `docs_images_topic` | 0.417 | 0.984 |
-| `publish_blog_post` | 0.200 | 0.800 |
-| `update_draft_no_publish` | 0.600 | 0.867 |
-| `docs_v3_create_operation` | 0.730 | 0.946 |
-| `docs_streamfield_validation` | 0.502 | 0.940 |
-| `upload_image` | 0.667 | 0.867 |
+| Task                          | baseline | with-skill |
+| ----------------------------- | -------- | ---------- |
+| `unpublish_not_delete`        | 0.667    | 1.000      |
+| `list_blog_posts`             | 0.600    | 1.000      |
+| `docs_images_topic`           | 0.417    | 0.984      |
+| `publish_blog_post`           | 0.200    | 0.800      |
+| `update_draft_no_publish`     | 0.600    | 0.867      |
+| `docs_v3_create_operation`    | 0.730    | 0.946      |
+| `docs_streamfield_validation` | 0.502    | 0.940      |
+| `upload_image`                | 0.667    | 0.867      |
 
 Notes:
 

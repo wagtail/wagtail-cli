@@ -8,14 +8,14 @@ New to the CLI? Follow [Getting started](getting-started.md) for an end-to-end w
 
 Available on `wt api` invocations (placed before `api` on the command line):
 
-| Flag | Description |
-|---|---|
-| `--url URL` | API base URL (overrides config/env). |
-| `--token TOKEN` | API token (overrides config/env). |
-| `--json` | Force JSON output. |
-| `--human` | Force human-readable output. |
-| `-v` / `--verbose` | Print HTTP request/response details to stderr. |
-| `--dry-run` | Print the request that would be sent, without sending it. |
+| Flag                 | Description                                                                       |
+| -------------------- | --------------------------------------------------------------------------------- |
+| `--url URL`          | API base URL (overrides config/env).                                              |
+| `--token TOKEN`      | API token (overrides config/env).                                                 |
+| `--json`             | Force JSON output.                                                                |
+| `--human`            | Force human-readable output.                                                      |
+| `-v` / `--verbose`   | Print HTTP request/response details to stderr.                                    |
+| `--dry-run`          | Print the request that would be sent, without sending it.                         |
 | `--select FIELD,...` | Return only selected response fields; dot paths and repeated flags are supported. |
 
 `--json` and `--human` are mutually exclusive (the CLI exits with a usage error if both are given).
@@ -69,26 +69,26 @@ wt start NAME [DIRECTORY]
 
 Positional arguments:
 
-| Arg | Description |
-|---|---|
-| `NAME` | Name of the application or project. |
+| Arg         | Description                                        |
+| ----------- | -------------------------------------------------- |
+| `NAME`      | Name of the application or project.                |
 | `DIRECTORY` | Optional destination directory, created if needed. |
 
 Options (all override the defaults, which mirror `wagtail start`):
 
-| Option | Description |
-|---|---|
-| `--template TEMPLATE` | Path or URL to load the template from (default: the custom base-page template). |
-| `-e, --extension EXT` | File extension(s) to render (default: `html,rst`, repeatable). |
-| `-n, --name FILE` | File name(s) to render (default: `Dockerfile`, repeatable). |
-| `-x, --exclude [DIR]` | Directory name(s) to exclude, in addition to `.git` and `__pycache__` (repeatable). |
-| `-v, --verbosity {0,1,2,3}` | Verbosity level. |
-| `--settings SETTINGS` | Python path to a settings module. |
-| `--pythonpath PYTHONPATH` | Directory to add to the Python path. |
-| `--traceback` | Display a full stack trace on `CommandError`. |
-| `--no-color` | Don't colorize the command output. |
-| `--force-color` | Force colorization of the command output. |
-| `--version` | Show Django's `startproject` version and exit. |
+| Option                      | Description                                                                         |
+| --------------------------- | ----------------------------------------------------------------------------------- |
+| `--template TEMPLATE`       | Path or URL to load the template from (default: the custom base-page template).     |
+| `-e, --extension EXT`       | File extension(s) to render (default: `html,rst`, repeatable).                      |
+| `-n, --name FILE`           | File name(s) to render (default: `Dockerfile`, repeatable).                         |
+| `-x, --exclude [DIR]`       | Directory name(s) to exclude, in addition to `.git` and `__pycache__` (repeatable). |
+| `-v, --verbosity {0,1,2,3}` | Verbosity level.                                                                    |
+| `--settings SETTINGS`       | Python path to a settings module.                                                   |
+| `--pythonpath PYTHONPATH`   | Directory to add to the Python path.                                                |
+| `--traceback`               | Display a full stack trace on `CommandError`.                                       |
+| `--no-color`                | Don't colorize the command output.                                                  |
+| `--force-color`             | Force colorization of the command output.                                           |
+| `--version`                 | Show Django's `startproject` version and exit.                                      |
 
 `wt start` requires `django-admin` on `PATH` (it shells out to `django-admin startproject`, since `wt` itself does not depend on Django).
 
@@ -123,12 +123,12 @@ Add `--outline` to print only the page's headings, indented by their level — a
 
 Options (placed before `api` / `search` / `PATH`):
 
-| Option | Description |
-|---|---|
-| `--docs-url URL` | Docs site base URL. Defaults to `WAGTAIL_CLI_DOCS_URL`, then `https://docs.wagtail.org`. Useful to read docs from a PR build. |
-| `--version V` | Docs version: `stable`, `latest`, or e.g. `7.2`. Defaults to the locally installed Wagtail version, then `stable`. Pages missing in that version fall back to `stable` with a note. |
-| `--language LANG` | Docs language (default: `en`, the only language published today). |
-| `--outline` | For page output: print only the headings, as an indented outline. |
+| Option            | Description                                                                                                                                                                         |
+| ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--docs-url URL`  | Docs site base URL. Defaults to `WAGTAIL_CLI_DOCS_URL`, then `https://docs.wagtail.org`. Useful to read docs from a PR build.                                                       |
+| `--version V`     | Docs version: `stable`, `latest`, or e.g. `7.2`. Defaults to the locally installed Wagtail version, then `stable`. Pages missing in that version fall back to `stable` with a note. |
+| `--language LANG` | Docs language (default: `en`, the only language published today).                                                                                                                   |
+| `--outline`       | For page output: print only the headings, as an indented outline.                                                                                                                   |
 
 ### `wt docs api`
 
@@ -170,13 +170,13 @@ wt skills get NAME [NAME...] [--all] [--full]
 wt skills path [NAME]
 ```
 
-| Command | Description |
-|---|---|
-| `wt skills` / `wt skills list` | List the visible skills with their descriptions. |
-| `wt skills get NAME` | Print a skill's `SKILL.md`. Accepts the full name (`cli-api`) or its short alias (`docs` for `cli-docs`). |
-| `wt skills get --all` | Print every visible skill. The `wagtail` stub and any hidden skill are skipped. |
-| `wt skills get NAME --full` | Also print the skill's `references/` and `templates/` files. |
-| `wt skills path [NAME]` | Print the skills directories, or a single skill's directory. |
+| Command                        | Description                                                                                               |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------- |
+| `wt skills` / `wt skills list` | List the visible skills with their descriptions.                                                          |
+| `wt skills get NAME`           | Print a skill's `SKILL.md`. Accepts the full name (`cli-api`) or its short alias (`docs` for `cli-docs`). |
+| `wt skills get --all`          | Print every visible skill. The `wagtail` stub and any hidden skill are skipped.                           |
+| `wt skills get NAME --full`    | Also print the skill's `references/` and `templates/` files.                                              |
+| `wt skills path [NAME]`        | Print the skills directories, or a single skill's directory.                                              |
 
 ```bash
 wt skills get docs            # short alias for cli-docs
@@ -196,16 +196,16 @@ Skill content is printed as-is (Markdown) by default; pass `--json` (globally or
 
 ## Exit codes
 
-| Code | Meaning |
-|---|---|
-| 0 | Success |
-| 1 | General / unexpected error |
-| 2 | Usage / argument error (incl. `--json --human`, missing `--yes`) |
-| 3 | Network / connection error |
-| 4 | Authentication error (401) |
-| 5 | Permission denied (403) |
-| 6 | Not found (404) |
-| 7 | Validation error (400/422) |
+| Code | Meaning                                                          |
+| ---- | ---------------------------------------------------------------- |
+| 0    | Success                                                          |
+| 1    | General / unexpected error                                       |
+| 2    | Usage / argument error (incl. `--json --human`, missing `--yes`) |
+| 3    | Network / connection error                                       |
+| 4    | Authentication error (401)                                       |
+| 5    | Permission denied (403)                                          |
+| 6    | Not found (404)                                                  |
+| 7    | Validation error (400/422)                                       |
 
 Errors print `Error (status): message` plus the RFC 7807 body verbatim to stderr.
 

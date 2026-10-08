@@ -43,41 +43,41 @@ Tokens carry the permissions of the user they belong to. In a Wagtail project wi
 
 ## Command map
 
-| Group | Operations |
-| --- | --- |
-| `wt api whoami`, `wt api init` | auth check; save URL + token |
-| `wt api schema list \| show TYPE` | content types; read/create/patch JSON schemas |
-| `wt api pages …` | list, find, get, create, update, delete, publish, unpublish, copy, move, revert, create-alias, convert-alias, copy-for-translation, revisions |
-| `wt api images …`, `wt api documents …` | list, get, create (upload), update (metadata), delete |
-| `wt api snippets TYPE …` | list, get, create, update, delete, publish, unpublish, revert, copy-for-translation, revisions |
-| `wt api sites …`, `wt api locales …`, `wt api redirects …` | CRUD; `redirects find --path` |
-| `wt start NAME [DIR]` | scaffold a project |
-| `wt <other>` | forwarded to `./manage.py` or `django-admin` |
+| Group                                                      | Operations                                                                                                                                    |
+| ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `wt api whoami`, `wt api init`                             | auth check; save URL + token                                                                                                                  |
+| `wt api schema list \| show TYPE`                          | content types; read/create/patch JSON schemas                                                                                                 |
+| `wt api pages …`                                           | list, find, get, create, update, delete, publish, unpublish, copy, move, revert, create-alias, convert-alias, copy-for-translation, revisions |
+| `wt api images …`, `wt api documents …`                    | list, get, create (upload), update (metadata), delete                                                                                         |
+| `wt api snippets TYPE …`                                   | list, get, create, update, delete, publish, unpublish, revert, copy-for-translation, revisions                                                |
+| `wt api sites …`, `wt api locales …`, `wt api redirects …` | CRUD; `redirects find --path`                                                                                                                 |
+| `wt start NAME [DIR]`                                      | scaffold a project                                                                                                                            |
+| `wt <other>`                                               | forwarded to `./manage.py` or `django-admin`                                                                                                  |
 
 ## Rules that are easy to get wrong
 
 1. **Unwritable fields are silently dropped.**
-    - A create/update succeeds even if you pass a field missing from `create`/`patch` properties; the response just shows it empty.
-    - Check the schema, and read the result back.
-    - This can only be fixed with model code changes (`APIField("name", writable=True)`).
+   - A create/update succeeds even if you pass a field missing from `create`/`patch` properties; the response just shows it empty.
+   - Check the schema, and read the result back.
+   - This can only be fixed with model code changes (`APIField("name", writable=True)`).
 2. **`update` and `delete` need `--yes`**
-    - When run off a TTY, or they exit 2.
-    - Actions (`publish`, `unpublish`, `move`, `copy`, `revert`, …) run without a prompt.
+   - When run off a TTY, or they exit 2.
+   - Actions (`publish`, `unpublish`, `move`, `copy`, `revert`, …) run without a prompt.
 3. **Page references.**
-    - `--parent` and `--destination` take an id or a URL path like `/blog/`.
-    - List filters (`--child-of`, `--descendant-of`, `--ancestor-of`) take an id or `root`.
-    - Path to id: `wt --json api pages find --path /blog/` (the `location` ends in `/pages/<id>/`).
+   - `--parent` and `--destination` take an id or a URL path like `/blog/`.
+   - List filters (`--child-of`, `--descendant-of`, `--ancestor-of`) take an id or `root`.
+   - Path to id: `wt --json api pages find --path /blog/` (the `location` ends in `/pages/<id>/`).
 4. **Live vs draft.** `find --path` only resolves live pages (404 = draft).
-    - Authenticated `list`/`get` include drafts and expose no `live` flag, so use `find --path` or the public URL to tell.
-    - There is no anonymous mode; an unauthenticated `curl "$WAGTAIL_CLI_BASE_URL/pages/?child_of=4"` lists live pages only.
+   - Authenticated `list`/`get` include drafts and expose no `live` flag, so use `find --path` or the public URL to tell.
+   - There is no anonymous mode; an unauthenticated `curl "$WAGTAIL_CLI_BASE_URL/pages/?child_of=4"` lists live pages only.
 5. **`pages get` returns the live version.**
-    - It accepts either an ID or a URL path such as `/blog/`.
-    - path lookup is resolved inside the same CLI invocation.
-    - `--version draft` gives the latest revision (the help text says the opposite).
-    - `--html` renders rich text as display HTML.
+   - It accepts either an ID or a URL path such as `/blog/`.
+   - path lookup is resolved inside the same CLI invocation.
+   - `--version draft` gives the latest revision (the help text says the opposite).
+   - `--html` renders rich text as display HTML.
 6. **Create is a draft unless `--publish`.**
-    - `update --publish` PATCHes then publishes.
-    - A 422 on `slug` is a sibling collision; pass a unique `--slug`.
+   - `update --publish` PATCHes then publishes.
+   - A 422 on `slug` is a sibling collision; pass a unique `--slug`.
 7. **StreamField and child relations are replaced whole on update.** Read, edit the full list, resend.
 8. **Markdown input only works for top-level page rich-text fields.** Many `body` fields are StreamFields; build blocks instead (see the reference).
 9. **A 422 naming a child relation** usually means the type requires at least one row; supply it (see the reference).

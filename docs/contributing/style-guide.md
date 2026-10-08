@@ -102,15 +102,15 @@ For callouts that really do need to stand out, use MkDocs admonition syntax (`!!
 
 Use these canonical URLs for resources we link often, so links stay consistent and are cheap to update:
 
-| Resource              | URL                                              |
-| :-------------------- | :----------------------------------------------- |
-| Wagtail project       | https://wagtail.org/                             |
-| Wagtail documentation | https://docs.wagtail.org/                        |
-| Wagtail repository    | https://github.com/wagtail/wagtail               |
-| wagtail-cli on PyPI   | https://pypi.org/project/wagtail-cli/            |
-| wagtail-cli repository | https://github.com/wagtail/wagtail-cli          |
-| Wagtail roadmap       | https://github.com/wagtail/roadmap               |
-| Agent skills spec     | https://agentskills.io/                          |
+| Resource               | URL                                    |
+| :--------------------- | :------------------------------------- |
+| Wagtail project        | https://wagtail.org/                   |
+| Wagtail documentation  | https://docs.wagtail.org/              |
+| Wagtail repository     | https://github.com/wagtail/wagtail     |
+| wagtail-cli on PyPI    | https://pypi.org/project/wagtail-cli/  |
+| wagtail-cli repository | https://github.com/wagtail/wagtail-cli |
+| Wagtail roadmap        | https://github.com/wagtail/roadmap     |
+| Agent skills spec      | https://agentskills.io/                |
 
 ## Headings and titles
 

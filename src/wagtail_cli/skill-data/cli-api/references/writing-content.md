@@ -6,14 +6,14 @@ How the Wagtail v3 API represents each kind of field, and how to express it with
 
 `--field KEY:VALUE` is repeatable on `create`/`update`:
 
-| Value | Sent as |
-| --- | --- |
-| `[…` or `{…` | parsed JSON (quote it in the shell) |
-| `@file.md` | `{"format": "db_markdown", "content": "<file text>"}` |
-| `@file.json` | parsed JSON (StreamField bodies, child relations) |
-| `@file.html` / other `@file` | raw file text |
-| `@-` | stdin, raw |
-| anything else | plain string (`title:Hello`, `date_published:2026-09-18`) |
+| Value                        | Sent as                                                   |
+| ---------------------------- | --------------------------------------------------------- |
+| `[…` or `{…`                 | parsed JSON (quote it in the shell)                       |
+| `@file.md`                   | `{"format": "db_markdown", "content": "<file text>"}`     |
+| `@file.json`                 | parsed JSON (StreamField bodies, child relations)         |
+| `@file.html` / other `@file` | raw file text                                             |
+| `@-`                         | stdin, raw                                                |
+| anything else                | plain string (`title:Hello`, `date_published:2026-09-18`) |
 
 Foreign keys use the id field the schema names, usually `<name>_id`.
 
@@ -57,10 +57,10 @@ If a value must be a JSON number/boolean rather than a string and the API reject
 
 Stored as Wagtail database HTML. Two input forms for **top-level page rich text fields** (`RichTextField` on the page model):
 
-| You pass | Sent |
-| --- | --- |
-| `--field body:@post.md` | `{"format":"db_markdown","content":"…"}` — Markdown converted server-side |
-| `--field body:@post.html` or `--field body:'<p>Hi</p>'` | raw database HTML |
+| You pass                                                | Sent                                                                      |
+| ------------------------------------------------------- | ------------------------------------------------------------------------- |
+| `--field body:@post.md`                                 | `{"format":"db_markdown","content":"…"}` — Markdown converted server-side |
+| `--field body:@post.html` or `--field body:'<p>Hi</p>'` | raw database HTML                                                         |
 
 Markdown may reference Wagtail objects with `wagtail://` URLs: `[About](wagtail://page?id=3)`, `[Policy](wagtail://document?id=7)`, `![Alt](wagtail://image?id=42)`. Content not allowed by the field's `features` is silently stripped, so read the page back if fidelity matters.
 
@@ -74,11 +74,11 @@ A StreamField value is a JSON list of blocks:
 
 ```json
 [
-  {"type": "heading", "value": "Example"},
-  {"type": "paragraph", "value": "<p>Database HTML for a RichTextBlock.</p>"},
-  {"type": "image", "value": 42},
-  {"type": "quote", "value": {"text": "…", "attribution": "…"}},
-  {"type": "gallery", "value": [42, 43]}
+  { "type": "heading", "value": "Example" },
+  { "type": "paragraph", "value": "<p>Database HTML for a RichTextBlock.</p>" },
+  { "type": "image", "value": 42 },
+  { "type": "quote", "value": { "text": "…", "attribution": "…" } },
+  { "type": "gallery", "value": [42, 43] }
 ]
 ```
 
@@ -121,13 +121,13 @@ Responses include `id`, `title`, dimensions (images), `collection`, `tags`, and 
 
 Snippet endpoints are per model label and always need a token. What you can do depends on the model's mixins:
 
-| Mixin | Enables |
-| --- | --- |
-| `RevisionMixin` | `revisions list/get`, `revert` |
-| `DraftStateMixin` | drafts, `--field` writes create a revision, `publish`/`unpublish` |
-| `TranslatableMixin` | `--locale`, `--translation-of`, `copy-for-translation` |
-| `LockableMixin` | locks respected, no lock/unlock via API |
-| `WorkflowMixin` | not supported |
+| Mixin               | Enables                                                           |
+| ------------------- | ----------------------------------------------------------------- |
+| `RevisionMixin`     | `revisions list/get`, `revert`                                    |
+| `DraftStateMixin`   | drafts, `--field` writes create a revision, `publish`/`unpublish` |
+| `TranslatableMixin` | `--locale`, `--translation-of`, `copy-for-translation`            |
+| `LockableMixin`     | locks respected, no lock/unlock via API                           |
+| `WorkflowMixin`     | not supported                                                     |
 
 Calling `publish` on a model without `DraftStateMixin` fails; `create` and `update` on such a model write directly. Snippet fields follow the same `--field` rules, minus the Markdown envelope.
 

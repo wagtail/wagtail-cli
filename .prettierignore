@@ -6,8 +6,7 @@ public/
 coverage/
 **/vendor/
 _build
-# File types which Prettier supports but we don’t want auto-formatting.
-*.md
+.pytest_cache
 # Files which contain incompatible syntax.
 *.html
 /site

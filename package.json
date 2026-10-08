@@ -13,7 +13,7 @@
   },
   "scripts": {
     "lint": "npm run lint:format",
-    "lint:format": "prettier --check \"**/?(.)*.{css,scss,mjs,js,ts,tsx,json,jsonc,yaml,yml}\"",
-    "format": "prettier --write \"**/?(.)*.{css,scss,mjs,js,ts,tsx,json,jsonc,yaml,yml}\""
+    "lint:format": "prettier --check \"**/?(.)*.{css,scss,mjs,js,ts,tsx,json,jsonc,yaml,yml,md}\"",
+    "format": "prettier --write \"**/?(.)*.{css,scss,mjs,js,ts,tsx,json,jsonc,yaml,yml,md}\""
   }
 }

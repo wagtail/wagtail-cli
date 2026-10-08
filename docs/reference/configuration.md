@@ -6,14 +6,14 @@ The CLI needs a base URL and an API token. Provide them via flags, environment v
 
 Settings are resolved from highest to lowest priority:
 
-| Priority | Source | Example |
-|---|---|---|
-| 1 (highest) | CLI flags | `--url`, `--token` |
-| 2 | Environment variables | `WAGTAIL_CLI_BASE_URL`, `WAGTAIL_CLI_TOKEN`, `WAGTAIL_CLI_DOCS_URL` |
-| 3 | Project dotfile | `./.wagtail-cli.toml` |
-| 4 (lowest) | User dotfile | `~/.wagtail-cli.toml` |
+| Priority    | Source                | Example                                                             |
+| ----------- | --------------------- | ------------------------------------------------------------------- |
+| 1 (highest) | CLI flags             | `--url`, `--token`                                                  |
+| 2           | Environment variables | `WAGTAIL_CLI_BASE_URL`, `WAGTAIL_CLI_TOKEN`, `WAGTAIL_CLI_DOCS_URL` |
+| 3           | Project dotfile       | `./.wagtail-cli.toml`                                               |
+| 4 (lowest)  | User dotfile          | `~/.wagtail-cli.toml`                                               |
 
-Each key (`url`, `token`) resolves independently across the cascade — the highest source that *defines that key* wins. A project dotfile can set `url` while the environment sets `token`; both apply.
+Each key (`url`, `token`) resolves independently across the cascade — the highest source that _defines that key_ wins. A project dotfile can set `url` while the environment sets `token`; both apply.
 
 ## Environment variables
 

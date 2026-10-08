@@ -1,4 +1,5 @@
 # Site context the fixture ships, so the agent does not have to hunt for it.
+
 # Kept short and factual — the skill is what should supply command syntax.
 
 ## Wagtail demo site

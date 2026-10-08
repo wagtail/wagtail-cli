@@ -107,7 +107,7 @@ Open the page in a browser if you like: `http://127.0.0.1:9001/blog/a-philosophy
 
 ## Mutating commands: `--dry-run` and confirmation
 
-Every mutating command supports `--dry-run`, which prints the request that *would* be sent without sending it:
+Every mutating command supports `--dry-run`, which prints the request that _would_ be sent without sending it:
 
 ```bash
 wt api pages create blog.BlogPage --parent /blog/ \

@@ -44,4 +44,4 @@ id = "lint-format"
 name = "npm run lint:format"
 entry = "npm run lint:format"
 language = "system"
-types_or = ["css", "scss", "javascript", "ts", "tsx", "json", "yaml"]
+types_or = ["css", "scss", "javascript", "ts", "tsx", "json", "yaml", "markdown"]
