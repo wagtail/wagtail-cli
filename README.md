@@ -20,7 +20,7 @@ uv tool install wagtail-cli
 uvx --from wagtail-cli wt
 ```
 
-Optionally, install the one skill that helps agents with everything Wagtail. There are multiple options depending on your needs:
+Optionally, install the one skill that helps agents with everything Wagtail. There are multiple options depending on your needs. To install directly as a skill, for multiple agents / harnesses:
 
 ```bash
 # Directly with the CLI, global:
@@ -28,6 +28,8 @@ mkdir -p ~/.agents/skills/wagtail && wt skills get wagtail > ~/.agents/skills/wa
 # Directly with the CLI, local:
 mkdir -p .agents/skills/wagtail && wt skills get wagtail > .agents/skills/wagtail/SKILL.md
 ```
+
+It’s also available as a plugin, follow [Agent Plugins compatible clients](https://agent-plugins.org/compatible-clients) installation instructions, using this repository as the plugin source: `wagtail/wagtail-cli`.
 
 ## Quick start
 

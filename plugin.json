@@ -1,0 +1,10 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "wagtail-cli",
+  "version": "0.1.0",
+  "description": "Progressively-loaded agent skills for Wagtail",
+  "homepage": "https://wagtail.org/ai/agent-skills-for-developers/",
+  "repository": "https://github.com/wagtail/wagtail-cli",
+  "license": "MIT",
+  "keywords": ["wagtail", "django", "python", "cms"]
+}
