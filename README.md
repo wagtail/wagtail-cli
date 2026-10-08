@@ -18,7 +18,11 @@ Install [`wagtail-cli`](https://pypi.org/project/wagtail-cli/) from PyPI with yo
 uv tool install wagtail-cli
 # One-off usage:
 uvx --from wagtail-cli wt
+# Done!
+wt --help
 ```
+
+### Install the skill
 
 Optionally, install the one skill that helps agents with everything Wagtail. There are multiple options depending on your needs. To install directly as a skill, for multiple agents / harnesses:
 
@@ -28,6 +32,8 @@ mkdir -p ~/.agents/skills/wagtail && wt skills get wagtail > ~/.agents/skills/wa
 # Directly with the CLI, local:
 mkdir -p .agents/skills/wagtail && wt skills get wagtail > .agents/skills/wagtail/SKILL.md
 ```
+
+#### As a plugin
 
 It’s also available as a plugin, follow [Agent Plugins compatible clients](https://agent-plugins.org/compatible-clients) installation instructions, using this repository as the plugin source: `wagtail/wagtail-cli`.
 

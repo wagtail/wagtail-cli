@@ -1,63 +1,74 @@
 # Getting started
 
-`wt` is a command-line client for the Wagtail v3 API. This walkthrough drives the API with `wt` from end to end: install, point it at a site, verify auth, and publish a page with rich-text (Markdown) content.
+The CLI requires a recent Python version. Its (optional) API client requires a exposing the [v3 API](https://docs.wagtail.org/en/stable/advanced_topics/api/v3/index.html).
 
-## Requirements
+## Installation
 
-- Python 3.12 or newer.
-- A Wagtail site exposing the v3 API (Wagtail 8.0 or newer). The demo site in this repository ships with the v3 API mounted at `/api/v3/`.
-
-## 1. Install
+Install [`wagtail-cli`](https://pypi.org/project/wagtail-cli/) from PyPI with your preferred package manager, then use the `wt` CLI. Example with `uv`:
 
 ```bash
-# one-shot (no install)
-uvx --from wagtail-cli wt --help
-
-# or install permanently
+# Permanent install:
 uv tool install wagtail-cli
+# One-off usage:
+uvx --from wagtail-cli wt
+# Done!
 wt --help
 ```
 
-> `wt` installed in isolation (uv tool, pipx) runs outside your project's environment. Delegated Django commands (for example `wt runserver`) and `wt --version` automatically prefer your project's interpreter: the active `$VIRTUAL_ENV`, or a `.venv` / `venv` directory in the current directory. Alternatively run `wt` inside the project environment with `uv run --with wagtail-cli wt ...`.
+Note: some of the CLI’s functionality relies on detecting your project’s environment. We do our best to identify it, but it’s always better to run it directly within your virtual environment.
 
-## 2. Configure a site
+### Install the skill
 
-You need two things: the API base URL and a token. Start the demo site and create a token:
-
-```bash
-# from the repo root, in the demo/ project
-cd demo
-.venv/bin/python manage.py migrate
-.venv/bin/python manage.py runserver 0.0.0.0:9001
-# in another terminal:
-.venv/bin/python manage.py api_tokens create --user=demo
-# → prints a token like wagtail_xxxxxxxxxxxxxxxxxxxxxxxx
-```
-
-> The v3 API lets authenticated clients create, read, update, and manage content. Tokens are tied to user accounts; create one for a superuser or a least-privilege role.
-
-Then configure the CLI:
+Optionally, install the one skill that helps agents with everything Wagtail. There are multiple options depending on your needs. To install directly as a skill, for multiple agents / harnesses:
 
 ```bash
-# env vars (simplest; also sets it for scripts)
-export WAGTAIL_CLI_BASE_URL="http://127.0.0.1:9001/api/v3"
-export WAGTAIL_CLI_TOKEN="wagtail_xxxxxxxxxxxxxxxxxxxxxxxx"
-
-# or persist it once:
-wt api init
-# prompts for URL + token and writes ~/.wagtail-cli.toml
+# Directly with the CLI, global:
+mkdir -p ~/.agents/skills/wagtail && wt skills get wagtail > ~/.agents/skills/wagtail/SKILL.md
+# Directly with the CLI, local:
+mkdir -p .agents/skills/wagtail && wt skills get wagtail > .agents/skills/wagtail/SKILL.md
 ```
 
-See [Configuration](reference/configuration.md) for the full precedence rules.
+#### As a plugin
 
-## 3. Verify authentication
+It’s also available as a plugin, follow [Agent Plugins compatible clients](https://agent-plugins.org/compatible-clients) installation instructions, using this repository as the plugin source: `wagtail/wagtail-cli`.
+
+## Quick start
+
+### Docs access
+
+Reading the Wagtail docs needs no configuration at all:
 
 ```bash
-wt api whoami
-# {"user": {"username": "demo", ...}, "profile": {...}, "groups": []}
+wt docs releases/8.0    # release notes, as Markdown
+wt docs api             # index of v3 API operations
+wt docs search picture  # search the docs
 ```
 
-## 4. Browse pages and the content model
+### API usage
+
+You will need to configure the needed API credentials before using the API commands:
+
+```bash
+# Create your API token:
+wt api_tokens create --user=demo
+# This is the same as:
+./manage.py api_tokens create --user=demo
+
+export WAGTAIL_CLI_BASE_URL="https://cms.example.com/api/v3/"
+export WAGTAIL_CLI_TOKEN="your-api-token"
+
+wt api whoami        # verify authentication
+wt api pages list    # browse pages
+wt api schema list   # discover page types
+```
+
+If you want, you can persist the API credentials with `wt api init`. Keep the generated file private.
+
+See [Configuration](reference/configuration.md) for the full precedence rules on managing credentials.
+
+## API operations
+
+### Browse pages and the content model
 
 ```bash
 wt api pages list --limit 5        # paginated, JSON when piped
@@ -67,7 +78,7 @@ wt api schema show blog.BlogPage   # the raw JSON read/create/patch schema
 
 `pages list` is a good sanity check: an error here usually means a bad URL, token, or API path.
 
-## 5. Publish a page written in Markdown
+### Publish a page written in Markdown
 
 Create a local Markdown file:
 
@@ -96,7 +107,7 @@ What happens:
 - `--field` is repeatable and JSON-aware: values starting with `[` or `{` are parsed as JSON, so you can set StreamField bodies and structured fields directly: `--field 'tags:["bread","sourdough"]'`.
 - Without `--publish` the page is created as a draft.
 
-## 6. Verify it's live
+### Verify it's live
 
 ```bash
 wt api pages list --search "Philosophy of Bread"
@@ -105,7 +116,7 @@ wt api pages get <ID> --version live
 
 Open the page in a browser if you like: `http://127.0.0.1:9001/blog/a-philosophy-of-bread/`.
 
-## Mutating commands: `--dry-run` and confirmation
+### Mutating commands: `--dry-run` and confirmation
 
 Every mutating command supports `--dry-run`, which prints the request that _would_ be sent without sending it:
 
@@ -118,7 +129,7 @@ wt api pages create blog.BlogPage --parent /blog/ \
 
 `update` and `delete` also require confirmation (`--yes`) on a non-interactive terminal, to keep scripts from destructively mutating content by accident.
 
-## Next steps
+### Next steps
 
 - [Usage](usage.md) – the full command reference, every command and flag.
 - [Configuration](reference/configuration.md) – the config cascade, dotfiles, and environment variables.

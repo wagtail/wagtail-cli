@@ -1,10 +1,10 @@
-site_name: wagtail-cli
+site_name: Wagtail CLI
 repo_url: https://github.com/wagtail/wagtail-cli
 site_url: https://wagtail.github.io/wagtail-cli
 edit_uri: edit/main/docs/
 repo_name: wagtail-cli
 
-site_description: 'CLI client for the Wagtail v3 API'
+site_description: 'Speed up and automate Wagtail operations with the command line'
 dev_addr: localhost:8001
 
 theme:

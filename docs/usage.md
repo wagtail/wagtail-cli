@@ -1,7 +1,5 @@
 # Command reference
 
-`wt` is organized as a Typer app with three nested command groups, `api` (all Wagtail v3 API operations, including the setup commands `whoami` and `init`), `docs` (read docs.wagtail.org from the terminal), and `skills` (load the agent skills bundled with the CLI), a `start` command that scaffolds a new Django/Wagtail project, and a delegation rule: any command `wt` doesn't know is forwarded to the current project's Django management runner.
-
 New to the CLI? Follow [Getting started](getting-started.md) for an end-to-end walkthrough first.
 
 ## Global options
