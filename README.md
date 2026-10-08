@@ -1,11 +1,12 @@
 # [Wagtail CLI](https://wagtail.github.io/wagtail-cli)
 
-> 🚧 This is a prototype. Feedback very welcome! See [CMS with AI, not AI CMS: Wagtail 8.0's new API](https://wagtail.org/blog/cms-with-ai-not-ai-cms-wagtail-80s-new-api/) and [Prototyping a new CLI for Wagtail](https://wagtail.org/blog/prototyping-a-cli-for-wagtail/) for context.
+> 🚧 This is a prototype. Feedback very welcome! See [Prototyping a new CLI for Wagtail](https://wagtail.org/blog/prototyping-a-cli-for-wagtail/) for context.
 
 Speed up and automate Wagtail operations with the command line. Key features:
 
 - v3 write API client. 50+ CMS admin operations available from the terminal. To help manage local development and live sites. Manage pages, images, documents, snippets, sites, locales, redirects, and more.
 - Read and search Wagtail docs as Markdown.
+- Integrated agent skills with advanced progressive disclosure.
 - Scaffold new Django/Wagtail projects.
 
 ## Installation
@@ -19,7 +20,30 @@ uv tool install wagtail-cli
 uvx --from wagtail-cli wt
 ```
 
+Optionally, install the one skill that helps agents with everything Wagtail. There are multiple options depending on your needs:
+
+```bash
+# Directly with the CLI, global:
+mkdir -p ~/.agents/skills/wagtail && wt skills get wagtail > ~/.agents/skills/wagtail/SKILL.md
+# Directly with the CLI, local:
+mkdir -p .agents/skills/wagtail && wt skills get wagtail > .agents/skills/wagtail/SKILL.md
+```
+
 ## Quick start
+
+### Docs access
+
+Reading the Wagtail docs needs no configuration at all:
+
+```bash
+wt docs releases/8.0    # release notes, as Markdown
+wt docs api             # index of v3 API operations
+wt docs search picture  # search the docs
+```
+
+### API usage
+
+You will need to configure the needed API credentials before using the API commands:
 
 ```bash
 export WAGTAIL_CLI_BASE_URL="https://cms.example.com/api/v3/"
@@ -28,14 +52,6 @@ export WAGTAIL_CLI_TOKEN="your-api-token"
 wt api whoami        # verify authentication
 wt api pages list    # browse pages
 wt api schema list   # discover page types
-```
-
-Reading the Wagtail docs needs no configuration at all:
-
-```bash
-wt docs releases/8.0    # release notes, as Markdown
-wt docs api             # index of v3 API operations
-wt docs search picture  # search the docs
 ```
 
 Create and publish a blog page from a Markdown file:
