@@ -1,14 +1,11 @@
 # Getting started
 
-`wt` is a command-line client for the Wagtail v3 API. This walkthrough drives
-the API with `wt` from end to end: install, point it at a site, verify auth,
-and publish a page with rich-text (Markdown) content.
+`wt` is a command-line client for the Wagtail v3 API. This walkthrough drives the API with `wt` from end to end: install, point it at a site, verify auth, and publish a page with rich-text (Markdown) content.
 
 ## Requirements
 
 - Python 3.12 or newer.
-- A Wagtail site exposing the v3 API (Wagtail 8.0 or newer). The demo site in
-  this repository ships with the v3 API mounted at `/api/v3/`.
+- A Wagtail site exposing the v3 API (Wagtail 8.0 or newer). The demo site in this repository ships with the v3 API mounted at `/api/v3/`.
 
 ## 1. Install
 
@@ -21,17 +18,11 @@ uv tool install wagtail-cli
 wt --help
 ```
 
-> `wt` installed in isolation (uv tool, pipx) runs outside your project's
-> environment. Delegated Django commands (for example `wt runserver`) and
-> `wt --version` automatically prefer your project's interpreter: the active
-> `$VIRTUAL_ENV`, or a `.venv` / `venv` directory in the current directory.
-> Alternatively run `wt` inside the project environment with
-> `uv run --with wagtail-cli wt ...`.
+> `wt` installed in isolation (uv tool, pipx) runs outside your project's environment. Delegated Django commands (for example `wt runserver`) and `wt --version` automatically prefer your project's interpreter: the active `$VIRTUAL_ENV`, or a `.venv` / `venv` directory in the current directory. Alternatively run `wt` inside the project environment with `uv run --with wagtail-cli wt ...`.
 
 ## 2. Configure a site
 
-You need two things: the API base URL and a token. Start the demo site and
-create a token:
+You need two things: the API base URL and a token. Start the demo site and create a token:
 
 ```bash
 # from the repo root, in the demo/ project
@@ -43,9 +34,7 @@ cd demo
 # → prints a token like wagtail_xxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
-> The v3 API lets authenticated clients create, read, update, and manage
-> content. Tokens are tied to user accounts; create one for a superuser or a
-> least-privilege role.
+> The v3 API lets authenticated clients create, read, update, and manage content. Tokens are tied to user accounts; create one for a superuser or a least-privilege role.
 
 Then configure the CLI:
 
@@ -76,8 +65,7 @@ wt api schema list                 # registered page types and snippets
 wt api schema show blog.BlogPage   # the raw JSON read/create/patch schema
 ```
 
-`pages list` is a good sanity check: an error here usually means a bad URL,
-token, or API path.
+`pages list` is a good sanity check: an error here usually means a bad URL, token, or API path.
 
 ## 5. Publish a page written in Markdown
 
@@ -103,15 +91,9 @@ wt api pages create blog.BlogPage \
 
 What happens:
 
-- `@post.md` reads the file; because of the `.md` suffix the CLI sends the value
-  as `{"format": "db_markdown", "content": "…"}` — the API converts to database
-  HTML. A `.html` file (or a plain `--field body:'<p>…</p>'`) is sent as-is.
-  `@-` reads from stdin.
-- `--parent /blog/` resolves a URL path to a page id via the API's `find`
-  endpoint (numeric ids also work, e.g. `--parent 5`).
-- `--field` is repeatable and JSON-aware: values starting with `[` or `{` are
-  parsed as JSON, so you can set StreamField bodies and structured fields
-  directly: `--field 'tags:["bread","sourdough"]'`.
+- `@post.md` reads the file; because of the `.md` suffix the CLI sends the value as `{"format": "db_markdown", "content": "…"}` — the API converts to database HTML. A `.html` file (or a plain `--field body:'<p>…</p>'`) is sent as-is. `@-` reads from stdin.
+- `--parent /blog/` resolves a URL path to a page id via the API's `find` endpoint (numeric ids also work, e.g. `--parent 5`).
+- `--field` is repeatable and JSON-aware: values starting with `[` or `{` are parsed as JSON, so you can set StreamField bodies and structured fields directly: `--field 'tags:["bread","sourdough"]'`.
 - Without `--publish` the page is created as a draft.
 
 ## 6. Verify it's live
@@ -121,13 +103,11 @@ wt api pages list --search "Philosophy of Bread"
 wt api pages get <ID> --version live
 ```
 
-Open the page in a browser if you like:
-`http://127.0.0.1:9001/blog/a-philosophy-of-bread/`.
+Open the page in a browser if you like: `http://127.0.0.1:9001/blog/a-philosophy-of-bread/`.
 
 ## Mutating commands: `--dry-run` and confirmation
 
-Every mutating command supports `--dry-run`, which prints the request that
-*would* be sent without sending it:
+Every mutating command supports `--dry-run`, which prints the request that *would* be sent without sending it:
 
 ```bash
 wt api pages create blog.BlogPage --parent /blog/ \
@@ -136,12 +116,10 @@ wt api pages create blog.BlogPage --parent /blog/ \
 # { ...payload... }
 ```
 
-`update` and `delete` also require confirmation (`--yes`) on a non-interactive
-terminal, to keep scripts from destructively mutating content by accident.
+`update` and `delete` also require confirmation (`--yes`) on a non-interactive terminal, to keep scripts from destructively mutating content by accident.
 
 ## Next steps
 
 - [Usage](usage.md) – the full command reference, every command and flag.
-- [Configuration](reference/configuration.md) – the config cascade, dotfiles,
-  and environment variables.
+- [Configuration](reference/configuration.md) – the config cascade, dotfiles, and environment variables.
 - [Agent skills](agent-skills.md) – point an AI agent at the published skill.

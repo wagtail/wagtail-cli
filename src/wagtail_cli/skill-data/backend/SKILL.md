@@ -6,8 +6,7 @@ license: BSD-3-Clause
 
 # Wagtail backend development
 
-Preserve Wagtail's publishing, permission, and data contracts while implementing the requested behavior.
-Apply only the sections relevant to the change.
+Preserve Wagtail's publishing, permission, and data contracts while implementing the requested behavior. Apply only the sections relevant to the change.
 
 ## Work with the project's architecture
 

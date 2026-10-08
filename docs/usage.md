@@ -1,14 +1,8 @@
 # Command reference
 
-`wt` is organized as a Typer app with three nested command groups, `api` (all
-Wagtail v3 API operations, including the setup commands `whoami` and `init`),
-`docs` (read docs.wagtail.org from the terminal), and `skills` (load the agent
-skills bundled with the CLI), a `start` command that scaffolds a new
-Django/Wagtail project, and a delegation rule: any command `wt` doesn't know
-is forwarded to the current project's Django management runner.
+`wt` is organized as a Typer app with three nested command groups, `api` (all Wagtail v3 API operations, including the setup commands `whoami` and `init`), `docs` (read docs.wagtail.org from the terminal), and `skills` (load the agent skills bundled with the CLI), a `start` command that scaffolds a new Django/Wagtail project, and a delegation rule: any command `wt` doesn't know is forwarded to the current project's Django management runner.
 
-New to the CLI? Follow [Getting started](getting-started.md) for an
-end-to-end walkthrough first.
+New to the CLI? Follow [Getting started](getting-started.md) for an end-to-end walkthrough first.
 
 ## Global options
 
@@ -24,28 +18,21 @@ Available on `wt api` invocations (placed before `api` on the command line):
 | `--dry-run` | Print the request that would be sent, without sending it. |
 | `--select FIELD,...` | Return only selected response fields; dot paths and repeated flags are supported. |
 
-`--json` and `--human` are mutually exclusive (the CLI exits with a usage
-error if both are given).
+`--json` and `--human` are mutually exclusive (the CLI exits with a usage error if both are given).
 
-For agent and scripting workflows, `--select` projects the response locally
-after the API request. It is especially useful for large page responses:
+For agent and scripting workflows, `--select` projects the response locally after the API request. It is especially useful for large page responses:
 
 ```bash
 wt --json --select id,title,meta.html_url api pages list --child-of 4
 wt --json --select id,meta.html_url api pages get /blog/
 ```
 
-Collection responses retain `count` and `items`; the selected fields are
-applied to each item. JSON-mode errors are written to stderr as one compact
-`{"error": ...}` object containing the exit code, HTTP status when present,
-and the original problem body.
+Collection responses retain `count` and `items`; the selected fields are applied to each item. JSON-mode errors are written to stderr as one compact `{"error": ...}` object containing the exit code, HTTP status when present, and the original problem body.
 
 Top-level `--version` and `--help` are handled by `wt` itself:
 
-- `wt --version` prints the CLI version, plus the detected Wagtail and Django
-  versions when those tools are available.
-- `wt --help` prints this help, plus `./manage.py --help` when a `manage.py`
-  exists in the current directory.
+- `wt --version` prints the CLI version, plus the detected Wagtail and Django versions when those tools are available.
+- `wt --help` prints this help, plus `./manage.py --help` when a `manage.py` exists in the current directory.
 
 ## Version and help
 
@@ -56,16 +43,13 @@ wt --help      # CLI help, plus ./manage.py --help when present
 
 ## Delegation
 
-Any `wt <command>` that is not `api`, `docs`, `skills`, `start`, `--version`,
-or `--help` is delegated to the current project's Django management command
-runner, in this order:
+Any `wt <command>` that is not `api`, `docs`, `skills`, `start`, `--version`, or `--help` is delegated to the current project's Django management command runner, in this order:
 
 1. `./manage.py` if that file exists in the current directory;
 2. `django-admin` if the `DJANGO_SETTINGS_MODULE` environment variable is set;
 3. otherwise a clear error explaining that neither is available.
 
-Delegation lets `wt` act as a swiss-army front end for Django commands
-(`runserver`, `makemigrations`, `shell`, `check`, …) in an existing project:
+Delegation lets `wt` act as a swiss-army front end for Django commands (`runserver`, `makemigrations`, `shell`, `check`, …) in an existing project:
 
 ```bash
 wt runserver          # -> ./manage.py runserver
@@ -73,14 +57,11 @@ wt makemigrations     # -> ./manage.py makemigrations
 wt shell              # -> ./manage.py shell
 ```
 
-The remaining arguments (and flags) are passed through verbatim to the
-delegated command.
+The remaining arguments (and flags) are passed through verbatim to the delegated command.
 
 ## `wt start`
 
-Scaffold a new Django/Wagtail project directory. This replicates the `start`
-command of `wagtail` / Django's `django-admin startproject`, using the custom
-base-page template by default.
+Scaffold a new Django/Wagtail project directory. This replicates the `start` command of `wagtail` / Django's `django-admin startproject`, using the custom base-page template by default.
 
 ```
 wt start NAME [DIRECTORY]
@@ -109,8 +90,7 @@ Options (all override the defaults, which mirror `wagtail start`):
 | `--force-color` | Force colorization of the command output. |
 | `--version` | Show Django's `startproject` version and exit. |
 
-`wt start` requires `django-admin` on `PATH` (it shells out to
-`django-admin startproject`, since `wt` itself does not depend on Django).
+`wt start` requires `django-admin` on `PATH` (it shells out to `django-admin startproject`, since `wt` itself does not depend on Django).
 
 ```bash
 wt start myproject                    # default custom template
@@ -121,8 +101,7 @@ wt start myproject ./site --template https://example.com/tmpl.zip -e py -e html
 
 ## `wt docs`
 
-Read Wagtail documentation from docs.wagtail.org as Markdown, in the style of
-the Stripe CLI docs viewer.
+Read Wagtail documentation from docs.wagtail.org as Markdown, in the style of the Stripe CLI docs viewer.
 
 ```
 wt docs [PATH]
@@ -130,9 +109,7 @@ wt docs api [OPERATION]
 wt docs search QUERY
 ```
 
-`PATH` accepts a full docs.wagtail.org URL (including PR preview builds on
-other hosts), a path starting with a language or version segment, or a bare
-page path:
+`PATH` accepts a full docs.wagtail.org URL (including PR preview builds on other hosts), a path starting with a language or version segment, or a bare page path:
 
 ```bash
 wt docs releases/8.0                            # en/<version>/releases/8.0
@@ -142,8 +119,7 @@ wt docs                                         # docs index (table of contents)
 wt docs releases/8.0 --outline                  # headings only, as an outline
 ```
 
-Add `--outline` to print only the page's headings, indented by their level —
-a streamlined table of contents for deciding which section to read in full.
+Add `--outline` to print only the page's headings, indented by their level — a streamlined table of contents for deciding which section to read in full.
 
 Options (placed before `api` / `search` / `PATH`):
 
@@ -156,8 +132,7 @@ Options (placed before `api` / `search` / `PATH`):
 
 ### `wt docs api`
 
-Look up the Wagtail v3 API reference. With no argument, lists all operations.
-With an operation, prints that section of the reference:
+Look up the Wagtail v3 API reference. With no argument, lists all operations. With an operation, prints that section of the reference:
 
 ```bash
 wt docs api                             # index of all operations
@@ -166,12 +141,7 @@ wt docs api get documents               # lenient: method and prefix optional
 wt docs api "GET /cms-api/v3/documents" # custom API mounts normalize too
 ```
 
-The operation query's HTTP method is optional (leading or trailing), and the
-`/api/v3/`, `/api/v3-preview/`, and `/cms-api/v3/` prefixes are optional. If a
-query is ambiguous (`wt docs api documents`), the matching operations are
-listed so you can disambiguate. If nothing matches, the error notes that
-operations may be project-specific (apps can add API endpoints) and points to
-`wt docs api` for the index.
+The operation query's HTTP method is optional (leading or trailing), and the `/api/v3/`, `/api/v3-preview/`, and `/cms-api/v3/` prefixes are optional. If a query is ambiguous (`wt docs api documents`), the matching operations are listed so you can disambiguate. If nothing matches, the error notes that operations may be project-specific (apps can add API endpoints) and points to `wt docs api` for the index.
 
 ### `wt docs search`
 
@@ -183,25 +153,15 @@ wt --json docs search picture            # raw search API response as JSON
 wt docs search --json picture            # equivalent local form
 ```
 
-Results are scoped to the resolved docs version (`project:wagtail/<version>`);
-when a non-stable version yields no results, a note suggests
-`--version stable`.
+Results are scoped to the resolved docs version (`project:wagtail/<version>`); when a non-stable version yields no results, a note suggests `--version stable`.
 
 ---
 
 ## `wt skills`
 
-Read the [agent skills](agent-skills.md) bundled with this CLI. Agents load a
-skill to get instructions that match the installed version, rather than a
-snapshot downloaded earlier.
+Read the [agent skills](agent-skills.md) bundled with this CLI. Agents load a skill to get instructions that match the installed version, rather than a snapshot downloaded earlier.
 
-The published `wagtail` skill lives in `.agents/skills/`, so agent tooling can
-install and auto-load it. It is the entry point, so `wt skills list` and
-`wt skills get --all` skip it (fetch it explicitly with `wt skills get wagtail`).
-The CLI-only content lives in `skill-data/`, outside that directory, so it is
-never auto-loaded — only served by `wt skills get`: `core`, `cli-api`,
-`cli-docs`, and the Wagtail project skills `api`, `backend`,
-`content-modeling`, `frontend`, and `upgrade-wagtail`.
+The published `wagtail` skill lives in `.agents/skills/`, so agent tooling can install and auto-load it. It is the entry point, so `wt skills list` and `wt skills get --all` skip it (fetch it explicitly with `wt skills get wagtail`). The CLI-only content lives in `skill-data/`, outside that directory, so it is never auto-loaded — only served by `wt skills get`: `core`, `cli-api`, `cli-docs`, and the Wagtail project skills `api`, `backend`, `content-modeling`, `frontend`, and `upgrade-wagtail`.
 
 ```
 wt skills                       # list available skills
@@ -224,18 +184,14 @@ wt skills get cli-api --full  # plus references/commands.md etc.
 wt skills get content-modeling
 ```
 
-Skill content is printed as-is (Markdown) by default; pass `--json` (globally
-or on the command) for machine-readable output, including JSON errors. Set
-`WAGTAIL_CLI_SKILLS_DIR` to serve skills from a single alternative directory,
-for development and tests.
+Skill content is printed as-is (Markdown) by default; pass `--json` (globally or on the command) for machine-readable output, including JSON errors. Set `WAGTAIL_CLI_SKILLS_DIR` to serve skills from a single alternative directory, for development and tests.
 
 ---
 
 ## Output conventions
 
 - `--json` / `--human` force the desired output format.
-- `--dry-run` prints `METHOD url`, `Params`, and the JSON body that would be
-  sent, and makes no network call.
+- `--dry-run` prints `METHOD url`, `Params`, and the JSON body that would be sent, and makes no network call.
 - `schema show` always outputs JSON (the schema is the machine-readable contract).
 
 ## Exit codes
@@ -251,8 +207,7 @@ for development and tests.
 | 6 | Not found (404) |
 | 7 | Validation error (400/422) |
 
-Errors print `Error (status): message` plus the RFC 7807 body verbatim to
-stderr.
+Errors print `Error (status): message` plus the RFC 7807 body verbatim to stderr.
 
 ---
 
@@ -262,8 +217,7 @@ Print the authenticated user, profile, and groups.
 
 ## `wt api init`
 
-Interactive setup: prompts for URL + token (unless both flags are given),
-tests the connection, and writes `~/.wagtail-cli.toml`.
+Interactive setup: prompts for URL + token (unless both flags are given), tests the connection, and writes `~/.wagtail-cli.toml`.
 
 ## `wt api schema`
 
@@ -302,13 +256,9 @@ wt api pages revisions list <ID> [--limit N] [--offset N]
 wt api pages revisions get <ID> <REVISION_ID>
 ```
 
-`REF` is a page id or a URL path (e.g. `/blog/`), resolved through the API's
-find endpoint. `--field` values that start with `[` or `{` are parsed as JSON;
-`@file` reads a value from a file (`@-` = stdin). Multi-line rich-text bodies
-read from a `.md` file are sent with `format: db_markdown`.
+`REF` is a page id or a URL path (e.g. `/blog/`), resolved through the API's find endpoint. `--field` values that start with `[` or `{` are parsed as JSON; `@file` reads a value from a file (`@-` = stdin). Multi-line rich-text bodies read from a `.md` file are sent with `format: db_markdown`.
 
-`pages get` also accepts a page URL path directly, so an agent can fetch a
-page in one CLI invocation with `wt api pages get /blog/`.
+`pages get` also accepts a page URL path directly, so an agent can fetch a page in one CLI invocation with `wt api pages get /blog/`.
 
 ## `wt api images`
 
@@ -338,8 +288,7 @@ wt api documents delete <ID> [--yes]
 
 ## `wt api snippets`
 
-Manage API-enabled snippets. The snippet type is always required (each snippet
-model lives in its own table).
+Manage API-enabled snippets. The snippet type is always required (each snippet model lives in its own table).
 
 ```
 wt api snippets list <TYPE> [--locale CODE] [--translation-of N]
@@ -398,13 +347,9 @@ wt api redirects delete <ID> [--yes]
 
 ## Confirmations
 
-Commands that mutate-or-destroy an existing object (`update`, `delete`) gate on
-`--yes` on a TTY (they prompt for confirmation otherwise; piped/scripted
-invocations never prompt, so pass `--yes` there).
+Commands that mutate-or-destroy an existing object (`update`, `delete`) gate on `--yes` on a TTY (they prompt for confirmation otherwise; piped/scripted invocations never prompt, so pass `--yes` there).
 
-Commands that perform an action (`publish`, `unpublish`, `revert`,
-`copy-for-translation`) execute immediately without a confirmation prompt —
-preview them with `--dry-run` instead.
+Commands that perform an action (`publish`, `unpublish`, `revert`, `copy-for-translation`) execute immediately without a confirmation prompt — preview them with `--dry-run` instead.
 
 ```
 wt --dry-run api pages publish 42

@@ -6,8 +6,7 @@ license: BSD-3-Clause
 
 # Wagtail API v3
 
-Build against the installed v3 API's contract and preserve its content and permission boundaries.
-Apply the sections relevant to the requested integration.
+Build against the installed v3 API's contract and preserve its content and permission boundaries. Apply the sections relevant to the requested integration.
 
 ## API use cases
 

@@ -1,8 +1,6 @@
 # `wt` command reference
 
-One line per command. `REF` = page id or URL path (resolved through the find
-endpoint). `TYPE` = Django model label such as `blog.BlogPage`. `K:V` =
-`--field KEY:VALUE`, repeatable, parsed as described in SKILL.md.
+One line per command. `REF` = page id or URL path (resolved through the find endpoint). `TYPE` = Django model label such as `blog.BlogPage`. `K:V` = `--field KEY:VALUE`, repeatable, parsed as described in SKILL.md.
 
 ## Global flags (before `api`)
 
@@ -12,12 +10,9 @@ wt --version          # CLI version, plus Wagtail/Django versions when detected
 wt --help             # CLI help, plus ./manage.py --help when present
 ```
 
-- Output is JSON when stdout is not a TTY, human tables otherwise; `--json`
-  / `--human` force it. `schema show` is JSON by default.
-- `--select id,title,meta.html_url` (comma-separated, repeatable, dot paths)
-  projects each item.
-- `--dry-run` prints `METHOD url`, params, and the JSON body, sends nothing.
-  Path REFs are left unresolved in dry-run output.
+- Output is JSON when stdout is not a TTY, human tables otherwise; `--json` / `--human` force it. `schema show` is JSON by default.
+- `--select id,title,meta.html_url` (comma-separated, repeatable, dot paths) projects each item.
+- `--dry-run` prints `METHOD url`, params, and the JSON body, sends nothing. Path REFs are left unresolved in dry-run output.
 - `-v` logs `> METHOD url` and `< status` to stderr.
 
 ## Auth and setup
@@ -34,9 +29,7 @@ wt api schema list                              # {"types":[{"name","label"}...]
 wt api schema show TYPE                         # {"read":{…},"create":{…},"patch":{…}} JSON schemas
 ```
 
-The generic page entry (`wagtailcore.Page`) only has a usable `read`
-schema; use a concrete type for `create`/`patch`. A field listed under
-`read` but missing from `create`/`patch` is read-only for the API.
+The generic page entry (`wagtailcore.Page`) only has a usable `read` schema; use a concrete type for `create`/`patch`. A field listed under `read` but missing from `create`/`patch` is read-only for the API.
 
 ## Pages
 
@@ -62,14 +55,9 @@ wt api pages revisions list ID [--limit N] [--offset N]      # newest first
 wt api pages revisions get ID REVISION_ID
 ```
 
-List filters: selecting exactly one `--type` allows ordering by that type's
-own fields. `--child-of` and `--descendant-of` cannot be combined. `--order
-random` cannot be combined with `--offset`. `--search` requires page search
-to be enabled on the site.
+List filters: selecting exactly one `--type` allows ordering by that type's own fields. `--child-of` and `--descendant-of` cannot be combined. `--order random` cannot be combined with `--offset`. `--search` requires page search to be enabled on the site.
 
-Page list items are compact: `id`, `title`, `meta.{type, detail_url,
-html_url, locale, slug, first_published_at}`. `get` adds the type's readable
-`api_fields` and more `meta` (seo, menus, parent, alias source).
+Page list items are compact: `id`, `title`, `meta.{type, detail_url, html_url, locale, slug, first_published_at}`. `get` adds the type's readable `api_fields` and more `meta` (seo, menus, parent, alias source).
 
 ## Images
 
@@ -81,8 +69,7 @@ wt api images update ID [--title T] [--field K:V]... [--yes] # JSON PATCH, metad
 wt api images delete ID [--yes]
 ```
 
-Tags are readable but not writable. Custom image models may require
-`collection_id` on create even if the schema marks it optional.
+Tags are readable but not writable. Custom image models may require `collection_id` on create even if the schema marks it optional.
 
 ## Documents
 
@@ -111,8 +98,7 @@ wt api snippets revisions list TYPE PK [--limit N] [--offset N]
 wt api snippets revisions get TYPE PK REVISION_ID
 ```
 
-A model is only exposed if it declares at least one `APIField`; `wt api
-schema list` shows which. PKs may be integers, UUIDs, or strings.
+A model is only exposed if it declares at least one `APIField`; `wt api schema list` shows which. PKs may be integers, UUIDs, or strings.
 
 ## Sites
 

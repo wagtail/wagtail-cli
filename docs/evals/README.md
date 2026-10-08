@@ -10,18 +10,14 @@ For each skill, we run two suites: a baseline with nothing loaded, and one with 
 
 ## Harnesses
 
-We run these suites with two tools, on the same tasks and the same model, so the
-results can be compared and either number trusted:
+We run these suites with two tools, on the same tasks and the same model, so the results can be compared and either number trusted:
 
 | | what it grades | what it is good for |
 | --- | --- | --- |
 | [Promptfoo](https://promptfoo.dev/) | the agent's written **answer** | command correctness and rubric grading |
 | [Coder Eval](coder-eval/README.md) | the agent's **trajectory** in a sandbox | time, tokens and tool calls per arm |
 
-Promptfoo is the primary harness. Coder Eval runs alongside it to add the
-efficiency metrics Promptfoo cannot report, and to check the two agree on what
-"correct" means. Neither replaces the other today; see
-[coder-eval/README.md](coder-eval/README.md) for the trade-offs.
+Promptfoo is the primary harness. Coder Eval runs alongside it to add the efficiency metrics Promptfoo cannot report, and to check the two agree on what "correct" means. Neither replaces the other today; see [coder-eval/README.md](coder-eval/README.md) for the trade-offs.
 
 ## Requirements
 
@@ -43,16 +39,7 @@ just eval-coder --repeats 5                     # raise the replicate count
 just eval-coder-report                          # Coder Eval report for the latest run
 ```
 
-There are four Promptfoo suites: `wagtail_api_skill.yaml` (operating a site
-through the v3 API), `wagtail_docs_skill.yaml` (reading and searching the
-documentation), `wagtail_skill.yaml` (whether the `wagtail` discovery stub
-activates on Wagtail tasks and routes agents to `wt skills get`), and
-`wagtail_trigger_skill.yaml`. The last one checks trigger behaviour against the
-Wagtail ai-evals atomic task corpus: every development prompt should activate
-`wagtail`, the `hello-world` control should not, and the `api-v3-recipe-editing`
-holdout is excluded per the corpus rules. Its Coder Eval counterpart is
-`coder-eval/tasks/wagtail_skill_triggers.yaml`, a dataset task that reports a
-per-row confusion matrix for the `wagtail` skill.
+There are four Promptfoo suites: `wagtail_api_skill.yaml` (operating a site through the v3 API), `wagtail_docs_skill.yaml` (reading and searching the documentation), `wagtail_skill.yaml` (whether the `wagtail` discovery stub activates on Wagtail tasks and routes agents to `wt skills get`), and `wagtail_trigger_skill.yaml`. The last one checks trigger behaviour against the Wagtail ai-evals atomic task corpus: every development prompt should activate `wagtail`, the `hello-world` control should not, and the `api-v3-recipe-editing` holdout is excluded per the corpus rules. Its Coder Eval counterpart is `coder-eval/tasks/wagtail_skill_triggers.yaml`, a dataset task that reports a per-row confusion matrix for the `wagtail` skill.
 
 `EVAL_MODEL` picks the Promptfoo model under test; it must be registered in `opencode.json` (default `z-ai/glm-5.3-flash`):
 
@@ -66,35 +53,13 @@ The Coder Eval model under test is set in `coder-eval/experiments/wagtail_skills
 
 Things a future maintainer will run into, and what to do about them:
 
-- **The two harnesses share their match rules, by design.** A task's
-  `expect_requests` lives in the Promptfoo YAML and in the Coder Eval task's
-  `run_command` line; both import
-  [`graders/_request_matching.py`](graders/_request_matching.py) so they cannot
-  drift. If you change a task's expectation, change it in both places.
-- **Coder Eval's rubric judge needs the `litellm` extra.** `just eval-init`
-  installs it (`uv tool install coder-eval --with litellm`). Without it the
-  judge fails loudly rather than scoring 0 silently.
-- **Coder Eval's with-skill arm needs `$SKILLS_PATH` and `$SKILL_DATA_PATH`.**
-  `just eval-coder` exports both and fails fast if either is unset; if you invoke
-  `coder-eval` directly, export them yourself or the arm silently measures a
-  smaller set of skills (or none).
-- **The harness loads `skill-data` as skills; production does not.** The
-  CLI-served content skills (`core`, `cli-api`, `cli-docs`, and the project
-  skills) live in `src/wagtail_cli/skill-data/`, outside the auto-loaded
-  `.agents/skills/` directory. The Promptfoo config (`opencode.json`) and the
-  Coder Eval A/B arm add `skill-data` as a skills path so those suites can keep
-  measuring the content skills directly. Only `wagtail` is auto-loadable in a
-  real install.
-- **OpenCode + Docker is unsupported in Coder Eval** (the CLI is not in its
-  image), so the sandbox is a tempdir — a working directory, not a confinement
-  boundary. OpenCode also ignores `allowed_tools`/`system_prompt`; the baseline
-  arm simply loads no skills rather than restricting tools.
-- **Both harnesses are local-only.** Neither runs in CI; there is no scheduled
-  job and no API key configured there. Committing a run means recording it by
-  hand in this file.
-- **`wt api schema show` prints a Python repr, not JSON, under `--dry-run`.**
-  The Coder Eval grader skips such lines. Keep it in mind if a recorded
-  trajectory ever looks like it is missing a command.
+- **The two harnesses share their match rules, by design.** A task's `expect_requests` lives in the Promptfoo YAML and in the Coder Eval task's `run_command` line; both import [`graders/_request_matching.py`](graders/_request_matching.py) so they cannot drift. If you change a task's expectation, change it in both places.
+- **Coder Eval's rubric judge needs the `litellm` extra.** `just eval-init` installs it (`uv tool install coder-eval --with litellm`). Without it the judge fails loudly rather than scoring 0 silently.
+- **Coder Eval's with-skill arm needs `$SKILLS_PATH` and `$SKILL_DATA_PATH`.** `just eval-coder` exports both and fails fast if either is unset; if you invoke `coder-eval` directly, export them yourself or the arm silently measures a smaller set of skills (or none).
+- **The harness loads `skill-data` as skills; production does not.** The CLI-served content skills (`core`, `cli-api`, `cli-docs`, and the project skills) live in `src/wagtail_cli/skill-data/`, outside the auto-loaded `.agents/skills/` directory. The Promptfoo config (`opencode.json`) and the Coder Eval A/B arm add `skill-data` as a skills path so those suites can keep measuring the content skills directly. Only `wagtail` is auto-loadable in a real install.
+- **OpenCode + Docker is unsupported in Coder Eval** (the CLI is not in its image), so the sandbox is a tempdir — a working directory, not a confinement boundary. OpenCode also ignores `allowed_tools`/`system_prompt`; the baseline arm simply loads no skills rather than restricting tools.
+- **Both harnesses are local-only.** Neither runs in CI; there is no scheduled job and no API key configured there. Committing a run means recording it by hand in this file.
+- **`wt api schema show` prints a Python repr, not JSON, under `--dry-run`.** The Coder Eval grader skips such lines. Keep it in mind if a recorded trajectory ever looks like it is missing a command.
 
 ## Results snapshot
 
@@ -123,9 +88,7 @@ Promptfoo numbers, post-leak-fix (see caveats): `--no-cache`, promptfoo 0.123.1,
 
 ### Coder Eval
 
-`tensorx/deepseek/deepseek-v4.1-flash`, 5 replicates per (task, arm), 8 tasks × 2
-arms, graded by `qwen/qwen3.8-flash-next` (a different family from the model
-under test). Run `2026-09-29_17-00-11`. Bold marks the better arm.
+`tensorx/deepseek/deepseek-v4.1-flash`, 5 replicates per (task, arm), 8 tasks × 2 arms, graded by `qwen/qwen3.8-flash-next` (a different family from the model under test). Run `2026-09-29_17-00-11`. Bold marks the better arm.
 
 | Metric | baseline | with-skill |
 | --- | --- | --- |
@@ -137,9 +100,7 @@ under test). Run `2026-09-29_17-00-11`. Bold marks the better arm.
 | Tokens per run | 218,188 | **166,784** |
 | Duration per run | 72.5s | **54.2s** |
 
-Paired mean difference (baseline − with-skill): **−0.378** (95% CI −0.505 to
-−0.251, Cohen's d = −2.49, p < 0.001). The skill arm wins every task, uses
-~24% fewer tokens, ~35% fewer tool calls, and ~25% less wall-clock time.
+Paired mean difference (baseline − with-skill): **−0.378** (95% CI −0.505 to −0.251, Cohen's d = −2.49, p < 0.001). The skill arm wins every task, uses ~24% fewer tokens, ~35% fewer tool calls, and ~25% less wall-clock time.
 
 Per-task scores (baseline → with-skill):
 
@@ -156,18 +117,9 @@ Per-task scores (baseline → with-skill):
 
 Notes:
 
-- The skill arm still misses `publish_blog_post` on 2/5 replicates and
-  `update_draft_no_publish` / `upload_image` on 1/5 each — the same
-  partial-payload failures the Promptfoo suite documents for its create row,
-  which is a useful cross-harness agreement.
-- Almost every run overshoots its `commands_efficiency` budget. That criterion
-  is `weight: 0` (informational), so it does not gate, but it shows both arms
-  loop more than the skill's intended `whoami → schema → create` path.
-- Two with-skill rows scored on a judge hiccup: one got no verdict
-  (`Judge did not call submit_verdict`), one a low score with a reasoning
-  rationale. Treat single judge rows as noisy; the paired aggregate is the
-  signal.
-- Baseline never passes a task (0/40 replicates); its 0.548 mean comes from
-  partial credit on the non-gating criteria.
+- The skill arm still misses `publish_blog_post` on 2/5 replicates and `update_draft_no_publish` / `upload_image` on 1/5 each — the same partial-payload failures the Promptfoo suite documents for its create row, which is a useful cross-harness agreement.
+- Almost every run overshoots its `commands_efficiency` budget. That criterion is `weight: 0` (informational), so it does not gate, but it shows both arms loop more than the skill's intended `whoami → schema → create` path.
+- Two with-skill rows scored on a judge hiccup: one got no verdict (`Judge did not call submit_verdict`), one a low score with a reasoning rationale. Treat single judge rows as noisy; the paired aggregate is the signal.
+- Baseline never passes a task (0/40 replicates); its 0.548 mean comes from partial credit on the non-gating criteria.
 
 Last updated: 2026-09-29.

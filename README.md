@@ -45,24 +45,15 @@ wt api pages create blog.BlogPage --parent /blog/ \
   --title "Hello world" --field body:@post.md --publish
 ```
 
-Rich-text fields accept Markdown via a `.md` file reference: the value is sent
-to the API as `{"format": "db_markdown", "content": …}`.
+Rich-text fields accept Markdown via a `.md` file reference: the value is sent to the API as `{"format": "db_markdown", "content": …}`.
 
 ## Command surface
 
-- **`wt api`** — the whole v3 API as commands: `pages`, `images`, `documents`,
-  `snippets`, `sites`, `locales`, `redirects`, `schema`, plus `wt api init`
-  and `wt api whoami`.
-- **`wt docs`** — docs.wagtail.org as Markdown: release notes, the v3 API
-  reference, and search.
-- **`wt start`** — scaffold a new Django/Wagtail project (mirrors
-  `wagtail start` / `django-admin startproject`, with a custom base page model
-  as the default).
-- **Delegation** — any other `wt <command>` is forwarded to `./manage.py` (if
-  present) or `django-admin` (when `DJANGO_SETTINGS_MODULE` is set), so `wt`
-  also fronts Django commands like `wt runserver` and `wt makemigrations`.
-- **`wt --version` / `wt --help`** — enhanced with detected Wagtail/Django
-  versions and `./manage.py --help` when available.
+- **`wt api`** — the whole v3 API as commands: `pages`, `images`, `documents`, `snippets`, `sites`, `locales`, `redirects`, `schema`, plus `wt api init` and `wt api whoami`.
+- **`wt docs`** — docs.wagtail.org as Markdown: release notes, the v3 API reference, and search.
+- **`wt start`** — scaffold a new Django/Wagtail project (mirrors `wagtail start` / `django-admin startproject`, with a custom base page model as the default).
+- **Delegation** — any other `wt <command>` is forwarded to `./manage.py` (if present) or `django-admin` (when `DJANGO_SETTINGS_MODULE` is set), so `wt` also fronts Django commands like `wt runserver` and `wt makemigrations`.
+- **`wt --version` / `wt --help`** — enhanced with detected Wagtail/Django versions and `./manage.py --help` when available.
 
 ## Documentation
 

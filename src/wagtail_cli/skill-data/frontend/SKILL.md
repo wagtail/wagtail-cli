@@ -6,8 +6,7 @@ license: BSD-3-Clause
 
 # Wagtail frontend development
 
-Render editorial content as accessible, efficient, discoverable pages.
-Apply the sections relevant to the task, using the project's existing design and asset pipeline.
+Render editorial content as accessible, efficient, discoverable pages. Apply the sections relevant to the task, using the project's existing design and asset pipeline.
 
 ## Trace the rendering path
 

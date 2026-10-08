@@ -1,7 +1,6 @@
 # Configuration
 
-The CLI needs a base URL and an API token. Provide them via flags, environment
-variables, dotfiles, or `wt api init`.
+The CLI needs a base URL and an API token. Provide them via flags, environment variables, dotfiles, or `wt api init`.
 
 ## Precedence
 
@@ -14,9 +13,7 @@ Settings are resolved from highest to lowest priority:
 | 3 | Project dotfile | `./.wagtail-cli.toml` |
 | 4 (lowest) | User dotfile | `~/.wagtail-cli.toml` |
 
-Each key (`url`, `token`) resolves independently across the cascade — the
-highest source that *defines that key* wins. A project dotfile can set `url`
-while the environment sets `token`; both apply.
+Each key (`url`, `token`) resolves independently across the cascade — the highest source that *defines that key* wins. A project dotfile can set `url` while the environment sets `token`; both apply.
 
 ## Environment variables
 
@@ -26,8 +23,7 @@ export WAGTAIL_CLI_TOKEN="wagtail_abc123def456"
 export WAGTAIL_CLI_DOCS_URL="https://pr-123.docs.test"  # optional: docs site for `wt docs`
 ```
 
-Setting these (or the dotfiles) is all you need for scripts and CI. `--url`
-and `--token` flags override them for a single invocation.
+Setting these (or the dotfiles) is all you need for scripts and CI. `--url` and `--token` flags override them for a single invocation.
 
 ## Dotfiles
 
@@ -43,9 +39,7 @@ wt api init
 
 If `--url` and `--token` are both given, `init` skips the prompts.
 
-The project dotfile lives at `./.wagtail-cli.toml` in the current working directory
-and overrides the user dotfile — useful for per-repo configuration committed
-to a shared team setup (though avoid committing real tokens).
+The project dotfile lives at `./.wagtail-cli.toml` in the current working directory and overrides the user dotfile — useful for per-repo configuration committed to a shared team setup (though avoid committing real tokens).
 
 ```toml
 # ~/.wagtail-cli.toml or ./.wagtail-cli.toml
@@ -53,14 +47,11 @@ url = "https://cms.example.com/api/v3/"
 token = "wagtail_abc123def456"
 ```
 
-> Do not commit production tokens. The project dotfile is intended for shared
-> URLs or dev-only tokens; use environment variables or the user dotfile for
-> real credentials.
+> Do not commit production tokens. The project dotfile is intended for shared URLs or dev-only tokens; use environment variables or the user dotfile for real credentials.
 
 ## Editor validation
 
-The dotfiles have a published [JSON Schema](https://wagtail.github.io/wagtail-cli/schema/wagtail-cli.json).
-Add a `#:schema` hint to validate and complete keys in TOML-aware editors:
+The dotfiles have a published [JSON Schema](https://wagtail.github.io/wagtail-cli/schema/wagtail-cli.json). Add a `#:schema` hint to validate and complete keys in TOML-aware editors:
 
 ```toml
 #:schema https://wagtail.github.io/wagtail-cli/schema/wagtail-cli.json

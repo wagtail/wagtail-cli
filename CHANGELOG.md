@@ -2,8 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
@@ -12,8 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - `wt skills` serves the agent skills bundled with the installed CLI, including the Wagtail project skills `api`, `backend`, `content-modeling`, `frontend`, and `upgrade-wagtail`.
-- `--json`, `--human`, `--select`, and `--dry-run` are now accepted on every `api`
-  command as well as globally.
+- `--json`, `--human`, `--select`, and `--dry-run` are now accepted on every `api` command as well as globally.
 - `wt api schema show` renders human-readable output with `--human`.
 - New [JSON Schema for config files](https://wagtail.github.io/wagtail-cli/schema/wagtail-cli.json).
 

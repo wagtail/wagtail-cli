@@ -70,9 +70,7 @@ We use Markdown blockquotes for short, scoped callouts:
 - **Constraints that change how the reader proceeds**, for example the install note in [Getting started](../getting-started.md):
 
   ```markdown
-  > `wt` installed in isolation (uv tool, pipx) runs outside your project's
-  > environment. Delegated Django commands automatically prefer your project's
-  > interpreter.
+  > `wt` installed in isolation (uv tool, pipx) runs outside your project's environment. Delegated Django commands automatically prefer your project's interpreter.
   ```
 
 - **Security or safety notes**, for example the "do not commit production tokens" warning in [Configuration](../reference/configuration.md#dotfiles).
@@ -155,7 +153,7 @@ Exceptions:
   ```
 
 - Use a **colon** before a code block or list that the preceding sentence introduces: "Errors print `Error (status): message` plus the RFC 7807 body to stderr."
-- **Hard-wrap prose at around 80 characters** rather than putting a whole paragraph on one source line. Every existing page does this; keeping to it makes diffs and GitHub review readable, and lets a paragraph be read at a comfortable line length on wide screens. Wrap at a word boundary — never break a code span, link, or URL mid-token, and let an over-long token overflow on its own line if it must. Tables, fenced code blocks, and front matter are exempt.
+- **Do not hard-wrap paragraphs or list items.** Keep each paragraph and list item on a single source line and let editors and GitHub wrap the text for display. Tables, fenced code blocks, and front matter keep their own formatting.
 - Comments in code blocks follow the same rule as source code: avoid hard-wrapping, except at full stops or other natural punctuation breaks.
 
 ### Referring to the reader

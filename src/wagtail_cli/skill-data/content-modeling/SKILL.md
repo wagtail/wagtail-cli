@@ -6,8 +6,7 @@ license: BSD-3-Clause
 
 # Wagtail content modeling
 
-Build content structures that editors can understand and that preserve existing content.
-Apply the sections relevant to the requested change; do not redesign unrelated models.
+Build content structures that editors can understand and that preserve existing content. Apply the sections relevant to the requested change; do not redesign unrelated models.
 
 ## Establish the content contract
 
