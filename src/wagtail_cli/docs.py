@@ -50,10 +50,23 @@ def resolve_docs_url(
     return DEFAULT_DOCS_URL
 
 
+def canonicalize_version(version: str) -> str:
+    """Ensure a release version number uses the canonical 'v' prefix.
+
+    docs.wagtail.org tag slugs use a 'v' prefix for release versions
+    (e.g. 'v7.4', 'v8.0'). Named versions like 'stable' and 'latest',
+    or already-prefixed versions like 'v7.4', are preserved as-is.
+    """
+    if re.match(r"^\d+(?:\.\d+)*$", version):
+        return f"v{version}"
+    return version
+
+
 def normalize_wagtail_version(raw: str) -> str | None:
-    """Reduce a package version (8.0.1, 8.0b1) to its docs version (8.0)."""
+    """Reduce a package version (8.0.1, 8.0b1) to its canonical docs version (v8.0)."""
+    raw = raw.lstrip("v")
     match = _WAGTAIL_VERSION_RE.match(raw)
-    return match.group(1) if match else None
+    return canonicalize_version(match.group(1)) if match else None
 
 
 def detect_wagtail_version() -> str | None:
@@ -89,10 +102,12 @@ def resolve_version(
 ) -> str:
     """Resolve the docs version to use: --version > local Wagtail > stable."""
     if explicit:
-        return explicit
+        return canonicalize_version(explicit)
     if installed is _unset:
         installed = detect_wagtail_version()
-    return installed if isinstance(installed, str) else "stable"
+    if isinstance(installed, str):
+        return canonicalize_version(installed)
+    return "stable"
 
 
 def resolve_page_url(docs_url: str, language: str, version: str, path: str) -> str:
@@ -129,6 +144,8 @@ def resolve_page_url(docs_url: str, language: str, version: str, path: str) -> s
         version, page_segments = segments[0], segments[1:]
     else:
         page_segments = segments
+
+    version = canonicalize_version(version)
 
     if not page_segments:
         page_segments = ["index.html"]

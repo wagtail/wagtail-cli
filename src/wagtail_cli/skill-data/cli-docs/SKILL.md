@@ -53,9 +53,9 @@ Project-specific endpoints are not in this reference; they only exist in that pr
 
 ## Pin a version
 
-We attempt to detect the locally installed Wagtail version and use the corresponding documentation by default, but this can also be overridden.
+We attempt to detect the locally installed Wagtail version and use the corresponding documentation by default, but this can also be overridden. Markdown documentation is available for Wagtail 7.3 and newer; older versions fall back to `stable`. Both bare versions (`7.4`) and prefixed versions (`v7.4`) are supported.
 
 ```bash
-wt docs --version 7.2 topics/images
+wt docs --version 7.4 topics/images
 wt docs --version latest search "workflows"
 ```
