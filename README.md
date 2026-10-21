@@ -35,7 +35,14 @@ mkdir -p .agents/skills/wagtail && wt skills get wagtail > .agents/skills/wagtai
 
 #### As a plugin
 
-It’s also available as a plugin, follow [Agent Plugins compatible clients](https://agent-plugins.org/compatible-clients) installation instructions, using this repository as the plugin source: `wagtail/wagtail-cli`.
+It’s also available as a plugin, follow [Agent Plugins compatible clients](https://agent-plugins.org/compatible-clients) installation instructions, using this repository as the plugin source: `wagtail/wagtail-cli`. Here is an example with `copilot`:
+
+```bash
+copilot plugin marketplace add wagtail/wagtail-cli
+copilot plugin install wagtail-cli@wagtail-cli
+# Should say:
+# Plugin "wagtail-cli" installed successfully. Installed 1 skill.
+```
 
 ## Quick start
 

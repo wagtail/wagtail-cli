@@ -6,9 +6,29 @@ Wagtail CLI includes [agent skills](https://agentskills.io/) that help agents ge
 
 - [wagtail](https://wagtail.github.io/wagtail-cli/.well-known/agent-skills/wagtail/SKILL.md): triggers on any Wagtail task and routes the agent to the detailed workflow for the task at hand.
 
-`wagtail` is the only skill published here, and the only one that lives in the package's `.agents/skills/` directory, so agent tooling can install and load it. The detailed content it loads is bundled for the CLI to serve on demand under `skill-data/` and is never auto-loaded. `wt skills list` lists them: `core` (orientation for work on Wagtail projects), `cli-api` (operate a site via the v3 API), `cli-docs` (read and search the documentation), and the specialized project skills `api`, `backend`, `content-modeling`, `frontend`, and `upgrade-wagtail`.
+We provide only one evergreen skill out of the box. On usage, it will load our official [agent skills for developers](https://wagtail.org/ai/agent-skills-for-developers/) on demand.
 
-We make the skill available in multiple formats, for compatibility with a wide range of tools.
+## Install the skills
+
+We make the skill available in multiple formats, for compatibility with a wide range of tools. To install directly as a skill, for multiple agents / harnesses:
+
+```bash
+# Directly with the CLI, global:
+mkdir -p ~/.agents/skills/wagtail && wt skills get wagtail > ~/.agents/skills/wagtail/SKILL.md
+# Directly with the CLI, local:
+mkdir -p .agents/skills/wagtail && wt skills get wagtail > .agents/skills/wagtail/SKILL.md
+```
+
+### As a plugin
+
+It’s also available as a plugin, follow [Agent Plugins compatible clients](https://agent-plugins.org/compatible-clients) installation instructions, using this repository as the plugin source: `wagtail/wagtail-cli`. Here is an example with `copilot`:
+
+```bash
+copilot plugin marketplace add wagtail/wagtail-cli
+copilot plugin install wagtail-cli@wagtail-cli
+# Should say:
+# Plugin "wagtail-cli" installed successfully. Installed 1 skill.
+```
 
 ## Loading skills from the CLI
 
