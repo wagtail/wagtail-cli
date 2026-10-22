@@ -124,7 +124,7 @@ Options (placed before `api` / `search` / `PATH`):
 | Option            | Description                                                                                                                                                                         |
 | ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `--docs-url URL`  | Docs site base URL. Defaults to `WAGTAIL_CLI_DOCS_URL`, then `https://docs.wagtail.org`. Useful to read docs from a PR build.                                                       |
-| `--version V`     | Docs version: `stable`, `latest`, or e.g. `7.2`. Defaults to the locally installed Wagtail version, then `stable`. Pages missing in that version fall back to `stable` with a note. |
+| `--version V`     | Docs version: `stable`, `latest`, or e.g. `7.4`. Markdown docs are available for Wagtail 7.3+. Defaults to the locally installed Wagtail version, then `stable`. Pages missing in that version fall back to `stable` with a note. |
 | `--language LANG` | Docs language (default: `en`, the only language published today).                                                                                                                   |
 | `--outline`       | For page output: print only the headings, as an indented outline.                                                                                                                   |
 

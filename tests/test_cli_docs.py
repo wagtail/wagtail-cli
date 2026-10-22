@@ -106,49 +106,62 @@ def test_docs_full_url():
 
 @respx.mock
 def test_docs_version_flag():
-    respx.get(f"{DOCS}/en/7.2/topics/images.html.md").respond(200, text="# Images")
-    result = runner.invoke(app, ["docs", "--version", "7.2", "topics/images.html"])
+    respx.get(f"{DOCS}/en/v7.4/topics/images.html.md").respond(200, text="# Images")
+    result = runner.invoke(app, ["docs", "--version", "7.4", "topics/images.html"])
     assert result.exit_code == 0
     assert "Images" in result.output
+    assert "stable" not in result.stderr
+
+
+@respx.mock
+def test_docs_version_flag_prefixed():
+    respx.get(f"{DOCS}/en/v7.4/topics/images.html.md").respond(200, text="# Images")
+    result = runner.invoke(app, ["docs", "--version", "v7.4", "topics/images.html"])
+    assert result.exit_code == 0
+    assert "Images" in result.output
+    assert "stable" not in result.stderr
 
 
 @respx.mock
 def test_docs_uses_locally_installed_wagtail_version(monkeypatch):
     monkeypatch.setattr("wagtail_cli.docs.detect_wagtail_version", lambda: "8.0")
-    respx.get(f"{DOCS}/en/8.0/topics/images.html.md").respond(200, text="# Images")
+    respx.get(f"{DOCS}/en/v8.0/topics/images.html.md").respond(200, text="# Images")
     result = runner.invoke(app, ["docs", "topics/images.html"])
     assert result.exit_code == 0
+    assert "Images" in result.output
+    assert "stable" not in result.stderr
 
 
 @respx.mock
 def test_docs_version_fallback_to_stable():
-    respx.get(f"{DOCS}/en/7.2/releases/8.0.html.md").respond(404)
+    respx.get(f"{DOCS}/en/v7.4/releases/8.0.html.md").respond(404)
     respx.get(f"{DOCS}/en/stable/releases/8.0.html.md").respond(
         200, text="# Wagtail 8.0 release notes"
     )
-    result = runner.invoke(app, ["docs", "--version", "7.2", "releases/8.0"])
+    result = runner.invoke(app, ["docs", "--version", "7.4", "releases/8.0"])
     assert result.exit_code == 0
     assert "Wagtail 8.0 release notes" in result.output
     assert "stable" in result.stderr
+    assert "v7.4" in result.stderr
 
 
 @respx.mock
 def test_docs_version_redirects_to_html_falls_back_to_stable():
     # Sphinx redirects missing versioned pages to an HTML index (HTTP 200).
-    respx.get(f"{DOCS}/en/7.2/releases/8.0.html.md").mock(
+    respx.get(f"{DOCS}/en/v7.4/releases/8.0.html.md").mock(
         side_effect=[
             httpx.Response(
-                302, headers={"location": f"{DOCS}/en/7.2/releases/index.html"}
+                302, headers={"location": f"{DOCS}/en/v7.4/releases/index.html"}
             ),
         ]
     )
-    respx.get(f"{DOCS}/en/7.2/releases/index.html").respond(
+    respx.get(f"{DOCS}/en/v7.4/releases/index.html").respond(
         200, text="<html>not found</html>", headers={"content-type": "text/html"}
     )
     respx.get(f"{DOCS}/en/stable/releases/8.0.html.md").respond(
         200, text="# Wagtail 8.0 release notes"
     )
-    result = runner.invoke(app, ["docs", "--version", "7.2", "releases/8.0"])
+    result = runner.invoke(app, ["docs", "--version", "7.4", "releases/8.0"])
     assert result.exit_code == 0
     assert "Wagtail 8.0 release notes" in result.output
 
@@ -156,10 +169,10 @@ def test_docs_version_redirects_to_html_falls_back_to_stable():
 @respx.mock
 def test_docs_502_html_error_not_reported_as_not_found():
     # A server-side HTML error page must not be treated as a missing page.
-    respx.get(f"{DOCS}/en/7.2/bogus.html.md").respond(
+    respx.get(f"{DOCS}/en/v7.4/bogus.html.md").respond(
         502, text="<html>Bad gateway</html>", headers={"content-type": "text/html"}
     )
-    result = runner.invoke(app, ["docs", "--version", "7.2", "bogus"])
+    result = runner.invoke(app, ["docs", "--version", "7.4", "bogus"])
     assert result.exit_code == 1
     assert "502" in result.stderr
 
@@ -174,11 +187,11 @@ def test_docs_404_error_mentions_version():
 
 @respx.mock
 def test_docs_404_after_fallback_error_mentions_both_versions():
-    respx.get(f"{DOCS}/en/7.2/bogus.html.md").respond(404)
+    respx.get(f"{DOCS}/en/v7.4/bogus.html.md").respond(404)
     respx.get(f"{DOCS}/en/stable/bogus.html.md").respond(404)
-    result = runner.invoke(app, ["docs", "--version", "7.2", "bogus"])
+    result = runner.invoke(app, ["docs", "--version", "7.4", "bogus"])
     assert result.exit_code == 6
-    assert "7.2" in result.stderr
+    assert "v7.4" in result.stderr
     assert "stable" in result.stderr
 
 
@@ -202,9 +215,9 @@ def test_docs_index_without_index_section_is_friendly_error():
 
 @respx.mock
 def test_docs_index_version_fallback():
-    respx.get(f"{DOCS}/en/7.2/index.html.md").respond(404)
+    respx.get(f"{DOCS}/en/v7.4/index.html.md").respond(404)
     respx.get(f"{DOCS}/en/stable/index.html.md").respond(200, text=_index_md())
-    result = runner.invoke(app, ["docs", "--version", "7.2"])
+    result = runner.invoke(app, ["docs", "--version", "7.4"])
     assert result.exit_code == 0
     assert "Getting started" in result.output
 
@@ -363,11 +376,31 @@ def test_docs_search_uses_version_flag(monkeypatch):
     route = respx.get(f"{DOCS}/_/api/v3/search/").respond(
         200, json={"count": 0, "query": "picture", "results": []}
     )
-    monkeypatch.setattr("wagtail_cli.docs.detect_wagtail_version", lambda: "7.2")
+    monkeypatch.setattr("wagtail_cli.docs.detect_wagtail_version", lambda: "7.4")
     result = runner.invoke(app, ["docs", "search", "picture"])
     assert result.exit_code == 0
-    assert "project:wagtail/7.2 picture" in route.calls[0].request.url.params["q"]
+    assert "project:wagtail/v7.4 picture" in route.calls[0].request.url.params["q"]
     assert "wt docs --version stable search" in result.stderr
+
+
+@respx.mock
+def test_docs_search_explicit_bare_version():
+    route = respx.get(f"{DOCS}/_/api/v3/search/").respond(
+        200, json={"count": 0, "query": "picture", "results": []}
+    )
+    result = runner.invoke(app, ["docs", "--version", "7.4", "search", "picture"])
+    assert result.exit_code == 0
+    assert "project:wagtail/v7.4 picture" in route.calls[0].request.url.params["q"]
+
+
+@respx.mock
+def test_docs_search_explicit_prefixed_version():
+    route = respx.get(f"{DOCS}/_/api/v3/search/").respond(
+        200, json={"count": 0, "query": "picture", "results": []}
+    )
+    result = runner.invoke(app, ["docs", "--version", "v7.4", "search", "picture"])
+    assert result.exit_code == 0
+    assert "project:wagtail/v7.4 picture" in route.calls[0].request.url.params["q"]
 
 
 @respx.mock

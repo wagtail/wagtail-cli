@@ -158,8 +158,9 @@ def docs_callback(
         None,
         "--version",
         help=(
-            "Docs version (stable, latest, or e.g. 7.2). Defaults to the "
-            "locally installed Wagtail version, then stable."
+            "Docs version (stable, latest, or e.g. 7.4). Markdown docs "
+            "are available for Wagtail 7.3+. Defaults to the locally installed "
+            "Wagtail version, then stable."
         ),
     ),
     outline: bool = typer.Option(

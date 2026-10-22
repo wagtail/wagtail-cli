@@ -27,16 +27,30 @@ def test_resolve_docs_url_env_var_ignored_when_none_set(monkeypatch):
     assert docs.resolve_docs_url() == "https://docs.wagtail.org"
 
 
+# --- canonicalize_version ---
+
+
+def test_canonicalize_version():
+    assert docs.canonicalize_version("7.4") == "v7.4"
+    assert docs.canonicalize_version("8.0") == "v8.0"
+    assert docs.canonicalize_version("v7.4") == "v7.4"
+    assert docs.canonicalize_version("latest") == "latest"
+    assert docs.canonicalize_version("stable") == "stable"
+    assert docs.canonicalize_version("feature/test") == "feature/test"
+
+
 # --- resolve_version ---
 
 
 def test_resolve_version_explicit_wins():
     assert docs.resolve_version("latest", installed="7.2") == "latest"
-    assert docs.resolve_version("7.2", installed="8.0") == "7.2"
+    assert docs.resolve_version("7.4", installed="8.0") == "v7.4"
+    assert docs.resolve_version("v7.4", installed="8.0") == "v7.4"
 
 
 def test_resolve_version_falls_back_to_installed():
-    assert docs.resolve_version(installed="7.2") == "7.2"
+    assert docs.resolve_version(installed="7.4") == "v7.4"
+    assert docs.resolve_version(installed="v7.4") == "v7.4"
 
 
 def test_resolve_version_falls_back_to_stable():
@@ -44,8 +58,13 @@ def test_resolve_version_falls_back_to_stable():
 
 
 def test_resolve_version_detects_installed_wagtail(monkeypatch):
+    monkeypatch.setattr(docs, "detect_wagtail_version", lambda: "v8.0")
+    assert docs.resolve_version() == "v8.0"
+
+
+def test_resolve_version_detects_unprefixed_installed_wagtail(monkeypatch):
     monkeypatch.setattr(docs, "detect_wagtail_version", lambda: "8.0")
-    assert docs.resolve_version() == "8.0"
+    assert docs.resolve_version() == "v8.0"
 
 
 def test_resolve_version_no_wagtail_installed(monkeypatch):
@@ -62,7 +81,7 @@ def test_detect_wagtail_version_uses_current_interpreter(monkeypatch):
     monkeypatch.setattr(
         docs, "package_version", lambda python, package: calls.append(package)
     )
-    assert docs.detect_wagtail_version() == "8.0"
+    assert docs.detect_wagtail_version() == "v8.0"
 
 
 def test_detect_wagtail_version_falls_back_to_project_python(monkeypatch):
@@ -71,8 +90,8 @@ def test_detect_wagtail_version_falls_back_to_project_python(monkeypatch):
 
     monkeypatch.setattr(docs.importlib.metadata, "version", raise_missing)
     monkeypatch.setattr(docs, "find_project_python", lambda: "/opt/venv/bin/python")
-    monkeypatch.setattr(docs, "package_version", lambda python, package: "7.2.4")
-    assert docs.detect_wagtail_version() == "7.2"
+    monkeypatch.setattr(docs, "package_version", lambda python, package: "7.4.1")
+    assert docs.detect_wagtail_version() == "v7.4"
 
 
 def test_detect_wagtail_version_none_without_project_python(monkeypatch):
@@ -97,10 +116,12 @@ def test_detect_wagtail_version_none_when_project_lacks_wagtail(monkeypatch):
 @pytest.mark.parametrize(
     ("raw", "expected"),
     [
-        ("8.0.1", "8.0"),
-        ("8.0b1", "8.0"),
-        ("7.2", "7.2"),
-        ("6.4.dev0", "6.4"),
+        ("8.0.1", "v8.0"),
+        ("8.0b1", "v8.0"),
+        ("7.4.1", "v7.4"),
+        ("7.2", "v7.2"),
+        ("6.4.dev0", "v6.4"),
+        ("v8.0.1", "v8.0"),
     ],
 )
 def test_normalize_wagtail_version(raw, expected):
@@ -158,24 +179,35 @@ def test_normalize_wagtail_version_unparseable():
         ),
         (
             "/7.2/topics/images.html",
-            "https://docs.wagtail.org/en/7.2/topics/images.html.md",
+            "https://docs.wagtail.org/en/v7.2/topics/images.html.md",
+        ),
+        (
+            "/v7.4/topics/images.html",
+            "https://docs.wagtail.org/en/v7.4/topics/images.html.md",
+        ),
+        (
+            "/7.4/topics/images.html",
+            "https://docs.wagtail.org/en/v7.4/topics/images.html.md",
         ),
         # No version: resolved version is inserted.
         # Bare page paths, including the .html.md link format the docs index
         # itself emits.
         (
             "/releases/8.0.html",
-            "https://docs.wagtail.org/en/8.0/releases/8.0.html.md",
+            "https://docs.wagtail.org/en/v8.0/releases/8.0.html.md",
         ),
-        ("releases/8.0", "https://docs.wagtail.org/en/8.0/releases/8.0.html.md"),
-        ("topics/images.html", "https://docs.wagtail.org/en/8.0/topics/images.html.md"),
+        ("releases/8.0", "https://docs.wagtail.org/en/v8.0/releases/8.0.html.md"),
+        (
+            "topics/images.html",
+            "https://docs.wagtail.org/en/v8.0/topics/images.html.md",
+        ),
         (
             "getting_started/index.html.md",
-            "https://docs.wagtail.org/en/8.0/getting_started/index.html.md",
+            "https://docs.wagtail.org/en/v8.0/getting_started/index.html.md",
         ),
         (
             "topics/images.html#section",
-            "https://docs.wagtail.org/en/8.0/topics/images.html.md",
+            "https://docs.wagtail.org/en/v8.0/topics/images.html.md",
         ),
         # Full URLs pointing at a directory (or the site root) resolve to the
         # index page.
@@ -183,15 +215,15 @@ def test_normalize_wagtail_version_unparseable():
             "https://docs.wagtail.org/en/stable/",
             "https://docs.wagtail.org/en/stable/index.html.md",
         ),
-        ("https://docs.wagtail.org/", "https://docs.wagtail.org/en/8.0/index.html.md"),
-        ("https://docs.wagtail.org", "https://docs.wagtail.org/en/8.0/index.html.md"),
+        ("https://docs.wagtail.org/", "https://docs.wagtail.org/en/v8.0/index.html.md"),
+        ("https://docs.wagtail.org", "https://docs.wagtail.org/en/v8.0/index.html.md"),
         (
             "https://pr-123.docs.test/",
-            "https://pr-123.docs.test/en/8.0/index.html.md",
+            "https://pr-123.docs.test/en/v8.0/index.html.md",
         ),
         # Empty path: the index page.
-        ("", "https://docs.wagtail.org/en/8.0/index.html.md"),
-        ("/", "https://docs.wagtail.org/en/8.0/index.html.md"),
+        ("", "https://docs.wagtail.org/en/v8.0/index.html.md"),
+        ("/", "https://docs.wagtail.org/en/v8.0/index.html.md"),
     ],
 )
 def test_resolve_page_url(path, expected):
